@@ -2,17 +2,16 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:8.0
-    container_name: mysql_webapp
+    image: postgres:latest # Il nome del Dockerfile (opzionale se è chiamato "Dockerfile")
+    container_name: Database
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: webapp
-      MYSQL_USER: webappuser
-      MYSQL_PASSWORD: webapppassword
-    ports:
-      - "3306:3306"
+      POSTGRES_PASSWORD: adminPW
+      POSTGRES_USER: postgres
+      POSTGRES_DB: SoundSphereDB
     volumes:
-      - db_data:/var/lib/mysql
+      - ./DBdata:/var/lib/postgresql/data  # Monta tutta la directory dei dati
+    ports:
+      - "5432:5432"
     networks:
       - app_network  # Aggiungi il servizio db alla rete comune
 
