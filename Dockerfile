@@ -8,5 +8,3 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 5005
 
-# Imposta il comando di default per avviare l'applicazione Spring Boot
-CMD ["./gradlew", "bootRun"]

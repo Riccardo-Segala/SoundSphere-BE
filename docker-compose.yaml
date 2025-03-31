@@ -22,7 +22,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/app  # Monta la cartella del progetto come volume
-
+    command: sh -c "chmod +x gradlew && ./gradlew bootRun"
     networks:
       - app_network  # Collega il backend alla rete comune
 
