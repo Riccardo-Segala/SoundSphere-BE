@@ -22,6 +22,8 @@ services:
       - "8080:8080"
     volumes:
       - .:/app  # Monta la cartella del progetto come volume
+      - /app/.idea  # Evita di modificare la cartella di IntelliJ
+      - /app/build
 
     networks:
       - app_network  # Collega il backend alla rete comune
