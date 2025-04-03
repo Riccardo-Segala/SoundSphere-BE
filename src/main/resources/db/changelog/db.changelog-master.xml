@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Inizializzazione di Liquibase, crea le tabelle di gestione -->
+    <changeSet id="1" author="admin">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DATABASECHANGELOG"/>
+            </not>
+        </preConditions>
+        <!-- Creazione della tabella DATABASECHANGELOG se non esiste -->
+        <createTable tableName="DATABASECHANGELOG">
+            <column name="ID" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="AUTHOR" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FILENAME" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATEEXECUTED" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORDEREXECUTED" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXECTYPE" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MD5SUM" type="varchar(35)"/>
+            <column name="DESCRIPTION" type="varchar(255)"/>
+            <column name="COMMENTS" type="varchar(255)"/>
+            <column name="TAG" type="varchar(255)"/>
+            <column name="LIQUIBASE" type="varchar(20)"/>
+            <column name="CONTEXTS" type="varchar(255)"/>
+            <column name="LABELS" type="varchar(255)"/>
+            <column name="DEPLOYMENT_ID" type="varchar(10)"/>
+        </createTable>
+
+        <createTable tableName="DATABASECHANGELOGLOCK">
+            <column name="ID" type="int">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="LOCKED" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LOCKGRANTED" type="timestamp"/>
+            <column name="LOCKEDBY" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    <include file="/db/changelog/migration/03-01-sample-entity.xml"/>
+
+</databaseChangeLog>

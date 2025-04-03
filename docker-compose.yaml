@@ -14,12 +14,21 @@ services:
       - "5432:5432"
     networks:
       - app_network  # Aggiungi il servizio db alla rete comune
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "SoundSphereDB" ]
+      interval: 10s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
 
   backend:
     build: .
     container_name: springbootbackend
     ports:
       - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - app_network  # Collega il backend alla rete comune
 

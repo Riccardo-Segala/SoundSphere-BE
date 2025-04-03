@@ -6,6 +6,7 @@
 gradle-app.setting
 
 gradlew
+gradlew.bat
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
@@ -21,5 +22,3 @@ gradlew
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
-.idea
-DBdata
