@@ -21,6 +21,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.postgresql:postgresql:42.2.5'
+	implementation 'org.liquibase:liquibase-core:4.15.0' // Aggiungi Liquibase
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc' // Per il supporto JDBC
 
 
 	implementation 'org.projectlombok:lombok:1.18.30'

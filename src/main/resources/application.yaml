@@ -10,10 +10,15 @@ spring:
     username: postgres
     password: adminPW
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none  # Disabilita l'auto aggiornamento dello schema di Hibernate
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    enabled: true  # Abilita Liquibase
+    change-log: classpath:/db/changelog/db.changelog-master.xml  # Percorso al file di changelog di Liquibase
