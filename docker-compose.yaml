@@ -29,6 +29,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      DEBUG_MODE: ${DEBUG_MODE:-false}
     networks:
       - app_network  # Collega il backend alla rete comune
 

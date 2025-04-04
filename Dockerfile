@@ -13,9 +13,12 @@ RUN sed -i 's/\r$//' gradlew
 # Imposta i permessi di esecuzione per gradlew
 RUN chmod +x gradlew
 
-# Espone le porte di Spring Boot
+# Espone le porte di Spring Boot e la porta del debug remoto
 EXPOSE 8080
 EXPOSE 5005
 
-# Esegui gradlew bootRun per avviare l'applicazione Spring Boot
-CMD ["./gradlew", "bootRun"]
+# Aggiungi variabile di ambiente per configurare se attivare il debug remoto
+ENV DEBUG_MODE=false
+
+# Esegui gradlew bootRun per avviare l'applicazione Spring Boot con supporto per il debug remoto se DEBUG_MODE è true
+CMD ["sh", "-c", "if [ \"$DEBUG_MODE\" = \"true\" ]; then ./gradlew bootRun --debug-jvm; else ./gradlew bootRun; fi"]
