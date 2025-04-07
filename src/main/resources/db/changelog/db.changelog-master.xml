@@ -4,16 +4,15 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
 
-    <!-- Inizializzazione di Liquibase, crea le tabelle di gestione -->
+    <!-- Creazione delle tabelle di gestione DATABASECHANGELOG e DATABASECHANGELOGLOCK -->
     <changeSet id="1" author="admin">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="DATABASECHANGELOG"/>
             </not>
         </preConditions>
-        <!-- Creazione della tabella DATABASECHANGELOG se non esiste -->
         <createTable tableName="DATABASECHANGELOG">
             <column name="ID" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false"/>
@@ -54,6 +53,8 @@
             <column name="LOCKEDBY" type="varchar(255)"/>
         </createTable>
     </changeSet>
-    <include file="/db/changelog/migration/03-01-sample-entity.xml"/>
+
+    <!-- Aggiungi le migrazioni da altri file -->
+    <includeAll path="db/changelog/migration"/>
 
 </databaseChangeLog>

@@ -36,6 +36,7 @@ services:
 
 volumes:
   db_data:
+  gradle_cache:
 
 networks:
   app_network:
