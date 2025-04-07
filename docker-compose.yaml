@@ -31,6 +31,8 @@ services:
         condition: service_healthy
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
+    volumes:
+      - gradle_cache:/home/gradle/.gradle
     networks:
       - app_network  # Collega il backend alla rete comune
 
