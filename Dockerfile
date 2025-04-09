@@ -17,5 +17,9 @@ RUN chmod +x gradlew
 EXPOSE 8080
 EXPOSE 5005
 
-# Esegui gradlew bootRun per avviare l'applicazione Spring Boot
-CMD ["./gradlew", "bootRun"]
+# Aggiungi variabile di ambiente per configurare se attivare il debug remoto
+ENV DEBUG_MODE=false
+
+# Esegui gradlew bootRun per avviare l'applicazione Spring Boot con supporto per il debug remoto se DEBUG_MODE è true
+CMD ["sh", "-c", "./gradlew bootRun --no-daemon"]
+

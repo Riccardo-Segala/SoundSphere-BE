@@ -17,6 +17,15 @@ repositories {
 	mavenCentral()
 }
 
+bootRun {
+	// Sovrascrive completamente le opzioni JVM che Gradle usa in debug
+	if (System.getenv("DEBUG_MODE") == "true") {
+		jvmArgs = [
+				"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005"
+		]
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
