@@ -1,9 +1,7 @@
 package backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,9 +26,14 @@ public class Recensione {
     @Column(nullable = false)
     private int numStelle;
 
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String descrizione;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_prodotto", nullable = false)
     private Prodotto prodotto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_utente", nullable = false)
     private Utente utente;
 }
