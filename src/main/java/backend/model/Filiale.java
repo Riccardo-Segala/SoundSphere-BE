@@ -16,4 +16,13 @@ public class Filiale {
     @Column(name = "id", nullable = false)
     private UUID id;
 
+    private String indirizzo;
+
+    private String nome;
+
+    private String telefono;
+
+    private String email;
+
+
 }

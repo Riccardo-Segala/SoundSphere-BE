@@ -52,7 +52,7 @@ public class Utente {
     private Vantaggio vantaggio;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_indirizzo")
-    private Indirizzo indirizzo;
+    @JoinColumn(name = "id_indirizzo_utente")
+    private IndirizzoUtente indirizzo;
 
 }
