@@ -49,6 +49,6 @@ public class Utente {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_vantaggio")
-    private Vantaggio vantaggio;;
+    private Vantaggio vantaggio;
 
 }
