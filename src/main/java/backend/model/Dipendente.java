@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,5 +22,5 @@ public class Dipendente extends Utente {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_filiale", nullable = false)
     private Filiale filiale;
-
+    
 }
