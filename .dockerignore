@@ -1,0 +1,34 @@
+# Build output
+/build
+/.gradle
+
+# System files
+*.log
+*.tmp
+*.swp
+*.DS_Store
+Thumbs.db
+
+# IDE config
+/.idea
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Git files
+.git
+.gitignore
+
+# Docker-related files
+docker-compose.yml
+docker-compose.override.yml
+Dockerfile*
+
+# Local database or volumes
+DBdata/
+
+# Node modules (if you have frontend parts)
+node_modules/
+
+# ATTENZIONE: NON ignoriamo gradlew, gradlew.bat, gradle/wrapper
