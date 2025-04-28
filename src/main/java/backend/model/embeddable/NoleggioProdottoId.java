@@ -1,10 +1,15 @@
 package backend.model.embeddable;
 
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@Setter
 @Embeddable
 public class NoleggioProdottoId implements Serializable {
     private UUID noleggioId;
@@ -15,14 +20,6 @@ public class NoleggioProdottoId implements Serializable {
     public NoleggioProdottoId(UUID noleggioId, UUID prodottoId) {
         this.noleggioId = noleggioId;
         this.prodottoId = prodottoId;
-    }
-
-    public UUID getNoleggioId() {
-        return noleggioId;
-    }
-
-    public UUID getProdottoId() {
-        return prodottoId;
     }
 
     @Override

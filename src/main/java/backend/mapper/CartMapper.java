@@ -1,42 +1,45 @@
 package backend.mapper;
 
-import backend.dto.carrello.ResponseCartDTO;
-import backend.dto.carrello.UpdateCartDTO;
-import backend.model.Carrello;
 import backend.dto.carrello.CreateCartDTO;
+import backend.dto.carrello.UpdateCartDTO;
+import backend.dto.carrello.ResponseCartDTO;
+import backend.model.Carrello;
 import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {ProductMapper.class})
 public interface CartMapper {
-    @Mapping(source = "prodottoId", target = "prodotto.id")
-    @Mapping(source = "utenteId", target = "utente.id")
+
+    // Mapping per CreateCartDTO -> Carrello
+    @Mapping(source = "prodottoId", target = "id.prodottoId")
+    @Mapping(source = "utenteId", target = "id.utenteId")
     Carrello toEntity(CreateCartDTO createCartDTO);
 
+    // Mapping inverso: Carrello -> CreateCartDTO
     @InheritInverseConfiguration(name = "toEntity")
-    CreateCartDTO toDto(Carrello carrello);
+    CreateCartDTO toCreateDto(Carrello carrello);
 
-    @InheritConfiguration(name = "toEntity")
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Carrello partialUpdate(CreateCartDTO createCartDTO, @MappingTarget Carrello carrello);
+    // Mapping per UpdateCartDTO -> Carrello
+    @Mapping(source = "prodottoId", target = "id.prodottoId")
+    @Mapping(source = "utenteId", target = "id.utenteId")
+    Carrello toEntity(UpdateCartDTO updateCartDTO);
 
-    @Mapping(source = "prodottoId", target = "prodotto.id")
-    @Mapping(source = "utenteId", target = "utente.id")
-    Carrello toEntity(UpdateCartDTO updateCartDto);
-
+    // Mapping inverso: Carrello -> UpdateCartDTO
     @InheritInverseConfiguration(name = "toEntity")
-    UpdateCartDTO toDto1(Carrello carrello);
+    UpdateCartDTO toUpdateDto(Carrello carrello);
 
-    @InheritConfiguration(name = "toEntity")
+    // Mapping per Carrello -> ResponseCartDTO
+    @Mapping(source = "prodotto", target = "prodotto")
+    @Mapping(source = "id.utenteId", target = "utenteId")
+    ResponseCartDTO toResponseDto(Carrello carrello);
+
+    // Aggiornamento parziale con UpdateCartDTO
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Carrello partialUpdate(UpdateCartDTO updateCartDto, @MappingTarget Carrello carrello);
+    @Mapping(source = "prodottoId", target = "id.prodottoId")
+    @Mapping(source = "utenteId", target = "id.utenteId")
+    Carrello partialUpdate(UpdateCartDTO updateCartDTO, @MappingTarget Carrello carrello);
 
-    @Mapping(source = "utenteId", target = "utente.id")
-    Carrello toEntity(ResponseCartDTO responseCartDto);
-
-    @Mapping(source = "utente.id", target = "utenteId")
-    ResponseCartDTO toDto2(Carrello carrello);
-
+    // Aggiornamento parziale con ResponseCartDTO
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "utenteId", target = "utente.id")
-    Carrello partialUpdate(ResponseCartDTO responseCartDto, @MappingTarget Carrello carrello);
+    @Mapping(source = "utenteId", target = "id.utenteId")
+    Carrello partialUpdate(ResponseCartDTO responseCartDTO, @MappingTarget Carrello carrello);
 }

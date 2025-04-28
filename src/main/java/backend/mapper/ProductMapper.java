@@ -2,6 +2,7 @@ package backend.mapper;
 
 import backend.dto.prodotto.UpdateProductDTO;
 import backend.dto.prodotto.CreateProductDTO;
+import backend.dto.prodotto.ResponseProductDTO;
 import backend.model.Prodotto;
 import org.mapstruct.*;
 
@@ -20,4 +21,7 @@ public interface ProductMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Prodotto partialUpdate(UpdateProductDTO updateProductDTO, @MappingTarget Prodotto prodotto);
+
+    // Metodo per mappare tutti i campi di Prodotto a ResponseProductDTO
+    ResponseProductDTO toResponseProductDto(Prodotto prodotto);
 }
