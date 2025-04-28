@@ -17,7 +17,7 @@ public class Stock {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("filialeId")
     @JoinColumn(name = "id_filiale")
-    private Ordine ordine;
+    private Filiale filiale;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("prodottoId")

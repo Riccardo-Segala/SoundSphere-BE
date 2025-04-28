@@ -2,10 +2,15 @@ package backend.model.embeddable;
 
 
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@Setter
 @Embeddable
 public class UtenteProdottoId implements Serializable {
     private UUID utenteId;
@@ -18,13 +23,6 @@ public class UtenteProdottoId implements Serializable {
         this.prodottoId = prodottoId;
     }
 
-    public UUID getUtenteId() {
-        return utenteId;
-    }
-
-    public UUID getProdottoId() {
-        return prodottoId;
-    }
 
     @Override
     public boolean equals(Object o) {
