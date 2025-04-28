@@ -24,4 +24,9 @@ public interface ProductMapper {
 
     // Metodo per mappare tutti i campi di Prodotto a ResponseProductDTO
     ResponseProductDTO toResponseProductDto(Prodotto prodotto);
+
+    Prodotto toEntity(ResponseProductDTO responseProductDTO);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Prodotto partialUpdate(ResponseProductDTO responseProductDTO, @MappingTarget Prodotto prodotto);
 }

@@ -30,5 +30,9 @@ public class Ordine {
     @Enumerated(EnumType.STRING)
     private StatoOrdine stato;
 
+    @ManyToOne
+    @JoinColumn(name = "id_indirizzo_utente")
+    private IndirizzoUtente indirizzo;
+
 
 }
