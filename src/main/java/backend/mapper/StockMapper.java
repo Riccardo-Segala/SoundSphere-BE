@@ -7,37 +7,25 @@ import backend.model.Stock;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {ProductMapper.class})
-public interface StockMapper {
-    @Mapping(source = "filialeNome", target = "filiale.nome")
+public interface StockMapper extends GenericMapper<Stock, CreateStockDTO, UpdateStockDTO, ResponseStockDTO> {
+    @Override
     @Mapping(source = "filialeId", target = "filiale.id")
-    Stock toEntity(ResponseStockDTO responseStockDTO);
+    Stock fromCreateDto(CreateStockDTO createStockDTO);
 
-    @InheritInverseConfiguration(name = "toEntity")
+    @Override
+    @Mapping(source = "filialeId", target = "filiale.id")
+    Stock fromUpdateDto(UpdateStockDTO updateStockDTO);
+
+    @Override
+    @Mapping(source = "filiale.nome", target = "filialeNome")
+    @Mapping(source = "filiale.id", target = "filialeId")
     ResponseStockDTO toDto(Stock stock);
 
-    @InheritConfiguration(name = "toEntity")
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Stock partialUpdate(ResponseStockDTO responseStockDTO, @MappingTarget Stock stock);
+    Stock partialUpdateFromCreate(CreateStockDTO createStockDTO, @MappingTarget Stock stock);
 
-    @Mapping(source = "prodottoId", target = "prodotto.id")
-    @Mapping(source = "filialeId", target = "filiale.id")
-    Stock toEntity(CreateStockDTO createStockDTO);
-
-    @InheritInverseConfiguration(name = "toEntity")
-    CreateStockDTO toDto1(Stock stock);
-
-    @InheritConfiguration(name = "toEntity")
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Stock partialUpdate(CreateStockDTO createStockDTO, @MappingTarget Stock stock);
-
-    @Mapping(source = "prodottoId", target = "prodotto.id")
-    @Mapping(source = "filialeId", target = "filiale.id")
-    Stock toEntity(UpdateStockDTO updateStockDTO);
-
-    @InheritInverseConfiguration(name = "toEntity")
-    UpdateStockDTO toDto2(Stock stock);
-
-    @InheritConfiguration(name = "toEntity")
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Stock partialUpdate(UpdateStockDTO updateStockDTO, @MappingTarget Stock stock);
+    Stock partialUpdateFromUpdate(UpdateStockDTO updateStockDTO, @MappingTarget Stock stock);
 }
