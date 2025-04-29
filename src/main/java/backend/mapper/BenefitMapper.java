@@ -7,25 +7,25 @@ import backend.model.Vantaggio;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface BenefitMapper {
-    Vantaggio toEntity(ResponseBenefitDTO responseBenefitDto);
+public interface BenefitMapper extends GenericMapper<Vantaggio, CreateBenefitDTO, UpdateBenefitDTO, ResponseBenefitDTO> {
 
+    @Override
     ResponseBenefitDTO toDto(Vantaggio vantaggio);
+
+    @Override
+    Vantaggio fromCreateDto(CreateBenefitDTO createBenefitDTO);
+
+    @Override
+    Vantaggio fromUpdateDto(UpdateBenefitDTO updateBenefitDTO);
+
+    @Override
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Vantaggio partialUpdateFromCreate(CreateBenefitDTO createBenefitDTO, @MappingTarget Vantaggio vantaggio);
+
+    @Override
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Vantaggio partialUpdateFromUpdate(UpdateBenefitDTO updateBenefitDTO, @MappingTarget Vantaggio vantaggio);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Vantaggio partialUpdate(ResponseBenefitDTO responseBenefitDto, @MappingTarget Vantaggio vantaggio);
-
-    Vantaggio toEntity(CreateBenefitDTO createBenefitDTO);
-
-    CreateBenefitDTO toDto1(Vantaggio vantaggio);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Vantaggio partialUpdate(CreateBenefitDTO createBenefitDTO, @MappingTarget Vantaggio vantaggio);
-
-    Vantaggio toEntity(UpdateBenefitDTO updateBenefitDTO);
-
-    UpdateBenefitDTO toDto2(Vantaggio vantaggio);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Vantaggio partialUpdate(UpdateBenefitDTO updateBenefitDTO, @MappingTarget Vantaggio vantaggio);
 }

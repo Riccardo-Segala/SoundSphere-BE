@@ -7,28 +7,24 @@ import backend.model.Utente;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {BenefitMapper.class})
-public interface UserMapper {
+public interface UserMapper extends GenericMapper<Utente, CreateUserDTO, UpdateUserDTO, ResponseUserDTO> {
+
+    @Override
+    ResponseUserDTO toDto(Utente utente);
+
+    @Override
     @Mapping(source = "vantaggioId", target = "vantaggio.id")
-    Utente toEntity(CreateUserDTO createUserDto);
+    Utente fromCreateDto(CreateUserDTO createUserDto);
 
-    @Mapping(source = "vantaggio.id", target = "vantaggioId")
-    CreateUserDTO toDto(Utente utente);
+    @Override
+    Utente fromUpdateDto(UpdateUserDTO updateUserDto);
 
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "vantaggioId", target = "vantaggio.id")
-    Utente partialUpdate(CreateUserDTO createUserDto, @MappingTarget Utente utente);
+    Utente partialUpdateFromCreate(CreateUserDTO createUserDto, @MappingTarget Utente utente);
 
-    Utente toEntity(UpdateUserDTO updateUserDto);
-
-    UpdateUserDTO toDto1(Utente utente);
-
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Utente partialUpdate(UpdateUserDTO updateUserDto, @MappingTarget Utente utente);
-
-    Utente toEntity(ResponseUserDTO responseUserDto);
-
-    ResponseUserDTO toDto2(Utente utente);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Utente partialUpdate(ResponseUserDTO responseUserDto, @MappingTarget Utente utente);
+    Utente partialUpdateFromUpdate(UpdateUserDTO updateUserDto, @MappingTarget Utente utente);
 }

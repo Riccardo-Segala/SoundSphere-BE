@@ -14,6 +14,7 @@ import java.util.UUID;
 public class VantaggioService extends GenericService<Vantaggio, UUID> {
 
     public VantaggioService(VantaggioRepository repository) {
-        super(repository);
+        super(repository); // Passa il repository al costruttore della classe base
     }
+
 }
