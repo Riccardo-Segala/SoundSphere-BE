@@ -37,9 +37,11 @@ services:
       - openapi-spec:/app/openapi
     command: >
       sh -c "
-        ./gradlew generateOpenApiDocs --no-daemon &&
-        ./gradlew bootRun --no-daemon
-      "
+          if [ \"$API_UPDATE\" != \"false\" ]; then  # Controlla se API_UPDATE è diverso da false
+              ./gradlew generateOpenApiDocs --no-daemon;  # Esegui solo se API_UPDATE non è false
+          fi &&
+          ./gradlew bootRun --no-daemon
+        "
     networks:
       - app_network  # Collega il backend alla rete comune
 
