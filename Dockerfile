@@ -21,5 +21,5 @@ EXPOSE 5005
 ENV DEBUG_MODE=false
 
 # Esegui gradlew bootRun per avviare l'applicazione Spring Boot con supporto per il debug remoto se DEBUG_MODE è true
-CMD ["sh", "-c", "./gradlew bootRun --no-daemon"]
+#CMD ["sh", "-c", "./gradlew bootRun --no-daemon"]
 

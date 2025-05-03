@@ -25,7 +25,6 @@ spring:
 
   springdoc:
     api-docs:
-      path: /v3/api-docs
-      format: yaml
+      enabled: true
     swagger-ui:
-      path: /swagger-ui.html
+      enabled: false

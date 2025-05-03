@@ -34,12 +34,21 @@ services:
       DEBUG_MODE: ${DEBUG_MODE:-false}
     volumes:
       - gradle_cache:/home/gradle/.gradle
+      - openapi-spec:/app/openapi
+    command: >
+      sh -c "
+        ./gradlew generateOpenApiDocs --no-daemon &&
+        ./gradlew bootRun --no-daemon
+      "
     networks:
       - app_network  # Collega il backend alla rete comune
 
 volumes:
   db_data:
   gradle_cache:
+  openapi-spec:
+    name: openapi-spec
+
 
 networks:
   app_network:
