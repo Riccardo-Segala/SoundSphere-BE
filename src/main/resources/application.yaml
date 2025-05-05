@@ -22,3 +22,9 @@ spring:
   liquibase:
     enabled: true  # Abilita Liquibase
     change-log: classpath:/db/changelog/db.changelog-master.xml  # Percorso al file di changelog di Liquibase
+
+  springdoc:
+    api-docs:
+      enabled: true
+    swagger-ui:
+      enabled: false
