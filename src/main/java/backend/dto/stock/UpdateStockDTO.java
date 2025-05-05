@@ -1,6 +1,6 @@
 package backend.dto.stock;
 
-import lombok.Value;
+import backend.dto.prodotto.ResponseProductDTO;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -8,10 +8,11 @@ import java.util.UUID;
 /**
  * DTO for {@link backend.model.Stock}
  */
-@Value
-public class UpdateStockDTO implements Serializable {
-    UUID filialeId;
-    UUID prodottoId;
-    int quantita;
-    int quantitaPerNoleggio;
+public record UpdateStockDTO (
+        UUID filialeId,
+        String filialeNome,
+        ResponseProductDTO prodotto,
+        int quantita,
+        int quantitaPerNoleggio
+) implements Serializable {
 }
