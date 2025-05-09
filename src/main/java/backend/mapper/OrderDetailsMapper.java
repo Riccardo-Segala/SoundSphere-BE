@@ -7,38 +7,32 @@ import backend.model.DettagliOrdine;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {ProductMapper.class})
-public interface
-OrderDetailsMapper {
+public interface OrderDetailsMapper extends GenericMapper<DettagliOrdine, CreateOrderDetailsDTO, UpdateOrderDetailsDTO, ResponseOrderDetailsDTO> {
+
+    @Override
     @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
-    DettagliOrdine toEntity(ResponseOrderDetailsDTO responseOrderDetailsDTO);
+    DettagliOrdine fromCreateDto(CreateOrderDetailsDTO createOrderDetailsDTO);
 
-    @InheritInverseConfiguration(name = "toEntity")
+    @Override
+    @Mapping(source = "utenteId", target = "utente.id")
+    @Mapping(source = "ordineId", target = "ordine.id")
+    DettagliOrdine fromUpdateDto(UpdateOrderDetailsDTO updateOrderDetailsDTO);
+
+    @Override
+    @Mapping(source = "utente.id", target = "utenteId")
+    @Mapping(source = "ordine.id", target = "ordineId")
     ResponseOrderDetailsDTO toDto(DettagliOrdine dettagliOrdine);
 
-    @InheritConfiguration(name = "toEntity")
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    DettagliOrdine partialUpdate(ResponseOrderDetailsDTO responseOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
-
     @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
-    DettagliOrdine toEntity(CreateOrderDetailsDTO createOrderDetailsDTO);
+    DettagliOrdine partialUpdateFromCreate(CreateOrderDetailsDTO createOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
 
-    @InheritInverseConfiguration(name = "toEntity")
-    CreateOrderDetailsDTO toDto1(DettagliOrdine dettagliOrdine);
-
-    @InheritConfiguration(name = "toEntity")
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    DettagliOrdine partialUpdate(CreateOrderDetailsDTO createOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
-
     @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
-    DettagliOrdine toEntity(UpdateOrderDetailsDTO updateOrderDetailsDTO);
-
-    @InheritInverseConfiguration(name = "toEntity")
-    UpdateOrderDetailsDTO toDto2(DettagliOrdine dettagliOrdine);
-
-    @InheritConfiguration(name = "toEntity")
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    DettagliOrdine partialUpdate(UpdateOrderDetailsDTO updateOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
+    DettagliOrdine partialUpdateFromUpdate(UpdateOrderDetailsDTO updateOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
 }
