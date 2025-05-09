@@ -7,25 +7,22 @@ import backend.model.Noleggio;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface RentalMapper {
-    Noleggio toEntity(CreateRentalDTO createRentalDTO);
+public interface RentalMapper extends GenericMapper<Noleggio, CreateRentalDTO, UpdateRentalDTO, ResponseRentalDTO> {
 
-    CreateRentalDTO toDto(Noleggio noleggio);
+    @Override
+    Noleggio fromCreateDto(CreateRentalDTO createRentalDTO);
 
+    @Override
+    Noleggio fromUpdateDto(UpdateRentalDTO updateRentalDTO);
+
+    @Override
+    ResponseRentalDTO toDto(Noleggio noleggio);
+
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Noleggio partialUpdate(CreateRentalDTO createRentalDTO, @MappingTarget Noleggio noleggio);
+    Noleggio partialUpdateFromCreate(CreateRentalDTO createRentalDTO, @MappingTarget Noleggio noleggio);
 
-    Noleggio toEntity(UpdateRentalDTO updateRentalDTO);
-
-    UpdateRentalDTO toDto1(Noleggio noleggio);
-
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Noleggio partialUpdate(UpdateRentalDTO updateRentalDTO, @MappingTarget Noleggio noleggio);
-
-    Noleggio toEntity(ResponseRentalDTO responseRentalDTO);
-
-    ResponseRentalDTO toDto2(Noleggio noleggio);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Noleggio partialUpdate(ResponseRentalDTO responseRentalDTO, @MappingTarget Noleggio noleggio);
+    Noleggio partialUpdateFromUpdate(UpdateRentalDTO updateRentalDTO, @MappingTarget Noleggio noleggio);
 }

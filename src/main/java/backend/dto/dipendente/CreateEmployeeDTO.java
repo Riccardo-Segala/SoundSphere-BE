@@ -1,7 +1,5 @@
 package backend.dto.dipendente;
 
-import lombok.Value;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -9,7 +7,7 @@ import java.util.UUID;
 /**
  * DTO for {@link backend.model.Dipendente}
  */
-public record CreateEmplyeeDTO (
+public record CreateEmployeeDTO(
         UUID id,
         double stipendio,
         LocalDate scadenzaContratto,
