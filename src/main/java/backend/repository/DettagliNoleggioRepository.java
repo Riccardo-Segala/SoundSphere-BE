@@ -5,6 +5,8 @@ import backend.model.embeddable.NoleggioProdottoId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
-public interface DettagliNoleggioRepository extends JpaRepository<DettagliNoleggio, NoleggioProdottoId> {
+public interface DettagliNoleggioRepository extends JpaRepository<DettagliNoleggio, UUID> {
 }
