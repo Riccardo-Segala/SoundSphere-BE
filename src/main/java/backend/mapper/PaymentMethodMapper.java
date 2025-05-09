@@ -7,23 +7,24 @@ import backend.model.MetodoPagamento;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface PaymentMethodMapper {
+public interface PaymentMethodMapper extends GenericMapper<MetodoPagamento, CreatePaymentMethodDTO, UpdatePaymentMethodDTO, ResponsePaymentMethodDTO> {
+
+    @Override
     @Mapping(source = "utenteId", target = "utente.id")
-    MetodoPagamento toEntity(CreatePaymentMethodDTO createPaymentMethodDTO);
+    MetodoPagamento fromCreateDto(CreatePaymentMethodDTO createPaymentMethodDTO);
 
-    @Mapping(source = "utente.id", target = "utenteId")
-    CreatePaymentMethodDTO toDto(MetodoPagamento metodoPagamento);
+    @Override
+    ResponsePaymentMethodDTO toDto(MetodoPagamento metodoPagamento);
 
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "utenteId", target = "utente.id")
-    MetodoPagamento partialUpdate(CreatePaymentMethodDTO createPaymentMethodDTO, @MappingTarget MetodoPagamento metodoPagamento);
+    MetodoPagamento partialUpdateFromCreate(CreatePaymentMethodDTO createPaymentMethodDTO, @MappingTarget MetodoPagamento metodoPagamento);
 
-    MetodoPagamento partialUpdate(UpdatePaymentMethodDTO updatePaymentMethodDTO, @MappingTarget MetodoPagamento metodoPagamento);
-
-    MetodoPagamento toEntity(ResponsePaymentMethodDTO responsePaymentMethodDTO);
-
-    ResponsePaymentMethodDTO toDto2(MetodoPagamento metodoPagamento);
-
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    MetodoPagamento partialUpdate(ResponsePaymentMethodDTO responsePaymentMethodDTO, @MappingTarget MetodoPagamento metodoPagamento);
+    MetodoPagamento partialUpdateFromUpdate(UpdatePaymentMethodDTO updatePaymentMethodDTO, @MappingTarget MetodoPagamento metodoPagamento);
+
+    // Metodo aggiuntivo per mappare ResponsePaymentMethodDTO a MetodoPagamento
+    MetodoPagamento fromUpdateDto(UpdatePaymentMethodDTO updatePaymentMethodDTO);
 }
