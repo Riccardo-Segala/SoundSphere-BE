@@ -7,28 +7,23 @@ import backend.model.OrganizzatoreEventi;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface EventManagerMapper {
-    OrganizzatoreEventi toEntity(CreateEventManagerDTO createEventManagerDTO);
+public interface EventManagerMapper extends GenericMapper<OrganizzatoreEventi, CreateEventManagerDTO, UpdateEventManagerDTO, ResponseEventManagerDTO> {
 
-    CreateEventManagerDTO toDto(OrganizzatoreEventi organizzatoreEventi);
+    @Override
+    OrganizzatoreEventi fromCreateDto(CreateEventManagerDTO createEventManagerDTO);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    OrganizzatoreEventi partialUpdate(CreateEventManagerDTO createEventManagerDTO, @MappingTarget OrganizzatoreEventi organizzatoreEventi);
+    @Override
+    OrganizzatoreEventi fromUpdateDto(UpdateEventManagerDTO updateEventManagerDTO);
 
-    OrganizzatoreEventi toEntity(UpdateEventManagerDTO updateEventManagerDTO);
-
-    UpdateEventManagerDTO toDto1(OrganizzatoreEventi organizzatoreEventi);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    OrganizzatoreEventi partialUpdate(UpdateEventManagerDTO updateEventManagerDTO, @MappingTarget OrganizzatoreEventi organizzatoreEventi);
-
-    @Mapping(source = "vantaggioId", target = "vantaggio.id")
-    OrganizzatoreEventi toEntity(ResponseEventManagerDTO responseEventManagerDTO);
-
+    @Override
     @Mapping(source = "vantaggio.id", target = "vantaggioId")
-    ResponseEventManagerDTO toDto2(OrganizzatoreEventi organizzatoreEventi);
+    ResponseEventManagerDTO toDto(OrganizzatoreEventi organizzatoreEventi);
 
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "vantaggioId", target = "vantaggio.id")
-    OrganizzatoreEventi partialUpdate(ResponseEventManagerDTO responseEventManagerDTO, @MappingTarget OrganizzatoreEventi organizzatoreEventi);
+    OrganizzatoreEventi partialUpdateFromCreate(CreateEventManagerDTO createEventManagerDTO, @MappingTarget OrganizzatoreEventi organizzatoreEventi);
+
+    @Override
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    OrganizzatoreEventi partialUpdateFromUpdate(UpdateEventManagerDTO updateEventManagerDTO, @MappingTarget OrganizzatoreEventi organizzatoreEventi);
 }

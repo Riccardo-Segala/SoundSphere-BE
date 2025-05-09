@@ -1,6 +1,6 @@
 package backend.dto.vantaggio;
 
-import lombok.Value;
+
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -8,11 +8,11 @@ import java.util.UUID;
 /**
  * DTO for {@link backend.model.Vantaggio}
  */
-@Value
-public class UpdateBenefitDTO implements Serializable {
-    UUID id;
-    String nome;
-    Double sconto;
-    Integer punteggioMinimo;
-    Integer punteggioMassimo;
+public record UpdateBenefitDTO (
+        UUID id,
+        String nome,
+        Double sconto,
+        Integer punteggioMinimo,
+        Integer punteggioMassimo
+) implements Serializable {
 }

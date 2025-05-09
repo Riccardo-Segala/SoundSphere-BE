@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * DTO for {@link backend.model.Vantaggio}
  */
-public record ResponseBenefitDTO(
+public record ResponseBenefitDTO (
         UUID id,
         String nome,
         Double sconto,

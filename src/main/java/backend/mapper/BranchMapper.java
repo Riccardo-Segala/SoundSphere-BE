@@ -7,25 +7,22 @@ import backend.model.Filiale;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface BranchMapper {
-    Filiale toEntity(ResponseBranchDTO responseBranchDTO);
+public interface BranchMapper extends GenericMapper<Filiale, CreateBranchDTO, UpdateBranchDTO, ResponseBranchDTO> {
 
+    @Override
     ResponseBranchDTO toDto(Filiale filiale);
 
+    @Override
+    Filiale fromCreateDto(CreateBranchDTO createBranchDTO);
+
+    @Override
+    Filiale fromUpdateDto(UpdateBranchDTO updateBranchDTO);
+
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Filiale partialUpdate(ResponseBranchDTO responseBranchDTO, @MappingTarget Filiale filiale);
+    Filiale partialUpdateFromCreate(CreateBranchDTO createBranchDTO, @MappingTarget Filiale filiale);
 
-    Filiale toEntity(CreateBranchDTO createBranchDTO);
-
-    CreateBranchDTO toDto1(Filiale filiale);
-
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Filiale partialUpdate(CreateBranchDTO createBranchDTO, @MappingTarget Filiale filiale);
-
-    Filiale toEntity(UpdateBranchDTO updateBranchDTO);
-
-    UpdateBranchDTO toDto2(Filiale filiale);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Filiale partialUpdate(UpdateBranchDTO updateBranchDTO, @MappingTarget Filiale filiale);
+    Filiale partialUpdateFromUpdate(UpdateBranchDTO updateBranchDTO, @MappingTarget Filiale filiale);
 }

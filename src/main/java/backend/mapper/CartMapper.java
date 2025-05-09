@@ -7,39 +7,32 @@ import backend.model.Carrello;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {ProductMapper.class})
-public interface CartMapper {
+public interface CartMapper extends GenericMapper<Carrello, CreateCartDTO, UpdateCartDTO, ResponseCartDTO> {
 
-    // Mapping per CreateCartDTO -> Carrello
+    @Override
     @Mapping(source = "prodottoId", target = "id.prodottoId")
     @Mapping(source = "utenteId", target = "id.utenteId")
-    Carrello toEntity(CreateCartDTO createCartDTO);
+    Carrello fromCreateDto(CreateCartDTO createCartDTO);
 
-    // Mapping inverso: Carrello -> CreateCartDTO
-    @InheritInverseConfiguration(name = "toEntity")
-    CreateCartDTO toCreateDto(Carrello carrello);
-
-    // Mapping per UpdateCartDTO -> Carrello
+    @Override
     @Mapping(source = "prodottoId", target = "id.prodottoId")
     @Mapping(source = "utenteId", target = "id.utenteId")
-    Carrello toEntity(UpdateCartDTO updateCartDTO);
+    Carrello fromUpdateDto(UpdateCartDTO updateCartDTO);
 
-    // Mapping inverso: Carrello -> UpdateCartDTO
-    @InheritInverseConfiguration(name = "toEntity")
-    UpdateCartDTO toUpdateDto(Carrello carrello);
-
-    // Mapping per Carrello -> ResponseCartDTO
+    @Override
     @Mapping(source = "prodotto", target = "prodotto")
     @Mapping(source = "id.utenteId", target = "utenteId")
-    ResponseCartDTO toResponseDto(Carrello carrello);
+    ResponseCartDTO toDto(Carrello carrello);
 
-    // Aggiornamento parziale con UpdateCartDTO
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "prodottoId", target = "id.prodottoId")
     @Mapping(source = "utenteId", target = "id.utenteId")
-    Carrello partialUpdate(UpdateCartDTO updateCartDTO, @MappingTarget Carrello carrello);
+    Carrello partialUpdateFromCreate(CreateCartDTO createCartDTO, @MappingTarget Carrello carrello);
 
-    // Aggiornamento parziale con ResponseCartDTO
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "prodottoId", target = "id.prodottoId")
     @Mapping(source = "utenteId", target = "id.utenteId")
-    Carrello partialUpdate(ResponseCartDTO responseCartDTO, @MappingTarget Carrello carrello);
+    Carrello partialUpdateFromUpdate(UpdateCartDTO updateCartDTO, @MappingTarget Carrello carrello);
 }

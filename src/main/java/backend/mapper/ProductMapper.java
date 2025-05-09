@@ -7,26 +7,22 @@ import backend.model.Prodotto;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ProductMapper {
-    Prodotto toEntity(CreateProductDTO createProductDTO);
+public interface ProductMapper extends GenericMapper<Prodotto, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
 
-    CreateProductDTO toDto(Prodotto prodotto);
+    @Override
+    Prodotto fromCreateDto(CreateProductDTO createProductDTO);
 
+    @Override
+    Prodotto fromUpdateDto(UpdateProductDTO updateProductDTO);
+
+    @Override
+    ResponseProductDTO toDto(Prodotto prodotto);
+
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Prodotto partialUpdate(CreateProductDTO createProductDTO, @MappingTarget Prodotto prodotto);
+    Prodotto partialUpdateFromCreate(CreateProductDTO createProductDTO, @MappingTarget Prodotto prodotto);
 
-    Prodotto toEntity(UpdateProductDTO updateProductDTO);
-
-    UpdateProductDTO toDto1(Prodotto prodotto);
-
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Prodotto partialUpdate(UpdateProductDTO updateProductDTO, @MappingTarget Prodotto prodotto);
-
-    // Metodo per mappare tutti i campi di Prodotto a ResponseProductDTO
-    ResponseProductDTO toResponseProductDto(Prodotto prodotto);
-
-    Prodotto toEntity(ResponseProductDTO responseProductDTO);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Prodotto partialUpdate(ResponseProductDTO responseProductDTO, @MappingTarget Prodotto prodotto);
+    Prodotto partialUpdateFromUpdate(UpdateProductDTO updateProductDTO, @MappingTarget Prodotto prodotto);
 }
