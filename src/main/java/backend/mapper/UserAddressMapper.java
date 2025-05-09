@@ -2,35 +2,31 @@ package backend.mapper;
 
 import backend.dto.indirizzo_utente.CreateUserAddressDTO;
 import backend.dto.indirizzo_utente.UpdateUserAddressDTO;
-import backend.model.IndirizzoUtente;
 import backend.dto.indirizzo_utente.ResponseUserAddressDTO;
+import backend.model.IndirizzoUtente;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface UserAddressMapper {
+public interface UserAddressMapper extends GenericMapper<IndirizzoUtente, CreateUserAddressDTO, UpdateUserAddressDTO, ResponseUserAddressDTO> {
+
+    @Override
     @Mapping(source = "utenteCognome", target = "utente.cognome")
     @Mapping(source = "utenteNome", target = "utente.nome")
     @Mapping(source = "utenteId", target = "utente.id")
-    IndirizzoUtente toEntity(CreateUserAddressDTO createUserAddressDTO);
+    IndirizzoUtente fromCreateDto(CreateUserAddressDTO createUserAddressDTO);
 
-    @InheritInverseConfiguration(name = "toEntity")
-    CreateUserAddressDTO toDto(IndirizzoUtente indirizzoUtente);
+    @Override
+    ResponseUserAddressDTO toDto(IndirizzoUtente indirizzoUtente);
 
-    @InheritConfiguration(name = "toEntity")
+    @Override
+    IndirizzoUtente fromUpdateDto(UpdateUserAddressDTO updateUserAddressDTO);
+
+    @Override
+    @InheritConfiguration(name = "fromCreateDto")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    IndirizzoUtente partialUpdate(CreateUserAddressDTO createUserAddressDTO, @MappingTarget IndirizzoUtente indirizzoUtente);
+    IndirizzoUtente partialUpdateFromCreate(CreateUserAddressDTO createUserAddressDTO, @MappingTarget IndirizzoUtente indirizzoUtente);
 
-    IndirizzoUtente toEntity(UpdateUserAddressDTO updateUserAddressDTO);
-
-    UpdateUserAddressDTO toDto1(IndirizzoUtente indirizzoUtente);
-
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    IndirizzoUtente partialUpdate(UpdateUserAddressDTO updateUserAddressDTO, @MappingTarget IndirizzoUtente indirizzoUtente);
-
-    IndirizzoUtente toEntity(ResponseUserAddressDTO responseUserAddressDTO);
-
-    ResponseUserAddressDTO toDto2(IndirizzoUtente indirizzoUtente);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    IndirizzoUtente partialUpdate(ResponseUserAddressDTO responseUserAddressDTO, @MappingTarget IndirizzoUtente indirizzoUtente);
+    IndirizzoUtente partialUpdateFromUpdate(UpdateUserAddressDTO updateUserAddressDTO, @MappingTarget IndirizzoUtente indirizzoUtente);
 }
