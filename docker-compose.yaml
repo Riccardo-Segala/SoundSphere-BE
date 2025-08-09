@@ -8,6 +8,7 @@ services:
       POSTGRES_PASSWORD: adminPW
       POSTGRES_USER: postgres
       POSTGRES_DB: SoundSphereDB
+
     volumes:
       - ./DBdata:/var/lib/postgresql/data  # Monta tutta la directory dei dati
     ports:
@@ -32,6 +33,8 @@ services:
         condition: service_healthy
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
+      APPLICATION_SECURITY_JWT_SECRET_KEY: "dZdUCghahmQ9KDUs1gKhQjTa6Jw4XWEgDCj3EBRtzESrd8XjqsxzJT7LMfJsqmOZh+Co+HHEuvefZLFg0GBX4g=="
+      APPLICATION_SECURITY_JWT_EXPIRATION: "86400000"  # 1 giorno in millisecondi
     volumes:
       - gradle_cache:/home/gradle/.gradle
       - openapi-spec:/app/openapi
