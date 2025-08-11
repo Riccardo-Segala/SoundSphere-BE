@@ -19,6 +19,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "utente")
 @Inheritance(strategy = InheritanceType.JOINED) // Strategia JOINED (tabelle separate per le sotto-classi)
+@DiscriminatorValue("UTENTE")
 @DiscriminatorColumn(name = "tipologia", discriminatorType = DiscriminatorType.STRING) // Nome della colonna discriminante
 public class Utente implements UserDetails {
     @Id
