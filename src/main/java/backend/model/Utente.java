@@ -10,9 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -57,9 +55,24 @@ public class Utente implements UserDetails {
     @JoinColumn(name = "id_vantaggio")
     private Vantaggio vantaggio;
 
+    @ManyToMany(fetch = FetchType.EAGER) // Carica subito i ruoli
+    @JoinTable(
+            name = "utente_ruolo",
+            joinColumns = @JoinColumn(name = "id_utente"),
+            inverseJoinColumns = @JoinColumn(name = "id_ruolo")
+    )
+    private Set<Ruolo> ruoli = new HashSet<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        for (Ruolo ruolo : this.ruoli) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + ruolo.getNome()));
+            for (Permesso permesso : ruolo.getPermessi()) {
+                authorities.add(new SimpleGrantedAuthority(permesso.getNome()));
+            }
+        }
+        return authorities;
     }
 
     @Override

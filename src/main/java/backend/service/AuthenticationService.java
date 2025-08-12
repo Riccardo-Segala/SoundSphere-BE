@@ -6,12 +6,10 @@ import backend.dto.dipendente.CreateEmployeeDTO;
 import backend.dto.utente.CreateUserDTO;
 import backend.mapper.EmployeeMapper;
 import backend.mapper.UserMapper;
-import backend.model.Dipendente;
-import backend.model.Filiale;
-import backend.model.Utente;
-import backend.model.Vantaggio;
+import backend.model.*;
 import backend.model.enums.Tipologia;
 import backend.repository.FilialeRepository;
+import backend.repository.RuoloRepository;
 import backend.repository.UtenteRepository;
 import backend.repository.VantaggioRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -34,12 +33,15 @@ public class AuthenticationService {
     private final VantaggioRepository vantaggioRepository;
     private final EmployeeMapper employeeMapper;
     private final FilialeRepository filialeRepository;
+    private final RuoloRepository ruoloRepository;
 
     public String registerUser(CreateUserDTO dto) {
         if (repository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email già in uso.");
         }
-
+        // Trova il ruolo "UTENTE"
+        Ruolo ruoloUtente = ruoloRepository.findByNome("UTENTE")
+                .orElseThrow(() -> new IllegalStateException("Ruolo 'UTENTE' non trovato"));
         // Creo Utente con MapStruct
         Utente utente = userMapper.fromCreateDto(dto);
         utente.setPassword(passwordEncoder.encode(dto.password()));
@@ -53,6 +55,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
         utente.setVantaggio(vantaggioDefault);
 
+        utente.setRuoli(Collections.singleton(ruoloUtente));
         repository.save(utente);
         return jwtService.generateToken(utente);
     }
@@ -63,6 +66,9 @@ public class AuthenticationService {
         if (repository.existsByEmail(userDto.email())) {
             throw new IllegalArgumentException("Email già in uso.");
         }
+
+        Ruolo ruoloDipendente = ruoloRepository.findByNome("DIPENDENTE")
+                .orElseThrow(() -> new IllegalStateException("Ruolo DIPENDENTE non trovato"));
 
         // Creo il Dipendente dai campi extra (MapStruct)
         Dipendente dipendente = employeeMapper.fromCreateDto(request);
@@ -87,6 +93,8 @@ public class AuthenticationService {
         Filiale filiale = filialeRepository.findById(request.filialeId())
                 .orElseThrow(() -> new IllegalStateException("Filiale non trovata"));
         dipendente.setFiliale(filiale);
+
+        dipendente.setRuoli(Collections.singleton(ruoloDipendente));
 
         repository.save(dipendente);
         return jwtService.generateToken(dipendente);
