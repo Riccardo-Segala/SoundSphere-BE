@@ -13,7 +13,7 @@ public interface UserMapper extends GenericMapper<Utente, CreateUserDTO, UpdateU
     ResponseUserDTO toDto(Utente utente);
 
     @Override
-    @Mapping(source = "vantaggioId", target = "vantaggio.id")
+    //@Mapping(source = "vantaggioId", target = "vantaggio.id")
     Utente fromCreateDto(CreateUserDTO createUserDto);
 
     @Override
@@ -21,7 +21,7 @@ public interface UserMapper extends GenericMapper<Utente, CreateUserDTO, UpdateU
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "vantaggioId", target = "vantaggio.id")
+    //@Mapping(source = "vantaggioId", target = "vantaggio.id")
     Utente partialUpdateFromCreate(CreateUserDTO createUserDto, @MappingTarget Utente utente);
 
     @Override

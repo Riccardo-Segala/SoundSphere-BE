@@ -5,6 +5,7 @@ server:
 spring:
   application:
     name: webapp
+
   datasource:
     url: jdbc:postgresql://Database:5432/SoundSphereDB
     username: postgres

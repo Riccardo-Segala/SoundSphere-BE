@@ -17,9 +17,7 @@ public record CreateUserDTO(
         String email,
         String password,
         LocalDate dataDiNascita,
-        Tipologia tipologia,
         String pathImmagine,
-        Sesso sesso,
-        UUID vantaggioId
+        Sesso sesso
 ) implements Serializable {
 }
