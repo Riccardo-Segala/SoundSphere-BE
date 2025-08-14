@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:latest # Il nome del Dockerfile (opzionale se è chiamato "Dockerfile")
+    image: postgres:17.1-bookworm # Il nome del Dockerfile (opzionale se è chiamato "Dockerfile")
     container_name: Database
     environment:
       POSTGRES_PASSWORD: adminPW
