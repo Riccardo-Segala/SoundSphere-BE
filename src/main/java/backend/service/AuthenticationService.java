@@ -14,7 +14,9 @@ import backend.repository.UtenteRepository;
 import backend.repository.VantaggioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -103,14 +105,29 @@ public class AuthenticationService {
 
 
     public String login(LoginRequestDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                )
-        );
+        // 1. Cerca l'utente nel database tramite email.
         var user = repository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
+                .orElse(null);
+
+        // 2. Se l'utente non viene trovato, lancia un'eccezione specifica.
+        if (user == null) {
+            throw new UsernameNotFoundException("Email non registrata.");
+        }
+
+        // 3. Se l'utente esiste, tenta di autenticarlo con la password.
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            // Se la password è sbagliata, lancia un'eccezione specifica.
+            throw new BadCredentialsException("Password errata.");
+        }
+
+        // 4. Se l'autenticazione ha successo, genera e restituisci il token.
         return jwtService.generateToken(user);
     }
 }

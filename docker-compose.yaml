@@ -40,11 +40,15 @@ services:
       - openapi-spec:/app/openapi
     command: >
       sh -c "
-          if [ \"$API_UPDATE\" != \"false\" ]; then  # Controlla se API_UPDATE è diverso da false
-              ./gradlew generateOpenApiDocs --no-daemon;  # Esegui solo se API_UPDATE non è false
-          fi &&
-          ./gradlew bootRun --no-daemon
-        "
+                if [ \"$API_UPDATE\" != \"false\" ]; then
+                    # 1. Genera il file YAML
+                    ./gradlew generateOpenApiDocs --no-daemon;
+                    # 2. Esegui lo script Python per normalizzarlo
+                    python3 /app/scripts/renameMethodOpenAPI.py /app/openapi/openapi.yaml;
+                fi &&
+                # 3. Avvia l'applicazione
+                ./gradlew bootRun --no-daemon
+            "
     networks:
       - app_network  # Collega il backend alla rete comune
 
