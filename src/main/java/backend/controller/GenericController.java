@@ -3,6 +3,7 @@ package backend.controller;
 import backend.mapper.GenericMapper;
 import backend.service.GenericService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

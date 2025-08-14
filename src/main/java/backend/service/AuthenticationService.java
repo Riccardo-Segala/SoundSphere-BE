@@ -16,12 +16,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,16 +110,11 @@ public class AuthenticationService {
 
 
     public String login(LoginRequestDTO request) {
-        // 1. Cerca l'utente nel database tramite email.
+        // 1. Cerca l'utente con ruoli e permessi
         var user = repository.findByEmail(request.email())
-                .orElse(null);
+                .orElseThrow(() -> new UsernameNotFoundException("Email non registrata."));
 
-        // 2. Se l'utente non viene trovato, lancia un'eccezione specifica.
-        if (user == null) {
-            throw new UsernameNotFoundException("Email non registrata.");
-        }
-
-        // 3. Se l'utente esiste, tenta di autenticarlo con la password.
+        // 2. Autentica username e password
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -123,11 +123,25 @@ public class AuthenticationService {
                     )
             );
         } catch (BadCredentialsException e) {
-            // Se la password è sbagliata, lancia un'eccezione specifica.
             throw new BadCredentialsException("Password errata.");
         }
 
-        // 4. Se l'autenticazione ha successo, genera e restituisci il token.
-        return jwtService.generateToken(user);
+        // 3. Converte i permessi in GrantedAuthority
+        List<SimpleGrantedAuthority> authorities = user.getRuoli().stream()
+                .flatMap(ruolo -> ruolo.getPermessi().stream())
+                .map(permesso -> new SimpleGrantedAuthority(permesso.getNome()))
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 4. Crea un UserDetails con le authorities
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                authorities
+        );
+
+        // 5. Genera il JWT includendo le authorities
+        return jwtService.generateToken(userDetails);
     }
+
 }
