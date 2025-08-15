@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -18,5 +21,8 @@ public class Permesso {
 
     @Column(unique = true, nullable = false)
     private String nome;
+
+    @ManyToMany(mappedBy = "permessi")
+    private Set<Ruolo> ruoli = new HashSet<>();
 
 }
