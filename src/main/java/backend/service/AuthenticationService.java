@@ -1,6 +1,7 @@
 package backend.service;
 
 import backend.config.JwtService;
+import backend.dto.autenticazione.JwtResponseDTO;
 import backend.dto.autenticazione.LoginRequestDTO;
 import backend.dto.dipendente.CreateEmployeeDTO;
 import backend.dto.utente.CreateUserDTO;
@@ -42,7 +43,7 @@ public class AuthenticationService {
     private final FilialeRepository filialeRepository;
     private final RuoloRepository ruoloRepository;
 
-    public String registerUser(CreateUserDTO dto) {
+    public JwtResponseDTO registerUser(CreateUserDTO dto) {
         if (repository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email già in uso.");
         }
@@ -64,10 +65,23 @@ public class AuthenticationService {
 
         utente.setRuoli(Collections.singleton(ruoloUtente));
         repository.save(utente);
-        return jwtService.generateToken(utente);
+        // Genera il token per l'utente appena registrato
+        String token = jwtService.generateToken(utente);
+        long expiresIn = 3600L; // Esempio di durata del token
+
+        // Costruisci e restituisci il DTO completo
+        return new JwtResponseDTO(
+                token,
+                expiresIn,
+                utente.getId(),
+                utente.getNome(),
+                utente.getCognome(),
+                utente.getEmail(),
+                utente.getRuoli().stream().map(Ruolo::getNome).collect(Collectors.toList())
+        );
     }
 
-    public String registerEmployee(CreateEmployeeDTO request) {
+    public JwtResponseDTO registerEmployee(CreateEmployeeDTO request) {
         CreateUserDTO userDto = request.utente();
 
         if (repository.existsByEmail(userDto.email())) {
@@ -104,12 +118,25 @@ public class AuthenticationService {
         dipendente.setRuoli(Collections.singleton(ruoloDipendente));
 
         repository.save(dipendente);
-        return jwtService.generateToken(dipendente);
+        // Genera il token
+        String token = jwtService.generateToken(dipendente);
+        long expiresIn = 3600L; // Esempio di durata del token
+
+        // Costruisci e restituisci il DTO completo con i dati del dipendente
+        return new JwtResponseDTO(
+                token,
+                expiresIn,
+                dipendente.getId(),
+                dipendente.getNome(),
+                dipendente.getCognome(),
+                dipendente.getEmail(),
+                dipendente.getRuoli().stream().map(Ruolo::getNome).collect(Collectors.toList())
+        );
     }
 
 
 
-    public String login(LoginRequestDTO request) {
+    public JwtResponseDTO login(LoginRequestDTO request) {
         // 1. Cerca l'utente con ruoli e permessi
         var user = repository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException("Email non registrata."));
@@ -141,7 +168,20 @@ public class AuthenticationService {
         );
 
         // 5. Genera il JWT includendo le authorities
-        return jwtService.generateToken(userDetails);
+        String token = jwtService.generateToken(userDetails);
+        // Calcolo della durata del token (es. 1 ora)
+        long expiresIn = 3600L;
+
+        // Costruisco e restituisco il DTO completo, inclusi i dati dell'utente
+        return new JwtResponseDTO(
+                token,
+                expiresIn,
+                user.getId(), // Popolo l'ID dell'utente
+                user.getNome(),
+                user.getCognome(),
+                user.getEmail(),
+                user.getRuoli().stream().map(ruolo -> ruolo.getNome()).collect(Collectors.toList())
+        );
     }
 
 }
