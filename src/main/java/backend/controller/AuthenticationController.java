@@ -27,22 +27,30 @@ public class AuthenticationController {
 
     @PostMapping("/register/user")
     public ResponseEntity<JwtResponseDTO> registerUser(@RequestBody CreateUserDTO request) {
-        return ResponseEntity.ok(new JwtResponseDTO(service.registerUser(request)));
+        // La logica di login nel service lancerà eccezioni specifiche
+        JwtResponseDTO response = service.registerUser(request);
+
+        // In caso di successo, restituisco il token
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register/employee")
     public ResponseEntity<JwtResponseDTO> registerEmployee(@RequestBody CreateEmployeeDTO request) {
-        return ResponseEntity.ok(new JwtResponseDTO(service.registerEmployee(request)));
+        // La logica di login nel service lancerà eccezioni specifiche
+        JwtResponseDTO response = service.registerEmployee(request);
+
+        // In caso di successo, restituisco il token
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         try {
             // La logica di login nel service lancerà eccezioni specifiche
-            String token = service.login(request);
+            JwtResponseDTO response = service.login(request);
 
             // In caso di successo, restituisco il token
-            return ResponseEntity.ok(new JwtResponseDTO(token));
+            return ResponseEntity.ok(response);
 
         } catch (UsernameNotFoundException e) {
             // Gestione errore: email non trovata

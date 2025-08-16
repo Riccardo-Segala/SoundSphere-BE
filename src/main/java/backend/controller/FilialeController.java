@@ -8,10 +8,7 @@ import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.service.FilialeService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,4 +27,33 @@ class FilialeController extends GenericController <Filiale, UUID, CreateBranchDT
         return ResponseEntity.ok(prodotti);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ResponseBranchDTO>> getAllBranches() {
+        return super.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseBranchDTO> getBranchById(@PathVariable UUID id) {
+        return super.getById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<ResponseBranchDTO> createBranch(@RequestBody CreateBranchDTO createDTO) {
+        return super.create(createDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseBranchDTO> updateBranch(@PathVariable UUID id, @RequestBody UpdateBranchDTO updateDTO) {
+        return super.update(id, updateDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBranch(@PathVariable UUID id) {
+        return super.delete(id);
+    }
+
+    @Override
+    protected UUID getId(Filiale entity) {
+        return entity.getId();
+    }
 }
