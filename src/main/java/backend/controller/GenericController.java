@@ -57,4 +57,9 @@ public abstract class GenericController<T, ID, CreateDTO, UpdateDTO, ResponseDTO
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    // espongo il sevice
+    protected GenericService<T, ID> getService() {
+        return this.service;
+    }
 }
