@@ -6,9 +6,10 @@ import backend.dto.prodotto.UpdateProductDTO;
 import backend.mapper.ProductMapper;
 import backend.model.Prodotto;
 import backend.service.ProdottoService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -16,5 +17,35 @@ import java.util.UUID;
 class ProdottoController extends GenericController<Prodotto, UUID, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
     public ProdottoController(ProdottoService service, ProductMapper mapper) {
         super(service, mapper);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ResponseProductDTO>> getAllProducts() {
+        return super.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseProductDTO> getProductById(@PathVariable UUID id) {
+        return super.getById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<ResponseProductDTO> createProduct(@RequestBody CreateProductDTO createDTO) {
+        return super.create(createDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseProductDTO> updateProduct(@PathVariable UUID id, @RequestBody UpdateProductDTO updateDTO) {
+        return super.update(id, updateDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
+        return super.delete(id);
+    }
+
+    @Override
+    protected UUID getId(Prodotto entity) {
+        return entity.getId();
     }
 }
