@@ -51,7 +51,7 @@ public class Utente implements UserDetails {
 
     private Integer punti;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "id_vantaggio")
     private Vantaggio vantaggio;
 
