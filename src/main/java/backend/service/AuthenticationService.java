@@ -110,38 +110,25 @@ public class AuthenticationService {
 
 
     public String login(LoginRequestDTO request) {
-        // 1. Cerca l'utente con ruoli e permessi
+        // 1. Autentica le credenziali dell'utente (email e password).
+        //    Se sono errate, questo metodo lancerà un'eccezione che
+        //    verrà gestita dal tuo AuthenticationController.
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password()
+                )
+        );
+
+        // 2. Se l'autenticazione ha successo, recupera l'utente completo dal database.
+        //    Questo oggetto 'user' contiene l'ID e tutti gli altri dati necessari.
         var user = repository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException("Email non registrata."));
 
-        // 2. Autentica username e password
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.email(),
-                            request.password()
-                    )
-            );
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Password errata.");
-        }
-
-        // 3. Converte i permessi in GrantedAuthority
-        List<SimpleGrantedAuthority> authorities = user.getRuoli().stream()
-                .flatMap(ruolo -> ruolo.getPermessi().stream())
-                .map(permesso -> new SimpleGrantedAuthority(permesso.getNome()))
-                .distinct()
-                .collect(Collectors.toList());
-
-        // 4. Crea un UserDetails con le authorities
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                authorities
-        );
-
-        // 5. Genera il JWT includendo le authorities
-        return jwtService.generateToken(userDetails);
+        // 3. Genera il token passando l'intera entità 'Utente'.
+        //    Questo invoca il metodo corretto nel tuo JwtService, che è stato
+        //    progettato appositamente per aggiungere il 'userId' ai claims del token.
+        return jwtService.generateToken(user);
     }
 
 }

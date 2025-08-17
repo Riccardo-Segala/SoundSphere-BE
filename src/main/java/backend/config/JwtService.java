@@ -1,5 +1,6 @@
 package backend.config;
 
+import backend.model.Utente;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -21,8 +22,25 @@ public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
 
+    // --- METODI DI ESTRAZIONE---
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    // Per estrarre l'ID utente che ho aggiunto.
+    public Optional<UUID> extractUserId(String token) {
+        try
+        {
+            String id = extractClaim(token, claims -> claims.get("userId", String.class));
+            return Optional.ofNullable(id).map(UUID::fromString);
+        }
+        catch (Exception e)
+        {
+            // Se non riesco a convertire l'ID, ritorno null.
+            return Optional.empty();
+        }
+
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -30,8 +48,24 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    // --- METODI DI GENERAZIONE  ---
+
+    // metodo principale che userò da AuthenticationService.
+    public String generateToken(Utente utente) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", utente.getId());
+        return generateToken(claims, utente);
+    }
+
+    // chiama il costruttore con claims vuoti.
     public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
+    }
+
+    // Il costruttore centrale flessibile.
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
+                .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
