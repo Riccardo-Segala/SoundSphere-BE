@@ -36,6 +36,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     @GetMapping("/totale-finale/{id}")
     public double getTotaleFinale(@PathVariable UUID id) {
         return carrelloService.calcolaTotaleFinale(id);
+    }
 
     @GetMapping
     public ResponseEntity<List<ResponseCartDTO>> getAllCarts() {
