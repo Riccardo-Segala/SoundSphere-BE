@@ -28,4 +28,8 @@ public class Ruolo {
             inverseJoinColumns = @JoinColumn(name = "id_permesso")
     )
     private Set<Permesso> permessi = new HashSet<>();
+
+    @ManyToMany(mappedBy = "ruoli")
+    private Set<Utente> utenti = new HashSet<>();
+
 }

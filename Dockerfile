@@ -1,6 +1,11 @@
 # Usa l'immagine con Gradle 8.13 e JDK 23 (Amazon Corretto)
 FROM gradle:8.13-jdk23-corretto-al2023 AS build
 
+# Installa Python 3, pip e la libreria pyyaml in un'unica riga per ottimizzare la build
+# L'immagine 'gradle:8.13-jdk23-corretto-al2023' si basa su Amazon Linux, che usa 'dnf'.
+RUN dnf install -y python3 python3-pip && pip3 install --no-cache-dir pyyaml
+
+
 # Copia l'intero progetto nella directory /app del contenitore
 COPY . /app
 

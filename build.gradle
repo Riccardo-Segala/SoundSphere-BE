@@ -63,6 +63,7 @@ tasks.withType(JavaCompile).configureEach {
 openApi {
 	outputDir.set(layout.projectDirectory.dir("openapi"))
 	outputFileName = "openapi.yaml"
+	waitTimeInSeconds = 60
 }
 
 tasks.named('test') {
