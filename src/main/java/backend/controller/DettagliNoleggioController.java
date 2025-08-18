@@ -6,6 +6,7 @@ import backend.mapper.RentalDetailsMapper;
 import backend.model.DettagliNoleggio;
 import backend.model.embeddable.NoleggioProdottoId;
 import backend.service.DettagliNoleggioService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/dettagli-noleggi")
+@RequestMapping(path="/api/dettagli-noleggi", produces = MediaType.APPLICATION_JSON_VALUE)
 class DettagliNoleggioController extends GenericController<DettagliNoleggio, NoleggioProdottoId, CreateRentalDetailsDTO, UpdateRentalDetailsDTO, ResponseRentalDetailsDTO> {
     public DettagliNoleggioController(DettagliNoleggioService service, RentalDetailsMapper mapper) {
         super(service, mapper);

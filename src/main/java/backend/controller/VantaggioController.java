@@ -6,6 +6,7 @@ import backend.dto.vantaggio.UpdateBenefitDTO;
 import backend.mapper.BenefitMapper;
 import backend.model.Vantaggio;
 import backend.service.VantaggioService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/vantaggio")
+@RequestMapping(path ="/api/vantaggio", produces = MediaType.APPLICATION_JSON_VALUE)
 public class VantaggioController extends GenericController<Vantaggio, UUID, CreateBenefitDTO, UpdateBenefitDTO, ResponseBenefitDTO> {
     public VantaggioController(VantaggioService service, BenefitMapper mapper) {
         super(service, mapper);

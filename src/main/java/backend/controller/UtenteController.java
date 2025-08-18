@@ -8,6 +8,7 @@ import backend.mapper.UserMapper;
 import backend.model.Dipendente;
 import backend.model.Utente;
 import backend.service.UtenteService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/utenti")
+@RequestMapping(path="/api/utenti", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UtenteController extends GenericController<Utente, UUID, CreateUserDTO, UpdateUserDTO, ResponseUserDTO> {
     private final EmployeeMapper employeeMapper;
     private final UserMapper userMapper;

@@ -7,6 +7,7 @@ import backend.mapper.OrderDetailsMapper;
 import backend.model.DettagliOrdine;
 import backend.model.embeddable.OrdineProdottoId;
 import backend.service.DettagliOrdineService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/dettagli-ordini")
+@RequestMapping(path="/api/dettagli-ordini", produces = MediaType.APPLICATION_JSON_VALUE)
 class DettagliOrdineController extends GenericController<DettagliOrdine, OrdineProdottoId, CreateOrderDetailsDTO, UpdateOrderDetailsDTO, ResponseOrderDetailsDTO> {
     public DettagliOrdineController(DettagliOrdineService service, OrderDetailsMapper mapper) {
         super(service, mapper);

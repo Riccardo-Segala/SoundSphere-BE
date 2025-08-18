@@ -6,6 +6,7 @@ import backend.dto.recensione.UpdateReviewDTO;
 import backend.mapper.ReviewMapper;
 import backend.model.Recensione;
 import backend.service.RecensioneService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/recensioni")
+@RequestMapping(path="/api/recensioni", produces = MediaType.APPLICATION_JSON_VALUE)
 class RecensioneController extends GenericController<Recensione, UUID, CreateReviewDTO, UpdateReviewDTO, ResponseReviewDTO> {
     public RecensioneController(RecensioneService service, ReviewMapper mapper) {
         super(service, mapper);

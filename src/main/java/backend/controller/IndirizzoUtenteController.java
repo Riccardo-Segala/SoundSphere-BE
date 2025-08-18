@@ -5,6 +5,7 @@ import backend.dto.indirizzo_utente.UpdateUserAddressDTO;
 import backend.mapper.UserAddressMapper;
 import backend.model.IndirizzoUtente;
 import backend.service.IndirizzoUtenteService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/indirizzi-utente")
+@RequestMapping(path="/api/indirizzi-utente", produces = MediaType.APPLICATION_JSON_VALUE)
 class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID, CreateUserAddressDTO, UpdateUserAddressDTO, ResponseUserAddressDTO> {
     public IndirizzoUtenteController(IndirizzoUtenteService service, UserAddressMapper mapper) {
         super(service, mapper);

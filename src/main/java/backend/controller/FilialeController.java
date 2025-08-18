@@ -7,6 +7,7 @@ import backend.mapper.BranchMapper;
 import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.service.FilialeService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/filiale")
+@RequestMapping(path="/api/filiale", produces = MediaType.APPLICATION_JSON_VALUE)
 class FilialeController extends GenericController <Filiale, UUID, CreateBranchDTO, UpdateBranchDTO, ResponseBranchDTO> {
     public FilialeController(FilialeService service, BranchMapper mapper) {
         super(service, mapper);

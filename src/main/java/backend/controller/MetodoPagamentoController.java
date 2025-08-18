@@ -6,6 +6,7 @@ import backend.dto.metodo_pagamento.UpdatePaymentMethodDTO;
 import backend.mapper.PaymentMethodMapper;
 import backend.model.MetodoPagamento;
 import backend.service.MetodoPagamentoService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/metodi-pagamento")
+@RequestMapping(path="/api/metodi-pagamento", produces = MediaType.APPLICATION_JSON_VALUE)
 class MetodoPagamentoController extends GenericController<MetodoPagamento, UUID, CreatePaymentMethodDTO, UpdatePaymentMethodDTO, ResponsePaymentMethodDTO> {
     public MetodoPagamentoController(MetodoPagamentoService service, PaymentMethodMapper mapper) {
         super(service, mapper);
