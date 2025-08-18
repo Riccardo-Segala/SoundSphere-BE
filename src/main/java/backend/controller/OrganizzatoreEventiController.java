@@ -6,6 +6,7 @@ import backend.dto.organizzatore_eventi.UpdateEventManagerDTO;
 import backend.mapper.EventManagerMapper;
 import backend.model.OrganizzatoreEventi;
 import backend.service.OrganizzatoreEventiService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/organizzatore-eventi")
+@RequestMapping(path="/api/organizzatore-eventi", produces = MediaType.APPLICATION_JSON_VALUE)
 class OrganizzatoreEventiController extends GenericController<OrganizzatoreEventi, UUID, CreateEventManagerDTO, UpdateEventManagerDTO, ResponseEventManagerDTO> {
     public OrganizzatoreEventiController(OrganizzatoreEventiService service, EventManagerMapper mapper) {
         super(service, mapper);

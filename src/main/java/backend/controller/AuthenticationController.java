@@ -6,10 +6,7 @@ import backend.dto.dipendente.CreateEmployeeDTO;
 import backend.dto.utente.CreateUserDTO;
 import backend.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.ErrorResponse;
@@ -19,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(path="/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AuthenticationController {
 

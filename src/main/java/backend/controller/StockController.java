@@ -6,6 +6,7 @@ import backend.mapper.StockMapper;
 import backend.model.Stock;
 import backend.model.embeddable.FilialeProdottoId;
 import backend.service.StockService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/stock")
+@RequestMapping(path="/api/stock", produces = MediaType.APPLICATION_JSON_VALUE)
 public class StockController extends GenericController<Stock, FilialeProdottoId, CreateStockDTO, UpdateStockDTO, ResponseStockDTO> {
     public StockController(StockService service, StockMapper mapper) {
         super(service, mapper);

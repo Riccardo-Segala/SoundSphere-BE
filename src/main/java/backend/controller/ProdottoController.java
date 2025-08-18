@@ -6,6 +6,7 @@ import backend.dto.prodotto.UpdateProductDTO;
 import backend.mapper.ProductMapper;
 import backend.model.Prodotto;
 import backend.service.ProdottoService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/prodotti")
+@RequestMapping(path="/api/prodotti", produces = MediaType.APPLICATION_JSON_VALUE)
 class ProdottoController extends GenericController<Prodotto, UUID, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
     public ProdottoController(ProdottoService service, ProductMapper mapper) {
         super(service, mapper);
