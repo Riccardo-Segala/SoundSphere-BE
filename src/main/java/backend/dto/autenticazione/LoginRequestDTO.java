@@ -1,4 +1,10 @@
 package backend.dto.autenticazione;
 
-public record LoginRequestDTO(String email, String password) {
+import jakarta.validation.constraints.NotNull;
+
+public record LoginRequestDTO(
+        @NotNull
+        String email,
+        @NotNull
+        String password) {
 }
