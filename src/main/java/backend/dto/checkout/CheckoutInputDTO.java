@@ -1,6 +1,11 @@
 package backend.dto.checkout;
 
-public record CheckoutInputDTO(
+import java.util.List;
+import java.util.UUID;
 
+public record CheckoutInputDTO(
+    UUID metodoPagamentoId,
+    UUID indirizzoSpedizioneId,
+    List<ProductOrderInputDTO> prodotti
 )
 {}
