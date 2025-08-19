@@ -6,7 +6,6 @@ import java.util.UUID;
 public record ProductOrderOutputDTO(
         UUID prodottoId,
         String nomeProdotto,
-        int quantita,
-        BigDecimal prezzoUnitarioCongelato
+        int quantita
 )
 {}
