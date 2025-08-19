@@ -73,7 +73,7 @@ public abstract class GenericController<T, ID, CreateDTO, UpdateDTO, ResponseDTO
         return ResponseEntity.noContent().build();
     }
 
-    // espongo il sevice
+    // espongo il service
     protected GenericService<T, ID> getService() {
         return this.service;
     }
