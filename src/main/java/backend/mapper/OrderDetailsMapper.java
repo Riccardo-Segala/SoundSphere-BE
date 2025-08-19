@@ -1,5 +1,6 @@
 package backend.mapper;
 
+import backend.dto.checkout.ProductOrderOutputDTO;
 import backend.dto.dettagli_ordine.CreateOrderDetailsDTO;
 import backend.dto.dettagli_ordine.ResponseOrderDetailsDTO;
 import backend.dto.dettagli_ordine.UpdateOrderDetailsDTO;
@@ -35,4 +36,9 @@ public interface OrderDetailsMapper extends GenericMapper<DettagliOrdine, Create
     @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
     DettagliOrdine partialUpdateFromUpdate(UpdateOrderDetailsDTO updateOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
+
+    @Mapping(target = "prodottoId", source = "prodotto.id")
+    @Mapping(target = "nomeProdotto", source = "prodotto.nome")
+        // 'quantita' viene mappato automaticamente
+    ProductOrderOutputDTO toProductOrderOutputDTO(DettagliOrdine dettaglio);
 }

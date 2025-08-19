@@ -98,11 +98,13 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         nuovoOrdine.setTotale(totaleFinale);
         // Salvo nuovo ordine
         Ordine ordineSalvato = ordineRepository.save(nuovoOrdine);
-        dettagliOrdineService.createList(dettagliOrdine);
+        dettagliOrdineService.createByList(dettagliOrdine);
 
         // --- 4. AZIONI POST-PERSISTENZA ---
         carrelloService.deleteAllForUser(utenteId);
         // emailService.inviaConfermaOrdine(ordineSalvato); // Esempio invio email
+
+        // Creazione di un dto di risposta
 
         // --- 5. MAPPATURA DELLA RISPOSTA ---
         return orderMapper.toCheckoutOutputDTO(ordineSalvato);
