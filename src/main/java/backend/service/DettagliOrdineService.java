@@ -3,13 +3,21 @@ package backend.service;
 import backend.model.DettagliOrdine;
 import backend.model.embeddable.OrdineProdottoId;
 import backend.repository.DettagliOrdineRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.List;
 
 @Service
 public class DettagliOrdineService extends GenericService<DettagliOrdine, OrdineProdottoId> {
-    public DettagliOrdineService(DettagliOrdineRepository repository) {
+    private final DettagliOrdineRepository dettagliOrdineRepository;
+    public DettagliOrdineService(DettagliOrdineRepository repository, DettagliOrdineRepository dettagliOrdineRepository) {
         super(repository); // Passa il repository al costruttore della classe base
+        this.dettagliOrdineRepository = dettagliOrdineRepository;
+    }
+
+    @Transactional
+    public void createByList(List<DettagliOrdine> orderDetails) {
+        dettagliOrdineRepository.saveAll(orderDetails);
     }
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -33,6 +35,9 @@ public class Ordine {
     @ManyToOne
     @JoinColumn(name = "id_indirizzo_utente")
     private IndirizzoUtente indirizzo;
+
+    @OneToMany(mappedBy = "ordine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DettagliOrdine> dettagli = new ArrayList<>();
 
 
 }
