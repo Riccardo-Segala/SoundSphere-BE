@@ -16,6 +16,6 @@ public class OrdineService extends GenericService<Ordine, UUID> {
 
     public CheckoutOutputDTO checkout(CheckoutInputDTO checkoutDto, UUID utenteId)
     {
-        return new CheckoutOutputDTO();
+        return new CheckoutOutputDTO(null, null, null, null, null, null, null, null);
     }
 }
