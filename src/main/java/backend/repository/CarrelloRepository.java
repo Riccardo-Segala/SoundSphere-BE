@@ -19,7 +19,7 @@ public interface CarrelloRepository extends JpaRepository<Carrello, UtenteProdot
     List<Carrello> findByUtenteId(@Param("utenteId") UUID utenteId);
 
     // Trova tutte le righe del carrello per un utente specifico, non della wishlist
-    @Query("SELECT c FROM Carrello c WHERE c.utente.id = :utenteId AND c.wishlist = false")
+    @Query("SELECT c FROM Carrello c JOIN FETCH c.prodotto WHERE c.utente.id = :utenteId AND c.wishlist = false")
     List<Carrello> findByUtenteIdAndWishlistIsFalse(@Param("utenteId") UUID utenteId);
 
     @Modifying(clearAutomatically = true)

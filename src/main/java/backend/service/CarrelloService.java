@@ -68,5 +68,10 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         carrelloRepository.deleteByUtenteId(utenteId);
     }
 
+    public List<Carrello> getCartByUtenteId(UUID utenteId) {
+        List<Carrello> result = carrelloRepository.findByUtenteIdAndWishlistIsFalse(utenteId);
+        return result;
+    }
+
 }
 

@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public record CheckoutInputDTO(
     UUID metodoPagamentoId,
-    UUID indirizzoSpedizioneId,
-    List<ProductOrderInputDTO> prodotti
+    UUID indirizzoSpedizioneId
 )
 {}
