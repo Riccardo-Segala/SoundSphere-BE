@@ -42,7 +42,6 @@ public interface OrderMapper extends GenericMapper<Ordine, CreateOrderDTO, Updat
     @Mapping(target = "statoOrdine", source = "stato")
     @Mapping(target = "importoTotale", source = "totale") // Converte double in BigDecimal
     @Mapping(target = "indirizzoSpedizione", source = "indirizzo") // Assumendo che esista un AddressMapper
-    @Mapping(target = "dataConsegnaStimata", source = "dataConsegna")
     @Mapping(target = "prodottiOrdinati", source = "dettagli")
     CheckoutOutputDTO toCheckoutOutputDTO(Ordine ordine);
 

@@ -11,29 +11,24 @@ import org.mapstruct.*;
 public interface OrderDetailsMapper extends GenericMapper<DettagliOrdine, CreateOrderDetailsDTO, UpdateOrderDetailsDTO, ResponseOrderDetailsDTO> {
 
     @Override
-    @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
     DettagliOrdine fromCreateDto(CreateOrderDetailsDTO createOrderDetailsDTO);
 
     @Override
-    @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
     DettagliOrdine fromUpdateDto(UpdateOrderDetailsDTO updateOrderDetailsDTO);
 
     @Override
-    @Mapping(source = "utente.id", target = "utenteId")
     @Mapping(source = "ordine.id", target = "ordineId")
     ResponseOrderDetailsDTO toDto(DettagliOrdine dettagliOrdine);
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
     DettagliOrdine partialUpdateFromCreate(CreateOrderDetailsDTO createOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "utenteId", target = "utente.id")
     @Mapping(source = "ordineId", target = "ordine.id")
     DettagliOrdine partialUpdateFromUpdate(UpdateOrderDetailsDTO updateOrderDetailsDTO, @MappingTarget DettagliOrdine dettagliOrdine);
 

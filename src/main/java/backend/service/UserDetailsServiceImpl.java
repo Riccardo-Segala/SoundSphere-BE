@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Cerca l'entità Utente nel database usando l'email come identificativo.
-        Utente utente = utenteRepository.findByEmail(username)
+        Utente utente = utenteRepository.findByEmailWithRuoli(username)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Nessun utente trovato con l'email: " + username));
 

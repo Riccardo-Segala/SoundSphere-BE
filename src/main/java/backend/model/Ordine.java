@@ -4,7 +4,6 @@ import backend.model.enums.StatoOrdine;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +19,18 @@ public class Ordine {
     @Column(name = "id", nullable = false)
     private UUID id;
 
+    // --- CAMBIAMENTO CRITICO: Aggiunta relazione con Utente ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_utente", nullable = false)
+    private Utente utente;
+
+    @ManyToOne(fetch = FetchType.LAZY) // CAMBIAMENTO: Aggiunto LAZY per coerenza
+    @JoinColumn(name = "id_indirizzo_utente")
+    private IndirizzoUtente indirizzo;
 
     private LocalDate dataAcquisto;
+
+    private LocalDate dataConsegnaStimata;
     private LocalDate dataConsegna;
 
     @Column(name = "spedizione_gratuita")
@@ -32,12 +41,6 @@ public class Ordine {
     @Enumerated(EnumType.STRING)
     private StatoOrdine stato;
 
-    @ManyToOne
-    @JoinColumn(name = "id_indirizzo_utente")
-    private IndirizzoUtente indirizzo;
-
     @OneToMany(mappedBy = "ordine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DettagliOrdine> dettagli = new ArrayList<>();
-
-
 }

@@ -63,14 +63,14 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
     }
 
     @Transactional
-    public void deleteAllForUser(UUID utenteId) {
-        // Chiama il metodo personalizzato che sa come gestire la chiave composta.
-        carrelloRepository.deleteByUtenteId(utenteId);
+    public void deleteAllItems(List<Carrello> carrelli) {
+        // Questo metodo lavora con le entità gestite,
+        // mantenendo il contesto di persistenza sincronizzato.
+        carrelloRepository.deleteAll(carrelli);
     }
 
     public List<Carrello> getCartByUtenteId(UUID utenteId) {
-        List<Carrello> result = carrelloRepository.findByUtenteIdAndWishlistIsFalse(utenteId);
-        return result;
+        return carrelloRepository.findByUtenteIdAndWishlistIsFalse(utenteId);
     }
 
 }

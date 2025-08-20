@@ -12,11 +12,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OrdineService extends GenericService<Ordine, UUID> {
@@ -29,8 +29,6 @@ public class OrdineService extends GenericService<Ordine, UUID> {
     private IndirizzoUtenteService indirizzoUtenteService;
     @Autowired
     private MetodoPagamentoService metodoPagamentoService;
-    @Autowired
-    private ProdottoService prodottoService;
     @Autowired
     private StockService stockService;
     @Autowired
@@ -64,6 +62,8 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         nuovoOrdine.setIndirizzo(indirizzo);
         nuovoOrdine.setDataAcquisto(LocalDate.now());
         nuovoOrdine.setStato(StatoOrdine.IN_ATTESA);
+        nuovoOrdine.setDataConsegnaStimata(LocalDate.now().plusDays(3));
+        nuovoOrdine.setUtente(utente);
 
         // Salva l'ordine per ottenere un ID generato dal database.
         // L'oggetto 'ordineSalvato' è ora un'entità "managed" da JPA e ha un ID valido.
@@ -84,12 +84,11 @@ public class OrdineService extends GenericService<Ordine, UUID> {
                     // Imposta le relazioni su entrambi i lati per coerenza
                     dettaglio.setOrdine(ordineSalvato);
                     dettaglio.setProdotto(prodotto);
-                    dettaglio.setUtente(utente);
                     dettaglio.setQuantita(cartElement.getQuantita());
 
                     return dettaglio;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
         // Salva la lista di tutti i dettagli ordine creati
         dettagliOrdineService.createByList(dettagliOrdine);
@@ -99,12 +98,14 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         double totaleFinale = carrelloService.calcolaTotaleFinale(utenteId);
         ordineSalvato.setTotale(totaleFinale);
 
+        ordineSalvato.setDettagli(dettagliOrdine);
+
         // Non è strettamente necessario chiamare save() di nuovo, perché 'ordineSalvato'
         // è già un'entità managed e JPA rileverà la modifica al totale al commit
         // della transazione. Tuttavia, chiamarlo rende il codice più esplicito.
         ordineRepository.save(ordineSalvato);
 
-        carrelloService.deleteAllForUser(utenteId);
+        carrelloService.deleteAllItems(carrello);
         // emailService.inviaConfermaOrdine(ordineSalvato);
 
         // --- 5. MAPPATURA DELLA RISPOSTA ---

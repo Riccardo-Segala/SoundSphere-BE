@@ -11,7 +11,6 @@ import java.util.UUID;
 public record UpdateOrderDetailsDTO (
         UUID ordineId,
         ResponseProductDTO prodotto,
-        UUID utenteId,
         int quantita
 ) implements Serializable {
 }
