@@ -22,7 +22,7 @@ public interface CarrelloRepository extends JpaRepository<Carrello, UtenteProdot
     @Query("SELECT c FROM Carrello c WHERE c.utente.id = :utenteId AND c.wishlist = false")
     List<Carrello> findByUtenteIdAndWishlistIsFalse(@Param("utenteId") UUID utenteId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     // Cancella tutte le righe del carrello per un utente specifico
     @Query("DELETE FROM Carrello c WHERE c.id.utenteId = :utenteId")
     void deleteByUtenteId(@Param("utenteId") UUID utenteId);
