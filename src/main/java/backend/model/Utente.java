@@ -51,17 +51,20 @@ public class Utente implements UserDetails {
 
     private Integer punti;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_vantaggio")
     private Vantaggio vantaggio;
 
-    @ManyToMany(fetch = FetchType.EAGER) // Carica subito i ruoli
+    @ManyToMany(fetch = FetchType.LAZY) // Carica subito i ruoli
     @JoinTable(
             name = "utente_ruolo",
             joinColumns = @JoinColumn(name = "id_utente"),
             inverseJoinColumns = @JoinColumn(name = "id_ruolo")
     )
     private Set<Ruolo> ruoli = new HashSet<>();
+
+    @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Ordine> ordini = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

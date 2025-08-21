@@ -5,5 +5,6 @@ public enum StatoOrdine {
     SPEDITO,
     IN_CONSEGNA,
     CONSEGNATO,
+    IN_ATTESA,
     ANNULLATO
 }

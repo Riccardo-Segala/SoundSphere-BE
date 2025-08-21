@@ -8,10 +8,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface FilialeRepository extends JpaRepository<Filiale, UUID> {
     @Query("SELECT p FROM Prodotto p JOIN Stock s ON p.id = s.prodotto.id WHERE s.filiale.id = :filialeId AND s.quantita > 0")
     List<Prodotto> getProductInStockByBranchId(@Param("filialeId") UUID filialeId);
+
+    @Query("SELECT f FROM Filiale f WHERE f.nome = :nome")
+    Optional<Filiale> findByName(@Param("nome") String nome);
 }

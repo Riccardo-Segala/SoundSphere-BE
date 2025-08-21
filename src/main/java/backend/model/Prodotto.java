@@ -1,9 +1,6 @@
 package backend.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*; // Aggiunto per GeneratedValue
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,11 +12,12 @@ import java.util.UUID;
 @Table(name = "prodotto")
 public class Prodotto {
     @Id
+    // --- CAMBIAMENTO CRITICO: Aggiunta generazione automatica dell'ID ---
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
     private String nome;
-
     private String descrizione;
 
     @Column(nullable = false)
@@ -35,5 +33,4 @@ public class Prodotto {
 
     @Column(columnDefinition = "TEXT")
     private String pathImmagine;
-
 }

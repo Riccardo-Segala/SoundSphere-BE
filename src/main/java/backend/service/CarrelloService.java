@@ -7,6 +7,8 @@ import backend.repository.CarrelloRepository;
 import backend.repository.DatiStaticiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,7 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
     // Calcola il totale parziale del carrello per un utente specifico
     public double calcolaTotaleParziale(UUID utenteId) {
         //Recupera tutte le righe del carrello per l'utente dal repository
-        List<Carrello> righeCarrello = carrelloRepository.findByUtenteId(utenteId);
+        List<Carrello> righeCarrello = carrelloRepository.findByUtenteIdAndWishlistIsFalse(utenteId);
 
         if (righeCarrello.isEmpty()) {
             return 0.0;
@@ -59,4 +61,17 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         // Totale non negativo
         return Math.max(0.0, totaleFinale);
     }
+
+    @Transactional
+    public void deleteAllItems(List<Carrello> carrelli) {
+        // Questo metodo lavora con le entità gestite,
+        // mantenendo il contesto di persistenza sincronizzato.
+        carrelloRepository.deleteAll(carrelli);
+    }
+
+    public List<Carrello> getCartByUtenteId(UUID utenteId) {
+        return carrelloRepository.findByUtenteIdAndWishlistIsFalse(utenteId);
+    }
+
 }
+

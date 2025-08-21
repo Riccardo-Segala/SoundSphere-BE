@@ -23,10 +23,6 @@ public class DettagliOrdine {
     @JoinColumn(name = "id_prodotto")
     private Prodotto prodotto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_utente")
-    private Utente utente;
-
     private int quantita;
 
 }

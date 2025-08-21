@@ -1,15 +1,114 @@
 package backend.service;
 
-import backend.model.Ordine;
+import backend.dto.checkout.CheckoutInputDTO;
+import backend.dto.checkout.CheckoutOutputDTO;
+import backend.mapper.OrderMapper;
+import backend.model.*;
+import backend.model.embeddable.OrdineProdottoId;
+import backend.model.enums.StatoOrdine;
 import backend.repository.OrdineRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OrdineService extends GenericService<Ordine, UUID> {
-    public OrdineService(OrdineRepository repository) {
+    private final OrdineRepository ordineRepository;
+    private final OrderMapper orderMapper;
+
+    @Autowired
+    private UtenteService utenteService;
+    @Autowired
+    private IndirizzoUtenteService indirizzoUtenteService;
+    @Autowired
+    private MetodoPagamentoService metodoPagamentoService;
+    @Autowired
+    private StockService stockService;
+    @Autowired
+    private CarrelloService carrelloService;
+    @Autowired
+    private DettagliOrdineService dettagliOrdineService;
+
+
+
+    public OrdineService(OrdineRepository repository, OrdineRepository ordineRepository, OrderMapper orderMapper) {
         super(repository); // Passa il repository al costruttore della classe base
+        this.ordineRepository = ordineRepository;
+        this.orderMapper = orderMapper;
     }
 
+    @Transactional
+    public CheckoutOutputDTO checkout(CheckoutInputDTO checkoutDto, UUID utenteId) {
+
+        // --- 1. RECUPERO E VALIDAZIONE TRAMITE SERVICE ---
+        Utente utente = utenteService.findById(utenteId)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non valido"));
+        IndirizzoUtente indirizzo = indirizzoUtenteService.findByIdAndValidateOwnership(checkoutDto.indirizzoSpedizioneId(), utenteId);
+        MetodoPagamento metodoPagamento = metodoPagamentoService.findById(checkoutDto.metodoPagamentoId())
+                .orElseThrow(() -> new EntityNotFoundException("Metodo di pagamento non valido"));
+
+        List<Carrello> carrello = carrelloService.getCartByUtenteId(utenteId);
+
+        // --- 2. CREA E SALVA L'ORDINE "PADRE" PER PRIMO ---
+        // Creiamo l'ordine con i dati che già conosciamo. Il totale verrà aggiornato dopo.
+        Ordine nuovoOrdine = new Ordine();
+        nuovoOrdine.setIndirizzo(indirizzo);
+        nuovoOrdine.setDataAcquisto(LocalDate.now());
+        nuovoOrdine.setStato(StatoOrdine.IN_ATTESA);
+        nuovoOrdine.setDataConsegnaStimata(LocalDate.now().plusDays(3));
+        nuovoOrdine.setUtente(utente);
+
+        // Salva l'ordine per ottenere un ID generato dal database.
+        // L'oggetto 'ordineSalvato' è ora un'entità "managed" da JPA e ha un ID valido.
+        Ordine ordineSalvato = ordineRepository.save(nuovoOrdine);
+
+        // --- 3. LOGICA DI BUSINESS E CREAZIONE DEI DETTAGLI "FIGLI" ---
+        List<DettagliOrdine> dettagliOrdine = carrello.stream()
+                .map(cartElement -> {
+                    Prodotto prodotto = cartElement.getProdotto();
+                    stockService.reserveStock("online", prodotto.getId(), cartElement.getQuantita());
+
+                    DettagliOrdine dettaglio = new DettagliOrdine();
+
+                    // **PASSAGGIO CHIAVE 2: Usa l'ID dell'ordine appena salvato.**
+                    OrdineProdottoId dettagliId = new OrdineProdottoId(ordineSalvato.getId(), prodotto.getId());
+                    dettaglio.setId(dettagliId);
+
+                    // Imposta le relazioni su entrambi i lati per coerenza
+                    dettaglio.setOrdine(ordineSalvato);
+                    dettaglio.setProdotto(prodotto);
+                    dettaglio.setQuantita(cartElement.getQuantita());
+
+                    return dettaglio;
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        // Salva la lista di tutti i dettagli ordine creati
+        dettagliOrdineService.createByList(dettagliOrdine);
+
+        // --- 4. AGGIORNAMENTO FINALE E AZIONI POST-PERSISTENZA ---
+        // Ora che abbiamo i dettagli, calcoliamo il totale e aggiorniamo l'ordine
+        double totaleFinale = carrelloService.calcolaTotaleFinale(utenteId);
+        ordineSalvato.setTotale(totaleFinale);
+
+        ordineSalvato.setDettagli(dettagliOrdine);
+
+        // Non è strettamente necessario chiamare save() di nuovo, perché 'ordineSalvato'
+        // è già un'entità managed e JPA rileverà la modifica al totale al commit
+        // della transazione. Tuttavia, chiamarlo rende il codice più esplicito.
+        ordineRepository.save(ordineSalvato);
+
+        carrelloService.deleteAllItems(carrello);
+        // emailService.inviaConfermaOrdine(ordineSalvato);
+
+        // --- 5. MAPPATURA DELLA RISPOSTA ---
+        return orderMapper.toCheckoutOutputDTO(ordineSalvato);
+    }
 }
