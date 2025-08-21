@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -35,8 +36,16 @@ public class CustomUserDetails implements UserDetails {
         // Mappa i ruoli dell'entità in una collezione di GrantedAuthority.
         // Il prefisso 'ROLE_' è una convenzione standard di Spring Security.
         this.authorities = utente.getRuoli().stream()
-                .flatMap(ruolo -> ruolo.getPermessi().stream())
-                .map(permesso -> new SimpleGrantedAuthority(permesso.getNome().toUpperCase()))
+                .flatMap(ruolo -> {
+                    Stream<GrantedAuthority> ruoloStream = Stream.of(
+                            new SimpleGrantedAuthority("ROLE_" + ruolo.getNome().toUpperCase())
+                    );
+
+                    Stream<GrantedAuthority> permessiStream = ruolo.getPermessi().stream()
+                            .map(permesso -> new SimpleGrantedAuthority(permesso.getNome().toUpperCase()));
+
+                    return Stream.concat(ruoloStream, permessiStream);
+                })
                 .collect(Collectors.toList());
 
         // Copia lo stato dell'account dall'entità

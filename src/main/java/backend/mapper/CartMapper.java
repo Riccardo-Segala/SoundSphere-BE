@@ -11,28 +11,23 @@ public interface CartMapper extends GenericMapper<Carrello, CreateCartDTO, Updat
 
     @Override
     @Mapping(source = "prodottoId", target = "id.prodottoId")
-    @Mapping(source = "utenteId", target = "id.utenteId")
     Carrello fromCreateDto(CreateCartDTO createCartDTO);
 
     @Override
     @Mapping(source = "prodottoId", target = "id.prodottoId")
-    @Mapping(source = "utenteId", target = "id.utenteId")
     Carrello fromUpdateDto(UpdateCartDTO updateCartDTO);
 
     @Override
     @Mapping(source = "prodotto", target = "prodotto")
-    @Mapping(source = "id.utenteId", target = "utenteId")
     ResponseCartDTO toDto(Carrello carrello);
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "prodottoId", target = "id.prodottoId")
-    @Mapping(source = "utenteId", target = "id.utenteId")
     Carrello partialUpdateFromCreate(CreateCartDTO createCartDTO, @MappingTarget Carrello carrello);
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "prodottoId", target = "id.prodottoId")
-    @Mapping(source = "utenteId", target = "id.utenteId")
     Carrello partialUpdateFromUpdate(UpdateCartDTO updateCartDTO, @MappingTarget Carrello carrello);
 }

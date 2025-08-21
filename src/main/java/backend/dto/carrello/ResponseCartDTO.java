@@ -9,7 +9,6 @@ import java.util.UUID;
  * DTO for {@link backend.model.Carrello}
  */
 public record ResponseCartDTO(
-        UUID utenteId,
         ResponseProductDTO prodotto,
         int quantita,
         boolean wishlist

@@ -5,13 +5,14 @@ import backend.dto.utente.ResponseUserDTO;
 import backend.dto.utente.UpdateUserDTO;
 import backend.mapper.EmployeeMapper;
 import backend.mapper.UserMapper;
-import backend.model.Dipendente;
 import backend.model.Utente;
+import backend.security.CustomUserDetails;
 import backend.service.UtenteService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,11 +23,13 @@ import java.util.UUID;
 public class UtenteController extends GenericController<Utente, UUID, CreateUserDTO, UpdateUserDTO, ResponseUserDTO> {
     private final EmployeeMapper employeeMapper;
     private final UserMapper userMapper;
+    private final UtenteService userService;
 
-    public UtenteController(UtenteService service, UserMapper mapper, EmployeeMapper employeeMapper) {
+    public UtenteController(UtenteService service, UserMapper mapper, EmployeeMapper employeeMapper, UtenteService userService) {
         super(service, mapper);
         this.employeeMapper = employeeMapper;
         this.userMapper = mapper;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -35,22 +38,19 @@ public class UtenteController extends GenericController<Utente, UUID, CreateUser
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
-        // Spring Security, grazie al nostro filtro, fornisce l'oggetto Authentication
-        // che contiene l'utente completo come "principal".
-        Utente currentUser = (Utente) authentication.getPrincipal();
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        // Controlla il ruolo chiamando .getAuthorities() direttamente sul principal.
+        boolean isDipendente = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_DIPENDENTE"));
 
-        // CONTROLLO DEL TIPO
-        if (currentUser instanceof Dipendente) {
-            // Se è un Dipendente, usa il DipendenteMapper per ottenere il DTO completo
-            Dipendente dipendente = (Dipendente) currentUser;
-            var dto = employeeMapper.toDto(dipendente);
-            return ResponseEntity.ok(dto);
-        } else {
-            // Altrimenti, usa il UserMapper standard
-            var dto = userMapper.toDto(currentUser);
-            return ResponseEntity.ok(dto);
-        }
+        // Prende l'ID direttamente, senza bisogno di getPrincipal() o cast.
+        UUID userId = userDetails.getId();
+
+        // 2. chiama il service
+        Object dto = userService.getUserDetailsById(userId, isDipendente);
+
+        // 3. restituisce la risposta
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{id}")

@@ -15,15 +15,11 @@ import java.util.UUID;
 public interface CarrelloRepository extends JpaRepository<Carrello, UtenteProdottoId> {
 
     // Trova tutte le righe del carrello e della wishlist per un utente specifico
-    @Query("SELECT c FROM Carrello c WHERE c.id.utenteId = :utenteId")
-    List<Carrello> findByUtenteId(@Param("utenteId") UUID utenteId);
 
     // Trova tutte le righe del carrello per un utente specifico, non della wishlist
     @Query("SELECT c FROM Carrello c JOIN FETCH c.prodotto WHERE c.utente.id = :utenteId AND c.wishlist = false")
-    List<Carrello> findByUtenteIdAndWishlistIsFalse(@Param("utenteId") UUID utenteId);
+    List<Carrello> findCartByUserId(@Param("utenteId") UUID utenteId);
 
-    @Modifying(clearAutomatically = true)
-    // Cancella tutte le righe del carrello per un utente specifico
-    @Query("DELETE FROM Carrello c WHERE c.id.utenteId = :utenteId")
-    void deleteByUtenteId(@Param("utenteId") UUID utenteId);
+    @Query("SELECT c FROM Carrello c JOIN FETCH c.prodotto WHERE c.utente.id = :utenteId AND c.wishlist = true")
+    List<Carrello> findWishlistByUserId(@Param("utenteId")UUID utenteId);
 }

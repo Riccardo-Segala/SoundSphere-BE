@@ -18,4 +18,7 @@ public interface UtenteRepository extends JpaRepository<Utente, UUID> {
     @Query("SELECT u FROM Utente u JOIN FETCH u.ruoli WHERE u.email = :email")
     Optional<Utente> findByEmailWithRuoli(@Param("email") String email);
 
+    @Query("SELECT u FROM Utente u LEFT JOIN FETCH u.ruoli LEFT JOIN FETCH u.vantaggio WHERE u.id = :id")
+    Optional<Utente> findUtenteByIdWithDetails(@Param("id") UUID id);
+
 }

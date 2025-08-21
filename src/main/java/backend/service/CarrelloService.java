@@ -30,7 +30,7 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
     // Calcola il totale parziale del carrello per un utente specifico
     public double calcolaTotaleParziale(UUID utenteId) {
         //Recupera tutte le righe del carrello per l'utente dal repository
-        List<Carrello> righeCarrello = carrelloRepository.findByUtenteIdAndWishlistIsFalse(utenteId);
+        List<Carrello> righeCarrello = carrelloRepository.findCartByUserId(utenteId);
 
         if (righeCarrello.isEmpty()) {
             return 0.0;
@@ -69,8 +69,14 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         carrelloRepository.deleteAll(carrelli);
     }
 
+    // aggiunta di un elemento al carrello o alla wishlist
+
+    public List<Carrello> getWishlistByUtenteId(UUID utenteId) {
+        return carrelloRepository.findWishlistByUserId(utenteId);
+    }
+
     public List<Carrello> getCartByUtenteId(UUID utenteId) {
-        return carrelloRepository.findByUtenteIdAndWishlistIsFalse(utenteId);
+        return carrelloRepository.findCartByUserId(utenteId);
     }
 
 }

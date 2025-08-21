@@ -10,7 +10,6 @@ import java.util.UUID;
  */
 //@Value
 public record CreateCartDTO(
-        UUID utenteId,
         UUID prodottoId,
         int quantita,
         boolean wishlist
