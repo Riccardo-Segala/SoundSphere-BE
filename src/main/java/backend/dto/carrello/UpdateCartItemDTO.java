@@ -9,7 +9,7 @@ import java.util.UUID;
  * DTO for {@link Carrello}
  */
 //@Value
-public record CreateCartDTO(
+public record UpdateCartItemDTO(
         UUID prodottoId,
         int quantita,
         boolean wishlist
