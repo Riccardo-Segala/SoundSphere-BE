@@ -1,5 +1,6 @@
 package backend.controller;
 
+import backend.dto.carrello.DeleteCartDTO;
 import backend.dto.carrello.UpdateCartItemDTO;
 import backend.dto.carrello.ResponseCartDTO;
 import backend.mapper.CartMapper;
@@ -42,7 +43,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     }*/
 
     // POST
-    @GetMapping("/getAllCartOfUser")
+    @GetMapping
     public ResponseEntity<List<ResponseCartDTO>> getAllCartOfUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId();
         // Chiamata al servizio per ottenere tutti gli elementi del carrello
@@ -52,7 +53,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
         return ResponseEntity.ok(cartItems);
     }
 
-    @PostMapping("/updateItems")
+    @PutMapping
     public ResponseEntity<ResponseCartDTO> updateItemInCart(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                        @RequestBody UpdateCartItemDTO dto)
     {
@@ -62,6 +63,32 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
 
         // Restituisce la lista aggiornata del carrello
         return ResponseEntity.ok(updatedCart);
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> removeItemFromCart(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                   @PathVariable UUID productId)
+    {
+        UUID userId = userDetails.getId();
+        UtenteProdottoId cartId = new UtenteProdottoId(userId, productId);
+        // Chiamata al servizio per rimuovere l'elemento dal carrello
+        carrelloService.delete(cartId);
+
+        // Restituisce la lista aggiornata del carrello
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @DeleteMapping("/items")
+    public ResponseEntity<Void> removeItemsFromCart(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody DeleteCartDTO dto) {
+
+        UUID userId = userDetails.getId();
+        carrelloService.removeItemsFromCart(userId, dto.productIds());
+
+        // La risposta standard per una DELETE andata a buon fine è "204 No Content".
+        return ResponseEntity.noContent().build();
     }
     // PUT by ID composto
 

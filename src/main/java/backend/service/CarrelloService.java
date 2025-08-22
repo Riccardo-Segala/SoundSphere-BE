@@ -127,60 +127,30 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
 
     @Transactional
     public ResponseCartDTO updateItemInCart(UUID userId, UpdateCartItemDTO dto) {
-        UtenteProdottoId cartId = new UtenteProdottoId(userId, dto.prodottoId());
-
-        // 1. Cercoo l'articolo nel carrello, ma senza lanciare un'eccezione se non c'è.
-        //    ottengo un Optional che può essere pieno o vuoto.
-        Optional<Carrello> optionalItem = carrelloRepository.findById(cartId);
-
-        Carrello itemToSave; // Dichiaro una variabile per l'oggetto che salvo alla fine
-
-        if (optionalItem.isPresent()) {
-            // --- CASO 1: L'ARTICOLO ESISTE GIÀ (AGGIORNA) ---
-
-            // Estraggo l'articolo esistente dall'Optional
-            Carrello existingItem = optionalItem.get();
-
-            // Controllo la quantità specificata nel DTO
-            if (dto.quantita() > 0) {
-                // Se la quantità è positiva, aggiorno il valore
-                existingItem.setQuantita(dto.quantita());
-                itemToSave = existingItem;
-
-            } else {
-                existingItem.setQuantita(0);
-                ResponseCartDTO responseDto = cartMapper.toDto(existingItem);
-                // Se la quantità è 0 o negativa, rimuovo l'articolo
-                carrelloRepository.delete(existingItem);
-                return responseDto;
-            }
-
-        } else {
-            // --- CASO 2: L'ARTICOLO NON ESISTE (CREA) ---
-
-            // Uso il mapper per creare una nuova entità Carrello a partire dal DTO
-            Carrello newItem = cartMapper.fromCreateDto(dto);
-            Utente utente = utenteService.getById(userId);
-            Prodotto prodotto = prodottoService.getById(dto.prodottoId());
-
-            // Imposto l'ID completo. Il prodottoId è già stato mappato,
-            // ma devo aggiungere l'userId che proviene dal contesto di sicurezza.
-            newItem.getId().setUtenteId(userId);
-            newItem.setProdotto(prodotto);
-            newItem.setUtente(utente);
-
-            newItem.setWishlist(false);
-
-            // Assegno il nuovo articolo alla variabile
-            itemToSave = newItem;
+        // --- Validazione dell'input ---
+        if (dto.quantita() <= 0) {
+            throw new IllegalArgumentException("La quantità deve essere maggiore di zero.");
         }
 
-        // 2. A questo punto, 'itemToSave' contiene o l'articolo aggiornato o quello nuovo.
-        //    Lo salvo nel database con un'unica operazione.
+        // Il prodottoId viene ora estratto dal DTO
+        UUID prodottoId = dto.prodottoId();
+        UtenteProdottoId cartId = new UtenteProdottoId(userId, prodottoId);
 
-        Carrello savedItem = carrelloRepository.save(itemToSave);
+        Carrello item = carrelloRepository.findById(cartId).orElseGet(() -> {
+            // Logica di creazione se l'elemento non esiste
+            Carrello newItem = cartMapper.fromCreateDto(dto);
+            Utente utente = utenteService.getById(userId);
+            Prodotto prodotto = prodottoService.getById(prodottoId);
 
-        // 3. Restituisco il DTO dell'articolo appena salvato, come richiesto.
+            newItem.setId(cartId);
+            newItem.setUtente(utente);
+            newItem.setProdotto(prodotto);
+            newItem.setWishlist(false);
+            return newItem;
+        });
+
+        item.setQuantita(dto.quantita());
+        Carrello savedItem = carrelloRepository.save(item);
         return cartMapper.toDto(savedItem);
     }
 
@@ -192,6 +162,23 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         return cartItems.stream()
                 .map(cartMapper::toDto)
                 .toList();
+    }
+
+    public void removeItemsFromCart(UUID userId, List<UUID> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            // Se la lista è vuota non fare nulla o lancia un'eccezione
+            return;
+        }
+
+        // 1. Crea la lista degli ID compositi (UtenteProdottoId) da eliminare
+        List<UtenteProdottoId> cartIdsToDelete = productIds.stream()
+                .map(productId -> new UtenteProdottoId(userId, productId))
+                .toList();
+
+        // 2. Usa il metodo deleteAllById di Spring Data JPA per una cancellazione efficiente.
+        //    Questo metodo esegue una singola query (o un numero molto limitato)
+        //    invece di una per ogni elemento.
+        carrelloRepository.deleteAllById(cartIdsToDelete);
     }
 }
 
