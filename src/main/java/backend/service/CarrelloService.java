@@ -5,6 +5,8 @@ import backend.dto.carrello.ResponseCartDTO;
 import backend.mapper.CartMapper;
 import backend.model.Carrello;
 import backend.model.DatiStatici;
+import backend.model.Prodotto;
+import backend.model.Utente;
 import backend.model.embeddable.UtenteProdottoId;
 import backend.repository.CarrelloRepository;
 import backend.repository.DatiStaticiRepository;
@@ -27,6 +29,11 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
     private VantaggioService vantaggioService;
 
     private final CartMapper cartMapper;
+    @Autowired
+    private UtenteService utenteService;
+    @Autowired
+    private ProdottoService prodottoService;
+
     public CarrelloService(CarrelloRepository repository, CartMapper cartMapper) {
         super(repository); // Passa il repository al costruttore della classe base
         this.cartMapper = cartMapper;
@@ -152,12 +159,16 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
             // --- CASO 2: L'ARTICOLO NON ESISTE (CREA) ---
 
             // Uso il mapper per creare una nuova entità Carrello a partire dal DTO
-            Carrello newItem = cartMapper.fromUpdateDto(dto);
+            Carrello newItem = cartMapper.fromCreateDto(dto);
+            Utente utente = utenteService.getById(userId);
+            Prodotto prodotto = prodottoService.getById(dto.prodottoId());
 
             // Imposto l'ID completo. Il prodottoId è già stato mappato,
             // ma devo aggiungere l'userId che proviene dal contesto di sicurezza.
             newItem.getId().setUtenteId(userId);
-            newItem.setQuantita(dto.quantita());
+            newItem.setProdotto(prodotto);
+            newItem.setUtente(utente);
+
             newItem.setWishlist(false);
 
             // Assegno il nuovo articolo alla variabile

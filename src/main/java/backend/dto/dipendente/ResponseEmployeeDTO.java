@@ -12,7 +12,6 @@ import java.util.UUID;
  */
 
 public record ResponseEmployeeDTO (
-        UUID id,
         String nome,
         String cognome,
         String email,
