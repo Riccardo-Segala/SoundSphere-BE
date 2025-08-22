@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class JwtService {
@@ -56,6 +58,7 @@ public class JwtService {
         claims.put("userId", utente.getId());
         return generateToken(claims, utente);
     }
+
 
     // chiama il costruttore con claims vuoti.
     public String generateToken(UserDetails userDetails) {

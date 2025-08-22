@@ -1,16 +1,16 @@
 package backend.controller;
 
-import backend.dto.carrello.CreateCartDTO;
+import backend.dto.carrello.DeleteCartDTO;
+import backend.dto.carrello.UpdateCartItemDTO;
 import backend.dto.carrello.ResponseCartDTO;
-import backend.dto.carrello.UpdateCartDTO;
 import backend.mapper.CartMapper;
 import backend.model.Carrello;
 import backend.model.embeddable.UtenteProdottoId;
+import backend.security.CustomUserDetails;
 import backend.service.CarrelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path="/api/carrello", produces = MediaType.APPLICATION_JSON_VALUE)
-class CarrelloController extends GenericController <Carrello, UtenteProdottoId, CreateCartDTO, UpdateCartDTO, ResponseCartDTO> {
+class CarrelloController extends GenericController <Carrello, UtenteProdottoId, UpdateCartItemDTO, UpdateCartItemDTO, ResponseCartDTO> {
     public CarrelloController(CarrelloService service, CartMapper mapper) {
         super(service, mapper);
     }
@@ -29,57 +29,68 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     @Autowired
     private CarrelloService carrelloService;
 
-    @GetMapping("/totale-parziale/{id}")
-    public double getTotaleParziale(@PathVariable UUID id) {
-        return carrelloService.calcolaTotaleParziale(id);
-    }
 
-    @GetMapping("/totale-finale/{id}")
-    public double getTotaleFinale(@PathVariable UUID id) {
-        return carrelloService.calcolaTotaleFinale(id);
-    }
 
-    @GetMapping
-    public ResponseEntity<List<ResponseCartDTO>> getAllCarts() {
-        return super.getAll();
-    }
 
     // GET by ID composto
-    @GetMapping("/{utenteId}/{prodottoId}")
+   /* @GetMapping("/{utenteId}/{prodottoId}")
     public ResponseEntity<ResponseCartDTO> getCartById(
             @PathVariable UUID utenteId,
             @PathVariable UUID prodottoId) {
 
         UtenteProdottoId id = new UtenteProdottoId(utenteId, prodottoId);
         return super.getById(id);
-    }
+    }*/
 
     // POST
-    @PostMapping
-    public ResponseEntity<ResponseCartDTO> createCart(@RequestBody CreateCartDTO createDTO) {
-        return super.create(createDTO);
+    @GetMapping
+    public ResponseEntity<List<ResponseCartDTO>> getAllCartOfUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UUID userId = userDetails.getId();
+        // Chiamata al servizio per ottenere tutti gli elementi del carrello
+        List<ResponseCartDTO> cartItems = carrelloService.getAllCartItemsByUserId(userId);
+
+        // Restituisce la lista degli elementi del carrello
+        return ResponseEntity.ok(cartItems);
     }
 
+    @PutMapping
+    public ResponseEntity<ResponseCartDTO> updateItemInCart(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                       @RequestBody UpdateCartItemDTO dto)
+    {
+        UUID userId = userDetails.getId();
+        // Chiamata al servizio per rimuovere l'elemento dal carrello
+        ResponseCartDTO updatedCart = carrelloService.updateItemInCart(userId, dto);
+
+        // Restituisce la lista aggiornata del carrello
+        return ResponseEntity.ok(updatedCart);
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> removeItemFromCart(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                   @PathVariable UUID productId)
+    {
+        UUID userId = userDetails.getId();
+        UtenteProdottoId cartId = new UtenteProdottoId(userId, productId);
+        // Chiamata al servizio per rimuovere l'elemento dal carrello
+        carrelloService.delete(cartId);
+
+        // Restituisce la lista aggiornata del carrello
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @DeleteMapping("/items")
+    public ResponseEntity<Void> removeItemsFromCart(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody DeleteCartDTO dto) {
+
+        UUID userId = userDetails.getId();
+        carrelloService.removeItemsFromCart(userId, dto.productIds());
+
+        // La risposta standard per una DELETE andata a buon fine è "204 No Content".
+        return ResponseEntity.noContent().build();
+    }
     // PUT by ID composto
-    @PutMapping("/{utenteId}/{prodottoId}")
-    public ResponseEntity<ResponseCartDTO> updateCart(
-            @PathVariable UUID utenteId,
-            @PathVariable UUID prodottoId,
-            @RequestBody UpdateCartDTO updateDTO) {
-
-        UtenteProdottoId id = new UtenteProdottoId(utenteId, prodottoId);
-        return super.update(id, updateDTO);
-    }
-
-    // DELETE by ID composto
-    @DeleteMapping("/{utenteId}/{prodottoId}")
-    public ResponseEntity<Void> deleteCart(
-            @PathVariable UUID utenteId,
-            @PathVariable UUID prodottoId) {
-
-        UtenteProdottoId id = new UtenteProdottoId(utenteId, prodottoId);
-        return super.delete(id);
-    }
 
     // implementazione del metodo astratto getId
     @Override

@@ -10,7 +10,6 @@ import java.util.UUID;
  * DTO for {@link backend.model.Utente}
  */
 public record UpdateUserDTO(
-        UUID id,
         String nome,
         String cognome,
         String password,
