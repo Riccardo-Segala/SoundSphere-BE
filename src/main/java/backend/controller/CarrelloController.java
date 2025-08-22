@@ -53,6 +53,19 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
         return ResponseEntity.ok(cartItems);
     }
 
+    @GetMapping("/wishlist")
+    public ResponseEntity<List<ResponseCartDTO>> getAllWishlist(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UUID userId = userDetails.getId();
+
+        // Chiamata al servizio per ottenere tutti gli elementi della wishlist
+        List<ResponseCartDTO> wishlistItems = carrelloService.getAllWishlistItemsByUserId(userId);
+
+        // 4. Restituisci la lista di DTO con uno status HTTP 200 OK
+        return ResponseEntity.ok(wishlistItems);
+    }
+
+
+
     @PutMapping
     public ResponseEntity<ResponseCartDTO> updateItemInCart(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                        @RequestBody UpdateCartItemDTO dto)

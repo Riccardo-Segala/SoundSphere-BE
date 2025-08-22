@@ -164,6 +164,16 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
                 .toList();
     }
 
+    public List<ResponseCartDTO> getAllWishlistItemsByUserId(UUID userId) {
+        // 1. Recupero tutte le righe della wishlist per l'utente specificato
+        List<Carrello> wishlistItems = carrelloRepository.findWishlistByUserId(userId);
+
+        // 2. Uso il mapper per convertire le entità in DTO
+        return wishlistItems.stream()
+                .map(cartMapper::toDto)
+                .toList();
+    }
+
     public void removeItemsFromCart(UUID userId, List<UUID> productIds) {
         if (productIds == null || productIds.isEmpty()) {
             // Se la lista è vuota non fare nulla o lancia un'eccezione
