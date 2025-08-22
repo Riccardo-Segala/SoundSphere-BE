@@ -14,8 +14,6 @@ import java.util.UUID;
 @Repository
 public interface CarrelloRepository extends JpaRepository<Carrello, UtenteProdottoId> {
 
-    // Trova tutte le righe del carrello e della wishlist per un utente specifico
-
     // Trova tutte le righe del carrello per un utente specifico, non della wishlist
     @Query("SELECT c FROM Carrello c JOIN FETCH c.prodotto WHERE c.utente.id = :utenteId AND c.wishlist = false")
     List<Carrello> findCartByUserId(@Param("utenteId") UUID utenteId);
