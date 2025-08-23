@@ -18,13 +18,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path="/api/prodotti", produces = MediaType.APPLICATION_JSON_VALUE)
 class ProdottoController extends GenericController<Prodotto, UUID, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
-    private final StockService stockService;
 
-    @Autowired
+    final ProdottoService prodottoService;
+    private final StockService stockService;
     public ProdottoController(ProdottoService service, ProductMapper mapper, StockService stockService) {
         super(service, mapper);
+        this.prodottoService = service;
         this.stockService = stockService;
-
     }
 
     @GetMapping
@@ -57,6 +57,12 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
         return entity.getId();
     }
 
+    @GetMapping("/{productId}/average-stars")
+    public ResponseEntity<Double> getAverageStars(@PathVariable UUID productId) {
+        Double averageStars = prodottoService.getAverageStars(productId);
+        return ResponseEntity.ok(averageStars);
+    }
+      
     @GetMapping("/marche/online")
     public ResponseEntity<List<String>> getBrandsAvailableOnline() {
         List<String> marcheDisponibili = stockService.getMarcheDisponibiliOnline();

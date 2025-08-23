@@ -11,9 +11,10 @@ public record ResponseReviewDTO (
         UUID id,
         LocalDate data,
         int numStelle,
+        String titolo,
         String descrizione,
-        String prodottoNome,
-        String utenteNome,
-        String utenteCognome
+        String nomeProdotto,
+        String nomeUtente,
+        String cognomeUtente
 )implements Serializable {
 }

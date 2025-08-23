@@ -4,14 +4,12 @@ import backend.mapper.GenericMapper;
 import backend.service.GenericService;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 @Getter
 public abstract class GenericController<T, ID, CreateDTO, UpdateDTO, ResponseDTO> {
 
@@ -48,9 +46,8 @@ public abstract class GenericController<T, ID, CreateDTO, UpdateDTO, ResponseDTO
 
         // costruzione dell’URI della risorsa creata
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()   // es: POST http://localhost:8080/filiali
-                .path("/{id}")          // diventa http://localhost:8080/filiali/{id}
-                .buildAndExpand(getId(saved)) // sostituisce {id} con l’ID reale della nuova entità
+                .fromCurrentRequest() // Prende l'URI della richiesta (es: POST /filiali)
+                .build()              // Costruisce l'URI così com'è, senza aggiungere altro
                 .toUri();
 
         return ResponseEntity.created(location) // HTTP 201 Created + Location header
