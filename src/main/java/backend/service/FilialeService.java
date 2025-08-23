@@ -3,6 +3,7 @@ package backend.service;
 import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.repository.FilialeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +19,10 @@ public class FilialeService extends GenericService<Filiale, UUID> {
         super(repository); // Passa il repository al costruttore della classe base
     }
 
-    public List<Prodotto> getProductInStockByBranchId(UUID filialeId) {
-        return filialeRepository.getProductInStockByBranchId(filialeId);
+
+    public Filiale getByName(String nome) {
+        return filialeRepository.findByName(nome)
+                .orElseThrow(() -> new EntityNotFoundException("Filiale non trovata nel database con nome: " + nome));
     }
 
 }

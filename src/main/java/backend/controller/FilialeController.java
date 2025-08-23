@@ -7,6 +7,7 @@ import backend.mapper.BranchMapper;
 import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.service.FilialeService;
+import backend.service.StockService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +18,16 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path="/api/filiale", produces = MediaType.APPLICATION_JSON_VALUE)
 class FilialeController extends GenericController <Filiale, UUID, CreateBranchDTO, UpdateBranchDTO, ResponseBranchDTO> {
-    public FilialeController(FilialeService service, BranchMapper mapper) {
+    private final StockService stockService;
+
+    FilialeController(FilialeService service, BranchMapper mapper, StockService stockService) {
         super(service, mapper);
+        this.stockService = stockService;
     }
 
     @GetMapping("/{id}/stock")
     public ResponseEntity<List<Prodotto>> getProductInStockByBranchId(@PathVariable UUID id) {
-        FilialeService filialeService = (FilialeService) this.getService();
-        List<Prodotto> prodotti = filialeService.getProductInStockByBranchId(id);
+        List<Prodotto> prodotti = stockService.getProductInStockByBranchId(id);
         return ResponseEntity.ok(prodotti);
     }
 

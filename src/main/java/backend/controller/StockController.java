@@ -1,4 +1,5 @@
 package backend.controller;
+import backend.dto.prodotto.ResponseProductDTO;
 import backend.dto.stock.CreateStockDTO;
 import backend.dto.stock.ResponseStockDTO;
 import backend.dto.stock.UpdateStockDTO;
@@ -16,8 +17,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path="/api/stock", produces = MediaType.APPLICATION_JSON_VALUE)
 public class StockController extends GenericController<Stock, FilialeProdottoId, CreateStockDTO, UpdateStockDTO, ResponseStockDTO> {
-    public StockController(StockService service, StockMapper mapper) {
+
+    private final StockService stockService;
+    public StockController(StockService service, StockMapper mapper, StockService stockService) {
         super(service, mapper);
+        this.stockService = stockService;
     }
 
     @GetMapping
@@ -26,13 +30,22 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     }
 
     // GET by ID composto
-    @GetMapping("/{filialeId}/{prodottoId}")
+    /*@GetMapping("/{filialeId}/{prodottoId}")
     public ResponseEntity<ResponseStockDTO> getStockItem(
             @PathVariable UUID filialeId,
             @PathVariable UUID prodottoId) {
 
         FilialeProdottoId id = new FilialeProdottoId(filialeId, prodottoId);
         return super.getById(id);
+    }*/
+
+    @GetMapping("/online")
+    public ResponseEntity<List<ResponseProductDTO>> getOnlineStock() {
+        // 1. Chiama il servizio per ottenere i dati, già pronti in formato DTO
+        List<ResponseProductDTO> avaiableProducts = stockService.getOnlineStock();
+
+        // 2. Restituisce i dati al frontend con uno status HTTP 200 (OK)
+        return ResponseEntity.ok(avaiableProducts);
     }
 
     // POST
@@ -42,7 +55,7 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     }
 
     // PUT by ID composto
-    @PutMapping("/{filialeId}/{prodottoId}")
+    /*@PutMapping("/{filialeId}/{prodottoId}")
     public ResponseEntity<ResponseStockDTO> updateStockItem(
             @PathVariable UUID filialeId,
             @PathVariable UUID prodottoId,
@@ -60,7 +73,7 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
 
         FilialeProdottoId id = new FilialeProdottoId(filialeId, prodottoId);
         return super.delete(id);
-    }
+    }*/
 
     // implementazione del metodo astratto getId
     @Override
