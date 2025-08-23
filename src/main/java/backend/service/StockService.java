@@ -21,7 +21,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
     @Autowired
     public StockService(StockRepository repository, StockRepository stockRepository, FilialeRepository filialeRepository) {
-        super(repository); // Passa il repository al costruttore della classe base
+        super(stockRepository); // Passa il repository al costruttore della classe base
         this.stockRepository = stockRepository;
         this.filialeRepository = filialeRepository;
     }
@@ -47,6 +47,6 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     // Restituisce una lista di stringhe con i nomi delle marche disponibili nella filiale "online"
     public List<String> getMarcheDisponibiliOnline() {
 
-        return stockRepository.findDistinctMarcheByNomeFiliale("online");
+        return stockRepository.findDistinctMarcaByFilialeNome("online");
     }
 }

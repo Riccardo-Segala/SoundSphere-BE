@@ -58,7 +58,7 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
     }
 
     @GetMapping("/marche/online")
-    public ResponseEntity<List<String>> getMarcheDisponibiliOnline() {
+    public ResponseEntity<List<String>> getBrandsAvailableOnline() {
         List<String> marcheDisponibili = stockService.getMarcheDisponibiliOnline();
         return ResponseEntity.ok(marcheDisponibili);
     }
