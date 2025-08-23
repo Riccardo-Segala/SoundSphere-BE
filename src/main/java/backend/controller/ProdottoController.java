@@ -27,6 +27,15 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
         this.stockService = stockService;
     }
 
+    @GetMapping("/{productId}/quantita")
+    public ResponseEntity<Integer> getProductStockQuantity(@PathVariable UUID productId) {
+        // 1. Chiama il servizio per ottenere il dato
+        int quantity = stockService.getOnlineStockProductQuantity(productId);
+
+        // 2. Restituisce il numero al frontend
+        return ResponseEntity.ok(quantity);
+    }
+
     @GetMapping
     public ResponseEntity<List<ResponseProductDTO>> getAllProducts() {
         return super.getAll();
