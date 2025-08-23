@@ -24,6 +24,9 @@ public class Recensione {
     private LocalDate data;
 
     @Column(nullable = false)
+    private String titolo;
+
+    @Column(nullable = false)
     private int numStelle;
 
     @Column(columnDefinition = "TEXT", nullable = false)

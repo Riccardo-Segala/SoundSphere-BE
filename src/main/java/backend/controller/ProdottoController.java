@@ -16,8 +16,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path="/api/prodotti", produces = MediaType.APPLICATION_JSON_VALUE)
 class ProdottoController extends GenericController<Prodotto, UUID, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
+    final ProdottoService prodottoService;
     public ProdottoController(ProdottoService service, ProductMapper mapper) {
         super(service, mapper);
+        this.prodottoService = service;
     }
 
     @GetMapping
@@ -48,5 +50,11 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
     @Override
     protected UUID getId(Prodotto entity) {
         return entity.getId();
+    }
+
+    @GetMapping("/{productId}/average-stars")
+    public ResponseEntity<Double> getAverageStars(@PathVariable UUID productId) {
+        Double averageStars = prodottoService.getAverageStars(productId);
+        return ResponseEntity.ok(averageStars);
     }
 }
