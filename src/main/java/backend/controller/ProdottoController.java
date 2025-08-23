@@ -6,6 +6,8 @@ import backend.dto.prodotto.UpdateProductDTO;
 import backend.mapper.ProductMapper;
 import backend.model.Prodotto;
 import backend.service.ProdottoService;
+import backend.service.StockService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path="/api/prodotti", produces = MediaType.APPLICATION_JSON_VALUE)
 class ProdottoController extends GenericController<Prodotto, UUID, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
+
     final ProdottoService prodottoService;
+    private final StockService stockService;
     public ProdottoController(ProdottoService service, ProductMapper mapper) {
         super(service, mapper);
         this.prodottoService = service;
+        this.stockService = stockService;
     }
 
     @GetMapping
@@ -56,5 +61,11 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
     public ResponseEntity<Double> getAverageStars(@PathVariable UUID productId) {
         Double averageStars = prodottoService.getAverageStars(productId);
         return ResponseEntity.ok(averageStars);
+    }
+      
+    @GetMapping("/marche/online")
+    public ResponseEntity<List<String>> getBrandsAvailableOnline() {
+        List<String> marcheDisponibili = stockService.getMarcheDisponibiliOnline();
+        return ResponseEntity.ok(marcheDisponibili);
     }
 }
