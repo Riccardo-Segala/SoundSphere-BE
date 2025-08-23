@@ -21,7 +21,7 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
 
     final ProdottoService prodottoService;
     private final StockService stockService;
-    public ProdottoController(ProdottoService service, ProductMapper mapper) {
+    public ProdottoController(ProdottoService service, ProductMapper mapper, StockService stockService) {
         super(service, mapper);
         this.prodottoService = service;
         this.stockService = stockService;
