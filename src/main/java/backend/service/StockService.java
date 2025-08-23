@@ -8,15 +8,18 @@ import backend.repository.FilialeRepository;
 import backend.repository.StockRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.List;
 
 @Service
 public class StockService extends GenericService<Stock, FilialeProdottoId> {
     private final StockRepository stockRepository;
     private final FilialeRepository filialeRepository;
 
+    @Autowired
     public StockService(StockRepository repository, StockRepository stockRepository, FilialeRepository filialeRepository) {
         super(repository); // Passa il repository al costruttore della classe base
         this.stockRepository = stockRepository;
@@ -39,5 +42,11 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
         stock.setQuantita(stock.getQuantita() - quantitaRichiesta);
         // Il salvataggio avverrà automaticamente alla fine della transazione @Transactional
+    }
+
+    // Restituisce una lista di stringhe con i nomi delle marche disponibili nella filiale "online"
+    public List<String> getMarcheDisponibiliOnline() {
+
+        return stockRepository.findDistinctMarcheByNomeFiliale("online");
     }
 }
