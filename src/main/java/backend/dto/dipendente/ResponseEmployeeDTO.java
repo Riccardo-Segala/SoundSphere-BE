@@ -12,6 +12,7 @@ import java.util.UUID;
  */
 
 public record ResponseEmployeeDTO (
+        UUID id,
         String nome,
         String cognome,
         String email,
@@ -21,7 +22,6 @@ public record ResponseEmployeeDTO (
         Sesso sesso,
         LocalDate dataRegistrazione,
         Integer punti,
-        UUID vantaggioId,
         double stipendio,
         LocalDate scadenzaContratto,
         LocalDate dataAssunzione,

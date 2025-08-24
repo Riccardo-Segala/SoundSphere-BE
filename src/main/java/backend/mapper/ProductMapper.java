@@ -9,14 +9,6 @@ import org.mapstruct.*;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProductMapper extends GenericMapper<Prodotto, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
 
-    @Override
-    Prodotto fromCreateDto(CreateProductDTO createProductDTO);
-
-    @Override
-    Prodotto fromUpdateDto(UpdateProductDTO updateProductDTO);
-
-    @Override
-    ResponseProductDTO toDto(Prodotto prodotto);
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
