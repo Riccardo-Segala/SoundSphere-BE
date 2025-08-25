@@ -1,8 +1,10 @@
 package backend.service;
 
 import backend.dto.prodotto.ResponseProductDTO;
+import backend.dto.stock.ResponseStockDTO;
 import backend.exception.OutOfStockException;
 import backend.mapper.ProductMapper;
+import backend.mapper.StockMapper;
 import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.model.Stock;
@@ -25,17 +27,17 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     private final FilialeRepository filialeRepository;
     private final FilialeService filialService;
     private final ProductMapper productMapper;
+    private final StockMapper stockMapper;
 
-    @Value("${app.filiale.online.name}")
-    private String nomeFilialeOnline;
 
     @Autowired
-    public StockService(StockRepository stockRepository, FilialeRepository filialeRepository, FilialeService filialService, ProductMapper productMapper) {
+    public StockService(StockRepository stockRepository, FilialeRepository filialeRepository, FilialeService filialService, ProductMapper productMapper, StockMapper stockMapper) {
         super(stockRepository); // Passa il repository al costruttore della classe base
         this.stockRepository = stockRepository;
         this.filialeRepository = filialeRepository;
         this.filialService = filialService;
         this.productMapper = productMapper;
+        this.stockMapper = stockMapper;
     }
 
     @Transactional
@@ -56,31 +58,26 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     }
 
     // Restituisce una lista di stringhe con i nomi delle marche disponibili nella filiale "online"
-    public List<String> getMarcheDisponibiliOnline() {
-
-        return stockRepository.findDistinctMarcaByFilialeNome("online");
-    }
 
 
-    public List<Prodotto> getProductInStockByBranchId(UUID filialeId) {
-        return filialeRepository.getProductInStockByBranchId(filialeId);
-    }
-
-    public List<ResponseProductDTO> getOnlineStock() {
-        List<Prodotto> prodottiInStock = getOnlineProduct();
-        return prodottiInStock.stream()
-                .map(productMapper::toDto)
+    public List<ResponseStockDTO> getOnlineStock() {
+        List<Stock> onlineStock = getOnlineStockEntries();
+        return onlineStock.stream()
+                .map(stockMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    private List<Prodotto> getOnlineProduct() {
-        Filiale filialeOnline = this.getOnlineBranch();
-        return getProductInStockByBranchId(filialeOnline.getId());
+    /**
+     * Private helper method that retrieves the raw Stock entities from the repository.
+     */
+    private List<Stock> getOnlineStockEntries() {
+        Filiale onlineBranch = filialService.getOnlineBranch();
+        return stockRepository.findByFilialeId(onlineBranch.getId()); // Assumendo findByBranchId
     }
 
     public int getOnlineStockProductQuantity(UUID prodottoId) {
         // 1. Trova l'entità della filiale "online" (riutilizzando il nostro metodo helper)
-        Filiale filialeOnline = this.getOnlineBranch();
+        Filiale filialeOnline = filialService.getOnlineBranch();
 
         // 2. Crea l'ID composito per la tabella stock
         FilialeProdottoId stockId = new FilialeProdottoId(filialeOnline.getId(), prodottoId);
@@ -92,8 +89,5 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
                 .orElse(0);
     }
 
-    private Filiale getOnlineBranch() {
-        return filialService.getByName(nomeFilialeOnline);
-    }
 
 }

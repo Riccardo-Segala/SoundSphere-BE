@@ -1,8 +1,11 @@
 package backend.service;
 
+import backend.dto.prodotto.CatalogProductDTO;
 import backend.dto.prodotto.ResponseProductDTO;
 import backend.mapper.ProductMapper;
+import backend.model.Filiale;
 import backend.model.Prodotto;
+import backend.model.Stock;
 import backend.repository.ProdottoRepository;
 import backend.repository.RecensioneRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,18 +14,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProdottoService extends GenericService<Prodotto, UUID> {
     private final ProdottoRepository repository;
     private final RecensioneRepository recensioneRepository;
     private final ProductMapper productMapper;
+    private final FilialeService filialeService;
 
-    public ProdottoService(ProdottoRepository repository, RecensioneRepository recensioneRepository, ProductMapper productMapper) {
+    public ProdottoService(ProdottoRepository repository, RecensioneRepository recensioneRepository, ProductMapper productMapper, FilialeService filialeService) {
         super(repository); // Passa il repository al costruttore della classe base
         this.repository = repository;
         this.recensioneRepository = recensioneRepository;
         this.productMapper = productMapper;
+        this.filialeService = filialeService;
     }
 
     public Double getAverageStars(UUID prodottoId) {
@@ -43,5 +49,31 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
         return prodotti.stream()
                 .map(productMapper::toDto)
                 .toList();
+    }
+
+    public List<CatalogProductDTO> getOnlineProductCatalog() {
+        // 1. Trova la filiale online
+        Filiale onlineBranch = filialeService.getOnlineBranch();
+
+        // 2. Chiama il repository per ottenere i dati grezzi (entità)
+        List<Object[]> results = repository.findAllProductsWithStockInfoByBranchId(onlineBranch.getId());
+
+        // 3. Usa il mapper per trasformare ogni riga di risultato nel DTO finale
+        return results.stream()
+                .map(row -> {
+                    Prodotto product = (Prodotto) row[0];
+                    Stock stock = (Stock) row[1]; // Può essere null
+                    return productMapper.toCatalogDTO(product, stock);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<ResponseProductDTO> getProductInStockByBranchId(UUID filialeId) {
+        List<Prodotto> prodotti = repository.getProductInStockByBranchId(filialeId);
+        return prodotti.stream().map(productMapper::toDto).collect(Collectors.toList());
+    }
+
+    public List<String> getMarcheDisponibiliOnline() {
+        return repository.findDistinctMarcaByFilialeNome("online");
     }
 }
