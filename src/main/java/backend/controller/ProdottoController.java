@@ -80,7 +80,7 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
       
     @GetMapping("/marche/online")
     public ResponseEntity<List<String>> getBrandsAvailableOnline() {
-        List<String> marcheDisponibili = prodottoService.getMarcheDisponibiliOnline();
+        List<String> marcheDisponibili = prodottoService.getAvailableBrandsOnline();
         return ResponseEntity.ok(marcheDisponibili);
     }
 

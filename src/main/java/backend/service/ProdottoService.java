@@ -8,7 +8,9 @@ import backend.model.Prodotto;
 import backend.model.Stock;
 import backend.repository.ProdottoRepository;
 import backend.repository.RecensioneRepository;
+import backend.repository.StockRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +24,18 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
     private final RecensioneRepository recensioneRepository;
     private final ProductMapper productMapper;
     private final FilialeService filialeService;
+    private final StockRepository stockRepository;
 
-    public ProdottoService(ProdottoRepository repository, RecensioneRepository recensioneRepository, ProductMapper productMapper, FilialeService filialeService) {
+    @Value("${app.filiale.online.name}")
+    private String nomeFilialeOnline;
+
+    public ProdottoService(ProdottoRepository repository, RecensioneRepository recensioneRepository, ProductMapper productMapper, FilialeService filialeService, StockRepository stockRepository) {
         super(repository); // Passa il repository al costruttore della classe base
         this.repository = repository;
         this.recensioneRepository = recensioneRepository;
         this.productMapper = productMapper;
         this.filialeService = filialeService;
+        this.stockRepository = stockRepository;
     }
 
     public Double getAverageStars(UUID prodottoId) {
@@ -73,7 +80,7 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
         return prodotti.stream().map(productMapper::toDto).collect(Collectors.toList());
     }
 
-    public List<String> getMarcheDisponibiliOnline() {
-        return repository.findDistinctMarcaByFilialeNome("online");
+    public List<String> getAvailableBrandsOnline() {
+        return stockRepository.findDistinctMarcaByFilialeNome(nomeFilialeOnline);
     }
 }
