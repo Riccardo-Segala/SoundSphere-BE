@@ -4,6 +4,8 @@ import jakarta.persistence.*; // Aggiunto per GeneratedValue
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -33,4 +35,12 @@ public class Prodotto {
 
     @Column(columnDefinition = "TEXT")
     private String pathImmagine;
+
+    @ManyToMany(fetch = FetchType.LAZY) // LAZY per non caricare le categorie se non servono
+    @JoinTable(
+            name = "prodotto_categoria", // Nome della tabella di join nel DB
+            joinColumns = @JoinColumn(name = "prodotto_id"), // FK verso questa entità (Prodotto)
+            inverseJoinColumns = @JoinColumn(name = "categoria_id") // FK verso l'altra entità (Categoria)
+    )
+    private Set<Categoria> categorie = new HashSet<>();
 }

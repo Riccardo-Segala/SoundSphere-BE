@@ -7,7 +7,6 @@ import backend.mapper.ProductMapper;
 import backend.model.Prodotto;
 import backend.service.ProdottoService;
 import backend.service.StockService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,5 +75,12 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
     public ResponseEntity<List<String>> getBrandsAvailableOnline() {
         List<String> marcheDisponibili = stockService.getMarcheDisponibiliOnline();
         return ResponseEntity.ok(marcheDisponibili);
+    }
+
+    @GetMapping("/search/{categoryId}")
+    public ResponseEntity<List<ResponseProductDTO>> getProductsByCategoryId(
+            @PathVariable(name = "categoryId") UUID categoryId) {
+        List<ResponseProductDTO> prodotti = prodottoService.findProductsByCategoryId(categoryId);
+        return ResponseEntity.ok(prodotti);
     }
 }

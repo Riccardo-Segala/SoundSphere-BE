@@ -12,6 +12,7 @@ import java.util.UUID;
  * DTO for {@link backend.model.Utente}
  */
 public record ResponseUserDTO(
+        UUID id,
         String nome,
         String cognome,
         String email,

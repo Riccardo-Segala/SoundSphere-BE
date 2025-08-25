@@ -37,6 +37,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/prodotti/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/stock/online").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/prodotti/{productId}/quantita").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorie").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorie/{id}").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/v3/api-docs/**",
