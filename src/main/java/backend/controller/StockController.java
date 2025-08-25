@@ -40,9 +40,9 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     }*/
 
     @GetMapping("/online")
-    public ResponseEntity<List<ResponseProductDTO>> getOnlineStock() {
+    public ResponseEntity<List<ResponseStockDTO>> getOnlineStock() {
         // 1. Chiama il servizio per ottenere i dati, già pronti in formato DTO
-        List<ResponseProductDTO> avaiableProducts = stockService.getOnlineStock();
+        List<ResponseStockDTO> avaiableProducts = stockService.getOnlineStock();
 
         // 2. Restituisce i dati al frontend con uno status HTTP 200 (OK)
         return ResponseEntity.ok(avaiableProducts);

@@ -1,5 +1,6 @@
 package backend.controller;
 
+import backend.dto.prodotto.CatalogProductDTO;
 import backend.dto.prodotto.CreateProductDTO;
 import backend.dto.prodotto.ResponseProductDTO;
 import backend.dto.prodotto.UpdateProductDTO;
@@ -27,12 +28,18 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
     }
 
     @GetMapping("/{productId}/quantita")
-    public ResponseEntity<Integer> getProductStockQuantity(@PathVariable UUID productId) {
+    public ResponseEntity<Integer> getOnlineProductStockQuantityByProductId(@PathVariable UUID productId) {
         // 1. Chiama il servizio per ottenere il dato
         int quantity = stockService.getOnlineStockProductQuantity(productId);
 
         // 2. Restituisce il numero al frontend
         return ResponseEntity.ok(quantity);
+    }
+
+    @GetMapping("/{branchId}/available-products")
+    public ResponseEntity<List<ResponseProductDTO>> getProductInStockByBranchId(@PathVariable UUID branchId) {
+        List<ResponseProductDTO> prodotti = prodottoService.getProductInStockByBranchId(branchId);
+        return ResponseEntity.ok(prodotti);
     }
 
     @GetMapping
@@ -73,7 +80,7 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
       
     @GetMapping("/marche/online")
     public ResponseEntity<List<String>> getBrandsAvailableOnline() {
-        List<String> marcheDisponibili = stockService.getMarcheDisponibiliOnline();
+        List<String> marcheDisponibili = prodottoService.getAvailableBrandsOnline();
         return ResponseEntity.ok(marcheDisponibili);
     }
 
@@ -82,5 +89,11 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
             @PathVariable(name = "categoryId") UUID categoryId) {
         List<ResponseProductDTO> prodotti = prodottoService.findProductsByCategoryId(categoryId);
         return ResponseEntity.ok(prodotti);
+    }
+
+    @GetMapping("/catalog/online")
+    public ResponseEntity<List<CatalogProductDTO>> getOnlineCatalog() {
+        List<CatalogProductDTO> catalog = prodottoService.getOnlineProductCatalog();
+        return ResponseEntity.ok(catalog);
     }
 }

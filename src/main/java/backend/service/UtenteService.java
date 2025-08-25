@@ -1,11 +1,8 @@
 package backend.service;
 
-import backend.mapper.EmployeeMapper;
 import backend.mapper.UserMapper;
-import backend.model.Dipendente;
 import backend.model.Utente;
 import backend.repository.UtenteRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,5 +32,9 @@ public class UtenteService extends GenericService<Utente, UUID> {
                     .orElseThrow(() -> new RuntimeException("Utente non trovato"));
             return userMapper.toDto(utente);
         }
+    }
+
+    public boolean existsById(UUID userId) {
+        return userRepository.existsById(userId);
     }
 }

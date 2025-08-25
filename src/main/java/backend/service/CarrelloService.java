@@ -149,6 +149,7 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         });
 
         item.setQuantita(dto.quantita());
+        item.setWishlist(dto.wishlist());
         Carrello savedItem = carrelloRepository.save(item);
         return cartMapper.toDto(savedItem);
     }

@@ -9,24 +9,19 @@ import org.mapstruct.*;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserAddressMapper extends GenericMapper<IndirizzoUtente, CreateUserAddressDTO, UpdateUserAddressDTO, ResponseUserAddressDTO> {
 
-    @Override
-    @Mapping(source = "utenteCognome", target = "utente.cognome")
-    @Mapping(source = "utenteNome", target = "utente.nome")
-    @Mapping(source = "utenteId", target = "utente.id")
-    IndirizzoUtente fromCreateDto(CreateUserAddressDTO createUserAddressDTO);
 
     @Override
-    ResponseUserAddressDTO toDto(IndirizzoUtente indirizzoUtente);
-
-    @Override
-    IndirizzoUtente fromUpdateDto(UpdateUserAddressDTO updateUserAddressDTO);
+    @Mapping(source = "isDefault", target = "default")
+    IndirizzoUtente fromCreateDto(CreateUserAddressDTO createDTO);
 
     @Override
     @InheritConfiguration(name = "fromCreateDto")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "isDefault", target = "default")
     IndirizzoUtente partialUpdateFromCreate(CreateUserAddressDTO createUserAddressDTO, @MappingTarget IndirizzoUtente indirizzoUtente);
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "isDefault", target = "default")
     IndirizzoUtente partialUpdateFromUpdate(UpdateUserAddressDTO updateUserAddressDTO, @MappingTarget IndirizzoUtente indirizzoUtente);
 }

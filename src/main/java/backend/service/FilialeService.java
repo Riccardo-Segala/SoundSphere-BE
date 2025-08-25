@@ -5,6 +5,7 @@ import backend.model.Prodotto;
 import backend.repository.FilialeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.UUID;
 
 @Service
 public class FilialeService extends GenericService<Filiale, UUID> {
+    @Value("${app.filiale.online.name}")
+    private String nomeFilialeOnline;
 
     @Autowired
     private FilialeRepository filialeRepository;
@@ -24,5 +27,10 @@ public class FilialeService extends GenericService<Filiale, UUID> {
         return filialeRepository.findByName(nome)
                 .orElseThrow(() -> new EntityNotFoundException("Filiale non trovata nel database con nome: " + nome));
     }
+
+    public Filiale getOnlineBranch() {
+        return this.getByName(nomeFilialeOnline);
+    }
+
 
 }
