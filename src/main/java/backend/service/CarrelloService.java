@@ -128,7 +128,7 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
     @Transactional
     public ResponseCartDTO updateItemInCart(UUID userId, UpdateCartItemDTO dto) {
         // --- Validazione dell'input ---
-        if (dto.quantita() <= 0) {
+        if (dto.quantita() <= 0 && !dto.wishlist()) {
             throw new IllegalArgumentException("La quantità deve essere maggiore di zero.");
         }
 
@@ -145,7 +145,6 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
             newItem.setId(cartId);
             newItem.setUtente(utente);
             newItem.setProdotto(prodotto);
-            newItem.setWishlist(false);
             return newItem;
         });
 
