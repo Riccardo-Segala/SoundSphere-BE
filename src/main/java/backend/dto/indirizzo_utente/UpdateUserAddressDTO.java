@@ -14,7 +14,7 @@ public record UpdateUserAddressDTO (
         String citta,
         String provincia,
         String nazione,
-        boolean isDefault,
+        boolean main,
         TipologiaIndirizzo tipologia
 )implements Serializable {
 }
