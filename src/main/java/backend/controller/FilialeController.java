@@ -18,18 +18,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path="/api/filiale", produces = MediaType.APPLICATION_JSON_VALUE)
 class FilialeController extends GenericController <Filiale, UUID, CreateBranchDTO, UpdateBranchDTO, ResponseBranchDTO> {
-    private final StockService stockService;
 
     FilialeController(FilialeService service, BranchMapper mapper, StockService stockService) {
         super(service, mapper);
-        this.stockService = stockService;
     }
 
-    @GetMapping("/{id}/stock")
-    public ResponseEntity<List<Prodotto>> getProductInStockByBranchId(@PathVariable UUID id) {
-        List<Prodotto> prodotti = stockService.getProductInStockByBranchId(id);
-        return ResponseEntity.ok(prodotti);
-    }
 
     @GetMapping
     public ResponseEntity<List<ResponseBranchDTO>> getAllBranches() {

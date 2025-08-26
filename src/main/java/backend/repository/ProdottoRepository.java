@@ -13,4 +13,14 @@ import java.util.UUID;
 public interface ProdottoRepository extends JpaRepository<Prodotto, UUID> {
     @Query("SELECT p FROM Prodotto p JOIN p.categorie c WHERE c.id = :categoryId")
     List<Prodotto> findByExactCategoryId(@Param("categoryId") UUID categoryId);
+
+    @Query("SELECT p FROM Prodotto p JOIN Stock s ON p.id = s.prodotto.id WHERE s.filiale.id = :filialeId AND s.quantita > 0")
+    List<Prodotto> getProductInStockByBranchId(@Param("filialeId") UUID filialeId);
+
+    @Query("""
+        SELECT p, s
+        FROM Prodotto p
+        LEFT JOIN Stock s ON p.id = s.prodotto.id AND s.filiale.id = :branchId
+    """)
+    List<Object[]> findAllProductsWithStockInfoByBranchId(@Param("branchId") UUID branchId);
 }
