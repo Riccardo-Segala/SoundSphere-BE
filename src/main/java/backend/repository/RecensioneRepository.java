@@ -13,6 +13,6 @@ import java.util.UUID;
 public interface RecensioneRepository extends JpaRepository<Recensione, UUID> {
     List<Recensione> findByProdottoId(UUID productId);
 
-    @Query("SELECT AVG(r.numStelle) FROM Recensione r WHERE r.prodotto.id = :prodottoId")
+    @Query("SELECT COALESCE(AVG(r.numStelle), 0) FROM Recensione r WHERE r.prodotto.id = :prodottoId")
     Double findAverageStarsByProdottoId(@Param("prodottoId") UUID prodottoId);
 }

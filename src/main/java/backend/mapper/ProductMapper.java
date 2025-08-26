@@ -25,7 +25,9 @@ public interface ProductMapper extends GenericMapper<Prodotto, CreateProductDTO,
     @Mapping(target = "marca", source = "prodotto.marca")
     @Mapping(target = "prezzo", source = "prodotto.prezzo")
     @Mapping(target = "pathImmagine", source = "prodotto.pathImmagine")
+    @Mapping(target = "stelleMedie", source = "stelleMedie")
+    @Mapping(target = "costoGiornaliero", source = "prodotto.costoGiornaliero")
     @Mapping(target = "quantitaDisponibile", expression = "java(stock == null ? 0 : stock.getQuantita())")
     @Mapping(target = "quantitaDisponibileAlNoleggio", expression = "java(stock == null ? 0 : stock.getQuantitaPerNoleggio())")
-    CatalogProductDTO toCatalogDTO(Prodotto prodotto, Stock stock);
+    CatalogProductDTO toCatalogDTO(Prodotto prodotto, Stock stock, double stelleMedie);
 }

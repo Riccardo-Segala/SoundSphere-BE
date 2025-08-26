@@ -70,7 +70,8 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
                 .map(row -> {
                     Prodotto product = (Prodotto) row[0];
                     Stock stock = (Stock) row[1]; // Può essere null
-                    return productMapper.toCatalogDTO(product, stock);
+                    double averageStars = this.getAverageStars(product.getId());
+                    return productMapper.toCatalogDTO(product, stock, averageStars);
                 })
                 .collect(Collectors.toList());
     }
