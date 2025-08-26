@@ -38,7 +38,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     }*/
 
     @GetMapping("/personalUserAddresses")
-    public ResponseEntity<List<ResponseUserAddressDTO>> getAllAddressesByUserId(
+    public ResponseEntity<List<ResponseUserAddressDTO>> getAllUserAddressesByUserId(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId(); // Ottiene l'ID dell'utente autenticato
 
@@ -47,7 +47,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     }
 
     @PostMapping
-    public ResponseEntity<ResponseUserAddressDTO> createAddress(
+    public ResponseEntity<ResponseUserAddressDTO> createUserAddress(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CreateUserAddressDTO createDTO) {
         UUID userId = userDetails.getId(); // Ottiene l'ID dell'utente autenticato
@@ -66,7 +66,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     }
 
     @PutMapping("/{addressId}")
-    public ResponseEntity<ResponseUserAddressDTO> updateAddress(
+    public ResponseEntity<ResponseUserAddressDTO> updateUserAddress(
             @PathVariable UUID addressId,
             @RequestBody UpdateUserAddressDTO updateDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) { // <-- Ottiene l'utente loggato
@@ -82,7 +82,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     }
 
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<Void> deleteAddress(
+    public ResponseEntity<Void> deleteUserAddress(
             @PathVariable UUID addressId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -98,7 +98,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
 
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<ResponseUserAddressDTO> getAddressById(
+    public ResponseEntity<ResponseUserAddressDTO> getUserAddressById(
             @PathVariable UUID addressId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId(); // Ottiene l'ID dell'utente autenticato
