@@ -15,4 +15,6 @@ public interface IndirizzoUtenteRepository extends JpaRepository<IndirizzoUtente
 
     @Query ("SELECT iu FROM IndirizzoUtente iu WHERE iu.id = :addressId AND iu.utente.id = :authUserId")
     Optional<IndirizzoUtente> findByIdAndUtenteId(UUID addressId, UUID authUserId);
+
+    Optional<IndirizzoUtente> findByUtenteIdAndMainTrue(UUID userId);
 }

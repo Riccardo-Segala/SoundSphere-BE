@@ -25,8 +25,8 @@ public class IndirizzoUtente {
     private String provincia;
     private String nazione;
 
-    @Column(name = "is_default")
-    private boolean isDefault;
+    @Column(name = "is_main")
+    private boolean main;
 
     @Enumerated(EnumType.STRING)
     private TipologiaIndirizzo tipologia;

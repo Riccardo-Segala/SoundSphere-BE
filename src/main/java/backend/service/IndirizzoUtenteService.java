@@ -75,7 +75,7 @@ public class IndirizzoUtenteService extends GenericService<IndirizzoUtente, UUID
         // --- 4. CONTROLLO ANTI-DUPLICATI ---
         // Creo un matcher per dire a JPA di ignorare i campi non pertinenti.
         ExampleMatcher matcher = ExampleMatcher.matching()
-                .withIgnorePaths("id", "isDefault");
+                .withIgnorePaths("id", "primary");
 
         // Creo un "esempio" usando l'indirizzo che vorrei salvare e le regole del matcher.
         Example<IndirizzoUtente> example = Example.of(nuovoIndirizzo, matcher);
@@ -83,6 +83,13 @@ public class IndirizzoUtenteService extends GenericService<IndirizzoUtente, UUID
         // Esegue il controllo: se un indirizzo che combacia con l'esempio esiste già, lancia un errore.
         if (userAddressRepository.exists(example)) {
             throw new DataIntegrityViolationException("Questo indirizzo esiste già per l'utente.");
+        }
+
+        if (nuovoIndirizzo.isMain()) {
+            // cerca il vecchio indirizzo predefinito e, se esiste, imposta il suo flag 'primary' a false.
+            // L'annotazione @Transactional garantirà che anche questa modifica venga salvata.
+            userAddressRepository.findByUtenteIdAndMainTrue(userId)
+                    .ifPresent(oldDefault -> oldDefault.setMain(false));
         }
 
         // 5. Salva l'entità ora che siamo sicuri non sia un duplicato.
@@ -102,6 +109,19 @@ public class IndirizzoUtenteService extends GenericService<IndirizzoUtente, UUID
                 .orElseThrow(() -> new EntityNotFoundException("Indirizzo non trovato o non appartenente all'utente"));
 
         // 2. Se il controllo passa, applica le modifiche dall'UpdateDTO all'entità.
+
+        if (updateDTO.main()) {
+            // ...cerca un altro indirizzo predefinito per l'utente.
+            userAddressRepository.findByUtenteIdAndMainTrue(userId)
+                    .ifPresent(oldDefault -> {
+                        // Se il vecchio indirizzo predefinito trovato allora è lo stesso che sto modificando,
+                        // imposta il suo flag 'primary' a false.
+                        if (!oldDefault.getId().equals(indirizzo.getId())) {
+                            oldDefault.setMain(false);
+                        }
+                    });
+        }
+
         userAddressMapper.partialUpdateFromUpdate(updateDTO, indirizzo);
 
         // 3. Salva l'entità aggiornata.
