@@ -10,9 +10,13 @@ import java.util.UUID;
  */
 public record ResponseBranchDTO (
         UUID id,
-        String indirizzo,
         String nome,
         String telefono,
-        String email
+        String email,
+        String via,
+        String citta,
+        String cap,
+        String provincia,
+        String nazione
 ) implements Serializable {
 }

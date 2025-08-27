@@ -50,6 +50,7 @@ dependencies {
 	implementation 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
 	runtimeOnly 'org.postgresql:postgresql:42.2.5'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

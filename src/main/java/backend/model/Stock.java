@@ -15,17 +15,21 @@ public class Stock {
     private FilialeProdottoId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("filialeId")
+    @MapsId("idFiliale")
     @JoinColumn(name = "id_filiale")
     private Filiale filiale;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("prodottoId")
+    @MapsId("idProdotto")
     @JoinColumn(name = "id_prodotto")
     private Prodotto prodotto;
 
     private int quantita;
     private int quantitaPerNoleggio;
+
+    public Stock() {
+        this.id = new FilialeProdottoId();
+    }
 
 
 }

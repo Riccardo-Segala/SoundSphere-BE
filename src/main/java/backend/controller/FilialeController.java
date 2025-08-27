@@ -1,56 +1,29 @@
 package backend.controller;
 
-import backend.dto.filiale.CreateBranchDTO;
 import backend.dto.filiale.ResponseBranchDTO;
-import backend.dto.filiale.UpdateBranchDTO;
 import backend.mapper.BranchMapper;
-import backend.model.Filiale;
-import backend.model.Prodotto;
+import backend.security.CustomUserDetails;
 import backend.service.FilialeService;
-import backend.service.StockService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path="/api/filiale", produces = MediaType.APPLICATION_JSON_VALUE)
-class FilialeController extends GenericController <Filiale, UUID, CreateBranchDTO, UpdateBranchDTO, ResponseBranchDTO> {
-
-    FilialeController(FilialeService service, BranchMapper mapper, StockService stockService) {
-        super(service, mapper);
+class FilialeController {
+    private final FilialeService filialeService;
+    private final BranchMapper branchMapper;
+    FilialeController(FilialeService filialeService, BranchMapper branchMapper) {
+        this.filialeService = filialeService;
+        this.branchMapper = branchMapper;
     }
 
-
-    @GetMapping
-    public ResponseEntity<List<ResponseBranchDTO>> getAllBranches() {
-        return super.getAll();
+    @GetMapping("/myBranch")
+    public ResponseEntity<ResponseBranchDTO> getMyBranch(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UUID id = userDetails.getId();
+        return ResponseEntity.ok(branchMapper.toDto(filialeService.getById(id)));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseBranchDTO> getBranchById(@PathVariable UUID id) {
-        return super.getById(id);
-    }
-
-    @PostMapping
-    public ResponseEntity<ResponseBranchDTO> createBranch(@RequestBody CreateBranchDTO createDTO) {
-        return super.create(createDTO);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseBranchDTO> updateBranch(@PathVariable UUID id, @RequestBody UpdateBranchDTO updateDTO) {
-        return super.update(id, updateDTO);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBranch(@PathVariable UUID id) {
-        return super.delete(id);
-    }
-
-    @Override
-    protected UUID getId(Filiale entity) {
-        return entity.getId();
-    }
 }

@@ -27,6 +27,11 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
         this.stockService = stockService;
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseProductDTO> getProductById(@PathVariable UUID id) {
+        return super.getById(id);
+    }
+
     @GetMapping("/{productId}/quantita")
     public ResponseEntity<Integer> getOnlineProductStockQuantityByProductId(@PathVariable UUID productId) {
         // 1. Chiama il servizio per ottenere il dato
@@ -40,36 +45,6 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
     public ResponseEntity<List<ResponseProductDTO>> getProductInStockByBranchId(@PathVariable UUID branchId) {
         List<ResponseProductDTO> prodotti = prodottoService.getProductInStockByBranchId(branchId);
         return ResponseEntity.ok(prodotti);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<ResponseProductDTO>> getAllProducts() {
-        return super.getAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseProductDTO> getProductById(@PathVariable UUID id) {
-        return super.getById(id);
-    }
-
-    @PostMapping
-    public ResponseEntity<ResponseProductDTO> createProduct(@RequestBody CreateProductDTO createDTO) {
-        return super.create(createDTO);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseProductDTO> updateProduct(@PathVariable UUID id, @RequestBody UpdateProductDTO updateDTO) {
-        return super.update(id, updateDTO);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
-        return super.delete(id);
-    }
-
-    @Override
-    protected UUID getId(Prodotto entity) {
-        return entity.getId();
     }
 
     @GetMapping("/{productId}/average-stars")
@@ -95,5 +70,10 @@ class ProdottoController extends GenericController<Prodotto, UUID, CreateProduct
     public ResponseEntity<List<CatalogProductDTO>> getOnlineCatalog() {
         List<CatalogProductDTO> catalog = prodottoService.getOnlineProductCatalog();
         return ResponseEntity.ok(catalog);
+    }
+
+    @Override
+    protected UUID getId(Prodotto entity) {
+        return null;
     }
 }
