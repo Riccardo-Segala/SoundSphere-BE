@@ -16,6 +16,6 @@ public record ResponsePaymentMethodDTO (
         LocalDate dataScadenza,
         String paypalEmail,
         TipoPagamento tipoPagamento,
-        boolean isDefault
+        boolean main
 )implements Serializable {
 }

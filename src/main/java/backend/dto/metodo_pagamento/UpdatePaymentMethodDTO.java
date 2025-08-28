@@ -17,6 +17,6 @@ public record UpdatePaymentMethodDTO (
         LocalDate dataScadenza,
         String paypalEmail,
         TipoPagamento tipoPagamento,
-        boolean isDefault
+        Boolean main
 ) implements Serializable {
 }
