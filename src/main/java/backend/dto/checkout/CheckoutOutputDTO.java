@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public record CheckoutOutputDTO(
         UUID ordineId,
-        String numeroOrdine, // Un numero più leggibile per il cliente, es. "2025-000123"
+        String numeroOrdine,
         LocalDate dataOrdine,
-        String statoOrdine, // Es. "IN_ELABORAZIONE", "CONFERMATO"
+        String statoOrdine,
         BigDecimal importoTotale,
         ResponseUserAddressDTO indirizzoSpedizione,
         LocalDate dataConsegnaStimata,

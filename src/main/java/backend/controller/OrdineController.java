@@ -68,7 +68,7 @@ class OrdineController extends GenericController<Ordine, UUID, CreateOrderDTO, U
         // 1. Estrae l'ID dell'utente in modo sicuro dall'oggetto 'Principal'
         //    fornito dal contesto di sicurezza. La chiamata a .getId() ora funziona
         //    grazie alla nostra classe CustomUserDetails.
-        UUID utenteId = userDetails.getId(); // o Long
+        UUID utenteId = userDetails.getId();
 
         // 2. Chiama il service, passando sia i dati della richiesta (DTO)
         //    sia l'ID dell'utente autenticato.
