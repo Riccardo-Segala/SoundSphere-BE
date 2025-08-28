@@ -10,6 +10,7 @@ import backend.repository.OrdineRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,6 +23,11 @@ import java.util.stream.Collectors;
 public class OrdineService extends GenericService<Ordine, UUID> {
     private final OrdineRepository ordineRepository;
     private final OrderMapper orderMapper;
+
+    @Value("${app.filiale.online.name}")
+    private String filialeOnlineName;
+
+
 
     @Autowired
     private UtenteService utenteService;
@@ -73,7 +79,7 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         List<DettagliOrdine> dettagliOrdine = carrello.stream()
                 .map(cartElement -> {
                     Prodotto prodotto = cartElement.getProdotto();
-                    stockService.reserveStock("online", prodotto.getId(), cartElement.getQuantita());
+                    stockService.reserveStock(filialeOnlineName, prodotto.getId(), cartElement.getQuantita());
 
                     DettagliOrdine dettaglio = new DettagliOrdine();
 
