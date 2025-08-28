@@ -13,7 +13,7 @@ public record ResponseProductDTO(
         String descrizione,
         double prezzo,
         String marca,
-        boolean isRentable,
+        boolean rentable,
         double costoGiornaliero,
         String pathImmagine
 ) implements Serializable {
