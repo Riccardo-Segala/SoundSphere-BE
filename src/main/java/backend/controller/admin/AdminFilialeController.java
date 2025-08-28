@@ -29,9 +29,9 @@ class AdminFilialeController{
         return ResponseEntity.ok(adminFilialeService.getAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseBranchDTO> getBranchById(@PathVariable UUID id) {
-        return ResponseEntity.ok(adminFilialeService.getById(id));
+    @GetMapping("/{branchId}")
+    public ResponseEntity<ResponseBranchDTO> getBranchById(@PathVariable UUID branchId) {
+        return ResponseEntity.ok(adminFilialeService.getById(branchId));
     }
 
     @PostMapping
@@ -39,13 +39,13 @@ class AdminFilialeController{
         return ResponseEntity.ok(adminFilialeService.createBranch(createDTO));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseBranchDTO> updateBranch(@PathVariable UUID id, @RequestBody UpdateBranchDTO updateDTO) {
-        return ResponseEntity.ok(adminFilialeService.updateBranch(id, updateDTO));
+    @PutMapping("/{branchId}")
+    public ResponseEntity<ResponseBranchDTO> updateBranch(@PathVariable UUID branchId, @RequestBody UpdateBranchDTO updateDTO) {
+        return ResponseEntity.ok(adminFilialeService.updateBranch(branchId, updateDTO));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBranch(@PathVariable UUID id) {
-        return ResponseEntity.ok(adminFilialeService.deleteBranch(id));
+    @DeleteMapping("/{branchId}")
+    public ResponseEntity<Void> deleteBranch(@PathVariable UUID branchId) {
+        return ResponseEntity.ok(adminFilialeService.deleteBranch(branchId));
     }
 }

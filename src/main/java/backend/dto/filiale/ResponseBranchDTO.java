@@ -13,10 +13,6 @@ public record ResponseBranchDTO (
         String nome,
         String telefono,
         String email,
-        String via,
-        String citta,
-        String cap,
-        String provincia,
-        String nazione
+        BranchAddressDTO indirizzo
 ) implements Serializable {
 }

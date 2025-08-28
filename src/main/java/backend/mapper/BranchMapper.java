@@ -11,7 +11,6 @@ import org.mapstruct.*;
 public interface BranchMapper {
 
 
-    @Mapping(target = ".", source = "indirizzo")
     ResponseBranchDTO toDto(Filiale filiale);
 
     @Mapping(target = "id", ignore = true)
@@ -52,25 +51,31 @@ public interface BranchMapper {
 
     @AfterMapping
     default void joinIndirizzoFromCreateToEntity(CreateBranchDTO dto, @MappingTarget Filiale filiale) {
-        String indirizzo = String.join(", ",
-                dto.via(),
-                dto.citta(),
-                dto.cap(),
-                dto.provincia(),
-                dto.nazione()
-        );
-        filiale.setIndirizzo(indirizzo);
+        BranchAddressDTO oldAddress = toIndirizzoScomposto(filiale.getIndirizzo());
+
+        String via = dto.via() != null ? dto.via() : oldAddress.via();
+        String citta = dto.citta() != null ? dto.citta() : oldAddress.citta();
+        String cap = dto.cap() != null ? dto.cap() : oldAddress.cap();
+        String provincia = dto.provincia() != null ? dto.provincia() : oldAddress.provincia();
+        String nazione = dto.nazione() != null ? dto.nazione() : oldAddress.nazione();
+
+        String indirizzoAggiornato = String.join(", ", via, citta, cap, provincia, nazione);
+
+        filiale.setIndirizzo(indirizzoAggiornato);
     }
 
     @AfterMapping
     default void joinIndirizzoFromUpdateToEntity(UpdateBranchDTO dto, @MappingTarget Filiale filiale) {
-        String indirizzo = String.join(", ",
-                dto.via(),
-                dto.citta(),
-                dto.cap(),
-                dto.provincia(),
-                dto.nazione()
-        );
-        filiale.setIndirizzo(indirizzo);
+        BranchAddressDTO oldAddress = toIndirizzoScomposto(filiale.getIndirizzo());
+
+        String via = dto.via() != null ? dto.via() : oldAddress.via();
+        String citta = dto.citta() != null ? dto.citta() : oldAddress.citta();
+        String cap = dto.cap() != null ? dto.cap() : oldAddress.cap();
+        String provincia = dto.provincia() != null ? dto.provincia() : oldAddress.provincia();
+        String nazione = dto.nazione() != null ? dto.nazione() : oldAddress.nazione();
+
+        String indirizzoAggiornato = String.join(", ", via, citta, cap, provincia, nazione);
+
+        filiale.setIndirizzo(indirizzoAggiornato);
     }
 }
