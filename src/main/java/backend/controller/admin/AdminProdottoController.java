@@ -1,13 +1,9 @@
 package backend.controller.admin;
 
-import backend.controller.GenericController;
 import backend.dto.prodotto.CreateProductDTO;
 import backend.dto.prodotto.ResponseProductDTO;
 import backend.dto.prodotto.UpdateProductDTO;
-import backend.mapper.ProductMapper;
-import backend.model.Prodotto;
-import backend.service.ProdottoService;
-import backend.service.StockService;
+import backend.service.admin.AdminProdottoService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,34 +13,32 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path="/api/admin/prodotti", produces = MediaType.APPLICATION_JSON_VALUE)
-class AdminProdottoController extends GenericController<Prodotto, UUID, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
+class AdminProdottoController {
+    private final AdminProdottoService adminProdottoService;
 
-    public AdminProdottoController(ProdottoService service, ProductMapper mapper) {
-        super(service, mapper);
+    public AdminProdottoController(AdminProdottoService service) {
+        this.adminProdottoService = service;
+
     }
 
     @GetMapping
     public ResponseEntity<List<ResponseProductDTO>> getAllProducts() {
-        return super.getAll();
+        return ResponseEntity.ok(adminProdottoService.getAll());
     }
 
     @PostMapping
     public ResponseEntity<ResponseProductDTO> createProduct(@RequestBody CreateProductDTO createDTO) {
-        return super.create(createDTO);
+        return ResponseEntity.ok(adminProdottoService.createProduct(createDTO));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseProductDTO> updateProduct(@PathVariable UUID id, @RequestBody UpdateProductDTO updateDTO) {
-        return super.update(id, updateDTO);
+    @PutMapping("/{productId}")
+    public ResponseEntity<ResponseProductDTO> updateProduct(@PathVariable UUID productId, @RequestBody UpdateProductDTO updateDTO) {
+        return ResponseEntity.ok(adminProdottoService.updateProduct(productId, updateDTO));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
-        return super.delete(id);
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
+        return ResponseEntity.ok(adminProdottoService.deleteProduct(productId));
     }
 
-    @Override
-    protected UUID getId(Prodotto entity) {
-        return entity.getId();
-    }
 }

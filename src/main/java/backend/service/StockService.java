@@ -88,4 +88,8 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     public void deleteAllByFilialeId(UUID id) {
         stockRepository.deleteAllByFilialeId(id);
     }
+
+    public void deleteAllByProdottoId(UUID id) {
+        stockRepository.deleteAllByProdottoId(id);
+    }
 }

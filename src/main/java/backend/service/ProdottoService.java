@@ -2,6 +2,7 @@ package backend.service;
 
 import backend.dto.prodotto.CatalogProductDTO;
 import backend.dto.prodotto.ResponseProductDTO;
+import backend.exception.ResourceNotFoundException;
 import backend.mapper.ProductMapper;
 import backend.model.Filiale;
 import backend.model.Prodotto;
@@ -36,6 +37,12 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
         this.productMapper = productMapper;
         this.filialeService = filialeService;
         this.stockRepository = stockRepository;
+    }
+
+    public ResponseProductDTO getProductById(UUID id) {
+        Prodotto prodotto = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Prodotto non trovato con ID: " + id));
+        return productMapper.toDto(prodotto);
     }
 
     public Double getAverageStars(UUID prodottoId) {

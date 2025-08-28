@@ -20,4 +20,6 @@ public interface StockRepository extends JpaRepository<Stock, FilialeProdottoId>
     List<Stock> findByFilialeId(UUID id);
     @Transactional
     void deleteAllByFilialeId(UUID filialeId);
+    @Transactional
+    void deleteAllByProdottoId(UUID id);
 }
