@@ -3,6 +3,8 @@ package backend.mapper;
 import backend.dto.stock.CreateStockDTO;
 import backend.dto.stock.ResponseStockDTO;
 import backend.dto.stock.UpdateStockDTO;
+import backend.model.Filiale;
+import backend.model.Prodotto;
 import backend.model.Stock;
 import org.mapstruct.*;
 
@@ -28,4 +30,11 @@ public interface StockMapper extends GenericMapper<Stock, CreateStockDTO, Update
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Stock partialUpdateFromUpdate(UpdateStockDTO updateStockDTO, @MappingTarget Stock stock);
+
+    @Mapping(target = "id", ignore = true) // Ignora l'ID perché è una nuova entità
+    @Mapping(target = "quantita", constant = "0") // Imposta la quantità a 0
+    @Mapping(target = "quantitaPerNoleggio", constant = "0") // Imposta la quantità per noleggio a 0
+    @Mapping(target = "prodotto", source = "prodotto") // MapStruct lo farebbe in automatico, ma è bene essere espliciti
+    @Mapping(target = "filiale", source = "filiale") // MapStruct lo farebbe in automatico
+    Stock createStockFromNewBranchOrProduct(Prodotto prodotto, Filiale filiale);
 }

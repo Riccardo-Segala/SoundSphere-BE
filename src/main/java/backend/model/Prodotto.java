@@ -28,7 +28,7 @@ public class Prodotto {
     private String marca;
 
     @Column(name = "is_rentable")
-    private boolean isRentable;
+    private boolean rentable;
 
     @Column(name = "costo_giornaliero")
     private double costoGiornaliero;

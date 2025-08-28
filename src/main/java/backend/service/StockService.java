@@ -1,20 +1,15 @@
 package backend.service;
 
-import backend.dto.prodotto.ResponseProductDTO;
 import backend.dto.stock.ResponseStockDTO;
 import backend.exception.OutOfStockException;
-import backend.mapper.ProductMapper;
 import backend.mapper.StockMapper;
 import backend.model.Filiale;
-import backend.model.Prodotto;
 import backend.model.Stock;
 import backend.model.embeddable.FilialeProdottoId;
-import backend.repository.FilialeRepository;
 import backend.repository.StockRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -24,19 +19,15 @@ import java.util.stream.Collectors;
 @Service
 public class StockService extends GenericService<Stock, FilialeProdottoId> {
     private final StockRepository stockRepository;
-    private final FilialeRepository filialeRepository;
     private final FilialeService filialService;
-    private final ProductMapper productMapper;
     private final StockMapper stockMapper;
 
 
     @Autowired
-    public StockService(StockRepository stockRepository, FilialeRepository filialeRepository, FilialeService filialService, ProductMapper productMapper, StockMapper stockMapper) {
+    public StockService(StockRepository stockRepository, FilialeService filialService, StockMapper stockMapper) {
         super(stockRepository); // Passa il repository al costruttore della classe base
         this.stockRepository = stockRepository;
-        this.filialeRepository = filialeRepository;
         this.filialService = filialService;
-        this.productMapper = productMapper;
         this.stockMapper = stockMapper;
     }
 
@@ -90,4 +81,15 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     }
 
 
+    public void saveAll(List<Stock> nuoviStock) {
+        stockRepository.saveAll(nuoviStock);
+    }
+
+    public void deleteAllByFilialeId(UUID id) {
+        stockRepository.deleteAllByFilialeId(id);
+    }
+
+    public void deleteAllByProdottoId(UUID id) {
+        stockRepository.deleteAllByProdottoId(id);
+    }
 }

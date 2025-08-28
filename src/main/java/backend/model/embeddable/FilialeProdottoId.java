@@ -10,25 +10,25 @@ import java.util.UUID;
 @Setter
 @Embeddable
 public class FilialeProdottoId {
-    private UUID filialeId;
-    private UUID prodottoId;
+    private UUID idFiliale;
+    private UUID idProdotto;
 
     public FilialeProdottoId() {}
 
-    public FilialeProdottoId(UUID filialeId, UUID prodottoId) {
-        this.filialeId = filialeId;
-        this.prodottoId = prodottoId;
+    public FilialeProdottoId(UUID idFiliale, UUID idProdotto) {
+        this.idFiliale = idFiliale;
+        this.idProdotto = idProdotto;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FilialeProdottoId that)) return false;
-        return filialeId.equals(that.filialeId) && prodottoId.equals(that.prodottoId);
+        return idFiliale.equals(that.idFiliale) && idProdotto.equals(that.idProdotto);
     }
 
     @Override
     public int hashCode() {
-        return 31 * filialeId.hashCode() + prodottoId.hashCode();
+        return 31 * idFiliale.hashCode() + idProdotto.hashCode();
     }
 }
