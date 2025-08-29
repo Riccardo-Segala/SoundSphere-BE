@@ -83,36 +83,32 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
         MetodoPagamento metodoEsistente = metodoPagamentoRepository.findByIdAndUtenteId(methodId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Metodo non trovato o non appartenente all'utente"));
 
-        boolean eraMainInizialmente = metodoEsistente.isMain();
-
-        // 2. RECUPERA GLI ALTRI METODI UNA SOLA VOLTA
-        List<MetodoPagamento> altriMetodi = metodoPagamentoRepository.findByUtente_Id(userId)
-                .stream()
-                .filter(metodo -> !metodo.getId().equals(methodId)) // Escludiamo sempre quello attuale
-                .toList();
-
-        // 3. Applica le modifiche parziali dal DTO
+        // 2. Applica le modifiche parziali dal DTO
         paymentMethodMapper.partialUpdateFromUpdate(dto, metodoEsistente);
 
-        // 4. LOGICA DI BUSINESS
+        // 3. LOGICA DI BUSINESS SEMPLIFICATA
+        // Se, dopo l'aggiornamento, questo metodo è diventato il principale...
+        if (metodoEsistente.isMain()) {
+            // ...allora ci assicuriamo che sia l'UNICO.
+            // Questa chiamata al repository è un singolo UPDATE sul DB, super efficiente.
+            metodoPagamentoRepository.demoteAllOtherMainMethodsForUser(userId, methodId);
+        }
 
-        // Caso A: Promozione a 'main'
-        if (metodoEsistente.isMain() && !eraMainInizialmente) {
-            // Retrocedi tutti gli altri. Non serve salvare, ci pensa @Transactional.
-            altriMetodi.forEach(metodo -> metodo.setMain(false));
+        // 4. Salva l'entità che abbiamo modificato in memoria.
+        MetodoPagamento savedMethod = metodoPagamentoRepository.save(metodoEsistente);
+
+        // 5. CONTROLLO DI SICUREZZA FINALE
+        // Assicurati che esista sempre almeno un metodo principale.
+        // Questo gestisce il caso in cui l'utente retrocede l'unico metodo esistente.
+        if (!metodoPagamentoRepository.existsByUtenteIdAndMain(userId, true)) {
+            // Se nessun metodo è 'main', promuovi il primo che trovi (o quello appena salvato se è l'unico).
+            MetodoPagamento primoMetodo = metodoPagamentoRepository.findFirstByUtente_Id(userId)
+                    .orElseThrow(() -> new IllegalStateException("Nessun metodo di pagamento trovato per l'utente."));
+            primoMetodo.setMain(true);
+            // non serve un'ulteriore save, @Transactional gestisce il commit finale.
         }
-        // Caso B: Retrocessione da 'main'
-        else if (!metodoEsistente.isMain() && eraMainInizialmente) {
-            if (altriMetodi.isEmpty()) {
-                // Non può essere retrocesso se è l'unico. Forza il ripristino.
-                metodoEsistente.setMain(true);
-            } else {
-                // Promuovi il primo degli altri a nuovo principale
-                altriMetodi.get(0).setMain(true);
-            }
-        }
-        // 5. Salviamo l'entità aggiornata
-        return metodoPagamentoRepository.save(metodoEsistente);
+
+        return savedMethod; // Restituisce l'oggetto modificato
     }
 
     @Transactional
