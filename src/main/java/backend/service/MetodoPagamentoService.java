@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,6 +30,12 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
         super(repository); // Passa il repository al costruttore della classe base
     }
 
+    public Optional<MetodoPagamento> findByIdAndUserId(UUID methodId, UUID userId) {
+        // Delega la chiamata direttamente al metodo sicuro del repository.
+        // Nessuna logica aggiuntiva è necessaria qui, perché la query è già sicura.
+        return metodoPagamentoRepository.findByIdAndUtenteId(methodId, userId);
+    }
+
     public List<ResponsePaymentMethodDTO> getAllPaymentMethodItemsByUserId(UUID userId) {
         // 1. Recupera tutti i metodi di pagamento per l'utente specificato
         List<MetodoPagamento> methodItems = metodoPagamentoRepository.findByUtente_Id(userId);
@@ -40,15 +47,15 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
     }
 
     @Transactional
-    public MetodoPagamento create(CreatePaymentMethodDTO dto) {
+    public MetodoPagamento create(UUID userId, CreatePaymentMethodDTO dto) {
         // 1. Validare e recuperare l'utente
-        Utente utente = utenteRepository.findById(dto.utenteId())
-                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con id: " + dto.utenteId()));
+        Utente utente = utenteRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con id: " + userId));
 
         // 2. Recuperare i metodi esistenti
         List<MetodoPagamento> metodiEsistenti = metodoPagamentoRepository.findByUtente_Id(utente.getId());
 
-        // 3. Creare il nuovo metodo e associarlo all'utente (Perfetto)
+        // 3. Creare il nuovo metodo e associarlo all'utente
         MetodoPagamento nuovoMetodo = paymentMethodMapper.fromCreateDto(dto);
         nuovoMetodo.setUtente(utente);
 
@@ -68,18 +75,20 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
     }
 
     @Transactional
-    public MetodoPagamento update(UUID id, UpdatePaymentMethodDTO dto) {
-        // 1. Trova il metodo di pagamento esistente
-        MetodoPagamento metodoEsistente = metodoPagamentoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Metodo di pagamento non trovato con id: " + id));
+    public MetodoPagamento update(UUID userId, UUID methodId, UpdatePaymentMethodDTO dto) {
+        // 1. Il controllo di sicurezza:
+        // Cerca il metodo usando sia il suo ID sia l'ID dell'utente.
+        // Se non viene trovato, significa o che il metodo non esiste, o che non appartiene all'utente.
+        // In entrambi i casi, l'operazione fallisce in modo sicuro.
+        MetodoPagamento metodoEsistente = metodoPagamentoRepository.findByIdAndUtenteId(methodId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Metodo non trovato o non appartenente all'utente"));
 
         boolean eraMainInizialmente = metodoEsistente.isMain();
-        UUID utenteId = metodoEsistente.getUtente().getId();
 
         // 2. RECUPERA GLI ALTRI METODI UNA SOLA VOLTA
-        List<MetodoPagamento> altriMetodi = metodoPagamentoRepository.findByUtente_Id(utenteId)
+        List<MetodoPagamento> altriMetodi = metodoPagamentoRepository.findByUtente_Id(userId)
                 .stream()
-                .filter(metodo -> !metodo.getId().equals(id)) // Escludiamo sempre quello attuale
+                .filter(metodo -> !metodo.getId().equals(methodId)) // Escludiamo sempre quello attuale
                 .toList();
 
         // 3. Applica le modifiche parziali dal DTO
@@ -107,19 +116,21 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
     }
 
     @Transactional
-    public void delete(UUID id) {
-        // 1. Trova il metodo da cancellare. Se non esiste, lancia un'eccezione 404.
-        MetodoPagamento metodoDaCancellare = metodoPagamentoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Metodo di pagamento non trovato con id: " + id));
+    public void delete(UUID userId, UUID methodId) {
+        // 1. Il controllo di sicurezza:
+        // Cerca il metodo usando sia il suo ID sia l'ID dell'utente.
+        // Se non viene trovato, significa o che il metodo non esiste, o che non appartiene all'utente.
+        // In entrambi i casi, l'operazione fallisce in modo sicuro.
+        MetodoPagamento metodoDaCancellare = metodoPagamentoRepository.findByIdAndUtenteId(methodId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Metodo non trovato o non appartenente all'utente"));
 
         // 2. Se il metodo che stiamo cancellando è quello principale, gestisci la successione.
         if (metodoDaCancellare.isMain()) {
-            UUID utenteId = metodoDaCancellare.getUtente().getId();
 
             // Cerca i possibili candidati a diventare il nuovo metodo principale.
-            List<MetodoPagamento> altriMetodi = metodoPagamentoRepository.findByUtente_Id(utenteId)
+            List<MetodoPagamento> altriMetodi = metodoPagamentoRepository.findByUtente_Id(userId)
                     .stream()
-                    .filter(metodo -> !metodo.getId().equals(id)) // Escludi quello corrente
+                    .filter(metodo -> !metodo.getId().equals(methodId)) // Escludi quello corrente
                     .toList();
 
             // Se esiste almeno un altro metodo...

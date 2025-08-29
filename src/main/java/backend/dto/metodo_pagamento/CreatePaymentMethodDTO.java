@@ -1,11 +1,9 @@
 package backend.dto.metodo_pagamento;
 
 import backend.model.enums.TipoPagamento;
-import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.UUID;
 
 /**
  * DTO for {@link backend.model.MetodoPagamento}
@@ -17,8 +15,6 @@ public record CreatePaymentMethodDTO (
         LocalDate dataScadenza,
         String paypalEmail,
         TipoPagamento tipoPagamento,
-        boolean main,
-        @NotNull(message = "L'ID dell'utente non può essere nullo.")
-        UUID utenteId
+        boolean main
 ) implements Serializable {
 }
