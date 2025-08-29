@@ -53,7 +53,7 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con id: " + userId));
 
         // 2. Recuperare i metodi esistenti
-        List<MetodoPagamento> metodiEsistenti = metodoPagamentoRepository.findByUtente_Id(utente.getId());
+        List<MetodoPagamento> metodiEsistenti = metodoPagamentoRepository.findByUtente_Id(userId);
 
         // 3. Creare il nuovo metodo e associarlo all'utente
         MetodoPagamento nuovoMetodo = paymentMethodMapper.fromCreateDto(dto);
