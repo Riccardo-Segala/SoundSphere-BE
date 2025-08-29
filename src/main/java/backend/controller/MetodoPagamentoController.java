@@ -5,44 +5,86 @@ import backend.dto.metodo_pagamento.ResponsePaymentMethodDTO;
 import backend.dto.metodo_pagamento.UpdatePaymentMethodDTO;
 import backend.mapper.PaymentMethodMapper;
 import backend.model.MetodoPagamento;
+import backend.security.CustomUserDetails;
 import backend.service.MetodoPagamentoService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path="/api/metodi-pagamento", produces = MediaType.APPLICATION_JSON_VALUE)
 class MetodoPagamentoController extends GenericController<MetodoPagamento, UUID, CreatePaymentMethodDTO, UpdatePaymentMethodDTO, ResponsePaymentMethodDTO> {
+
+    @Autowired
+    private MetodoPagamentoService metodoPagamentoService;
+    @Autowired
+    private PaymentMethodMapper paymentMethodMapper;
+
     public MetodoPagamentoController(MetodoPagamentoService service, PaymentMethodMapper mapper) {
         super(service, mapper);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ResponsePaymentMethodDTO>> getAllPaymentMethod() {
-        return super.getAll();
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponsePaymentMethodDTO> getPaymentMethodById(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable UUID id) {
+        UUID userId = userDetails.getId();
+
+        Optional<MetodoPagamento> entity = metodoPagamentoService.findByIdAndUserId(id, userId);
+
+        // 3. Mappa il risultato o restituisci 404 Not Found.
+        // Se l'optional è vuoto (perché il metodo non esiste O non è dell'utente),
+        // il client riceverà un 404, senza rivelare informazioni.
+        return entity.map(e -> ResponseEntity.ok(paymentMethodMapper.toDto(e)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponsePaymentMethodDTO> getPaymentMethodById(@PathVariable UUID id) {
-        return super.getById(id);
+    @GetMapping
+    public ResponseEntity<List<ResponsePaymentMethodDTO>> getAllUserPaymentMethod(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UUID userId = userDetails.getId();
+
+        List<ResponsePaymentMethodDTO> methodItems = metodoPagamentoService.getAllPaymentMethodItemsByUserId(userId);
+
+        return ResponseEntity.ok(methodItems);
     }
 
     @PostMapping
-    public ResponseEntity<ResponsePaymentMethodDTO> createPaymentMethod(@RequestBody CreatePaymentMethodDTO createDTO) {
-        return super.create(createDTO);
+    public ResponseEntity<ResponsePaymentMethodDTO> createPaymentMethod(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody CreatePaymentMethodDTO dto) {
+        UUID userId = userDetails.getId();
+        MetodoPagamento savedEntity = metodoPagamentoService.create(userId, dto);
+        ResponsePaymentMethodDTO responseDto = paymentMethodMapper.toDto(savedEntity);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedEntity.getId()).toUri();
+
+        return ResponseEntity.created(location).body(responseDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponsePaymentMethodDTO> updatePaymentMethod(@PathVariable UUID id, @RequestBody UpdatePaymentMethodDTO updateDTO) {
-        return super.update(id, updateDTO);
+    public ResponseEntity<ResponsePaymentMethodDTO> updatePaymentMethod(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable UUID id, @RequestBody UpdatePaymentMethodDTO updateDTO) {
+        UUID userId = userDetails.getId();
+        MetodoPagamento metodoAggiornato = metodoPagamentoService.update(userId, id, updateDTO);
+
+        return ResponseEntity.ok(paymentMethodMapper.toDto(metodoAggiornato));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePaymentMethod(@PathVariable UUID id) {
-        return super.delete(id);
+    public ResponseEntity<Void> deletePaymentMethod(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable UUID id) {
+        UUID userId = userDetails.getId();
+        // Delega tutta la logica complessa al service
+        metodoPagamentoService.delete(userId, id);
+
+        // Se il service non lancia eccezioni, la cancellazione è andata a buon fine.
+        // Restituisci 204 No Content come da standard per una DELETE.
+        return ResponseEntity.noContent().build();
     }
 
     @Override

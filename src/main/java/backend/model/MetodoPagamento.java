@@ -28,8 +28,8 @@ public class MetodoPagamento {
     @Enumerated(EnumType.STRING)
     private TipoPagamento tipoPagamento;
 
-    @Column(name = "is_default")
-    private boolean isDefault;
+    @Column(name = "is_main")
+    private boolean main;
 
     @ManyToOne
     @JoinColumn(name = "id_utente")

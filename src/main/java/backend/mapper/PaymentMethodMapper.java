@@ -10,7 +10,6 @@ import org.mapstruct.*;
 public interface PaymentMethodMapper extends GenericMapper<MetodoPagamento, CreatePaymentMethodDTO, UpdatePaymentMethodDTO, ResponsePaymentMethodDTO> {
 
     @Override
-    @Mapping(source = "utenteId", target = "utente.id")
     MetodoPagamento fromCreateDto(CreatePaymentMethodDTO createPaymentMethodDTO);
 
     @Override
@@ -18,7 +17,6 @@ public interface PaymentMethodMapper extends GenericMapper<MetodoPagamento, Crea
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "utenteId", target = "utente.id")
     MetodoPagamento partialUpdateFromCreate(CreatePaymentMethodDTO createPaymentMethodDTO, @MappingTarget MetodoPagamento metodoPagamento);
 
     @Override
