@@ -6,6 +6,8 @@ import backend.dto.vantaggio.UpdateBenefitDTO;
 import backend.model.Vantaggio;
 import org.mapstruct.*;
 
+import java.util.UUID;
+
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BenefitMapper extends GenericMapper<Vantaggio, CreateBenefitDTO, UpdateBenefitDTO, ResponseBenefitDTO> {
 
@@ -28,4 +30,8 @@ public interface BenefitMapper extends GenericMapper<Vantaggio, CreateBenefitDTO
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Vantaggio partialUpdate(ResponseBenefitDTO responseBenefitDto, @MappingTarget Vantaggio vantaggio);
+
+    default UUID fromBenefit(Vantaggio benefit) {
+        return benefit != null ? benefit.getId() : null;
+    }
 }
