@@ -1,5 +1,6 @@
 package backend.controller.admin;
 
+import backend.dto.utente.DeleteUsersDTO;
 import backend.dto.utente.ResponseUserDTO;
 import backend.dto.utente.admin.CreateUserFromAdminDTO;
 import backend.dto.utente.admin.UpdateUserFromAdminDTO;
@@ -42,6 +43,12 @@ public class AdminUtenteController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
+        return null;
+    }
+
+    @DeleteMapping("/users")
+    public ResponseEntity<Void> deleteUsers(@RequestBody DeleteUsersDTO dto) {
+        userService.deleteUsers(dto.userIds());
         return null;
     }
 }
