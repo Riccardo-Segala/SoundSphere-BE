@@ -145,9 +145,9 @@ public class UtenteService extends GenericService<Utente, UUID> {
         userRepository.deleteById(id);
     }
 
+    // metodi di utilità
+
     public boolean existsById(UUID userId) {
         return userRepository.existsById(userId);
     }
-
-
 }

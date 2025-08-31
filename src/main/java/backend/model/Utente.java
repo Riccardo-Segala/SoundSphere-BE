@@ -5,6 +5,7 @@ import backend.model.enums.Tipologia;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Check;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import java.util.*;
 @Inheritance(strategy = InheritanceType.JOINED) // Strategia JOINED (tabelle separate per le sotto-classi)
 @DiscriminatorValue("UTENTE")
 @DiscriminatorColumn(name = "tipologia", discriminatorType = DiscriminatorType.STRING) // Nome della colonna discriminante
+@Check(constraints = "(tipologia <> 'UTENTE' OR id_vantaggio IS NOT NULL)")
 public class Utente implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
