@@ -10,8 +10,6 @@ import backend.security.CustomUserDetails;
 import backend.service.UtenteService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +21,14 @@ import java.util.UUID;
 public class UtenteController extends GenericController<Utente, UUID, CreateUserDTO, UpdateUserDTO, ResponseUserDTO> {
     private final EmployeeMapper employeeMapper;
     private final UserMapper userMapper;
+    private final UtenteService utenteService;
     private final UtenteService userService;
 
-    public UtenteController(UtenteService service, UserMapper mapper, EmployeeMapper employeeMapper, UtenteService userService) {
+    public UtenteController(UtenteService service, UserMapper mapper, EmployeeMapper employeeMapper, UtenteService utenteService, UtenteService userService) {
         super(service, mapper);
         this.employeeMapper = employeeMapper;
         this.userMapper = mapper;
+        this.utenteService = utenteService;
         this.userService = userService;
     }
 
@@ -53,25 +53,13 @@ public class UtenteController extends GenericController<Utente, UUID, CreateUser
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwner(authentication, #id)")
-    public ResponseEntity<ResponseUserDTO> getUserById(@PathVariable UUID id) {
-        return super.getById(id);
-    }
-
-    @PostMapping
-    public ResponseEntity<ResponseUserDTO> createUser(@RequestBody CreateUserDTO createDTO) {
-        return super.create(createDTO);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseUserDTO> updateUser(@PathVariable UUID id, @RequestBody UpdateUserDTO updateDTO) {
-        return super.update(id, updateDTO);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-        return super.delete(id);
+    @PutMapping
+    public ResponseEntity<ResponseUserDTO> updateCurrentUser(
+            @RequestBody UpdateUserDTO dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID userId = userDetails.getId();
+        return ResponseEntity.ok(utenteService.updateCurrentUser(userId, dto));
     }
 
     @Override

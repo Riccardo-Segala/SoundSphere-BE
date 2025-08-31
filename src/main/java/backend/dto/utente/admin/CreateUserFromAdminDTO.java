@@ -1,6 +1,5 @@
-package backend.dto.utente;
+package backend.dto.utente.admin;
 
-import backend.dto.vantaggio.ResponseBenefitDTO;
 import backend.model.enums.Sesso;
 import backend.model.enums.Tipologia;
 
@@ -12,18 +11,15 @@ import java.util.UUID;
 /**
  * DTO for {@link backend.model.Utente}
  */
-public record ResponseUserDTO(
-        UUID id,
+public record CreateUserFromAdminDTO(
         String nome,
         String cognome,
         String email,
+        String password,
         LocalDate dataDiNascita,
         Tipologia tipologia,
         String pathImmagine,
         Sesso sesso,
-        LocalDate dataRegistrazione,
-        Integer punti,
-        ResponseBenefitDTO vantaggio,
-        Set<String> ruoli
-) implements Serializable {
-}
+        UUID vantaggioId,
+        Set<UUID> ruoliIds
+) implements Serializable {}
