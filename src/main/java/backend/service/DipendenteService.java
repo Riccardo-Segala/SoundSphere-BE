@@ -9,13 +9,13 @@ import backend.mapper.BranchMapper;
 import backend.mapper.EmployeeMapper;
 import backend.model.Dipendente;
 import backend.model.Filiale;
+import backend.model.enums.Tipologia;
 import backend.repository.DipendenteRepository;
 import backend.repository.UtenteRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -88,11 +88,13 @@ public class DipendenteService extends GenericService<Dipendente, UUID> {
 
         // 4. Salva l'entità nel database
         Dipendente savedDipendente = employeeRepository.save(dipendente);
+        savedDipendente.setTipologia(Tipologia.DIPENDENTE);
 
         // 5. Ritorna il DTO di risposta mappando l'entità appena salvata
         return employeeMapper.toDto(savedDipendente);
     }
 
+    @Transactional
     public ResponseEmployeeDTO updateEmployee(UUID id, UpdateEmployeeFromAdminDTO dto) {
         // 1. Recupera l'entità esistente dal database
         Dipendente dipendente = employeeRepository.findById(id)
