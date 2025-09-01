@@ -27,4 +27,8 @@ public class Noleggio {
 
     private double totale;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_utente", nullable = false)
+    private Utente utente;
+
 }

@@ -24,9 +24,5 @@ public class DettagliNoleggio {
     @JoinColumn(name = "id_prodotto")
     private Prodotto prodotto;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_organizzatore_eventi", referencedColumnName = "id")
-    private OrganizzatoreEventi organizzatoreEventi;
-
     private int quantita;
 }
