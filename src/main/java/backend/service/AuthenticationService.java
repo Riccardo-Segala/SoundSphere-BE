@@ -14,19 +14,11 @@ import backend.repository.UtenteRepository;
 import backend.repository.VantaggioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +54,11 @@ public class AuthenticationService {
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
         utente.setVantaggio(vantaggioDefault);
 
-        utente.setRuoli(Collections.singleton(ruoloUtente));
+        UtenteRuolo defaultRole = new UtenteRuolo();
+        defaultRole.setUtente(utente);
+        defaultRole.setRuolo(ruoloUtente);
+        utente.getUtenteRuoli().add(defaultRole);
+
         repository.save(utente);
         return jwtService.generateToken(utente);
     }
@@ -101,7 +97,10 @@ public class AuthenticationService {
                 .orElseThrow(() -> new IllegalStateException("Filiale non trovata"));
         dipendente.setFiliale(filiale);
 
-        dipendente.setRuoli(Collections.singleton(ruoloDipendente));
+        UtenteRuolo defaultRole = new UtenteRuolo();
+        defaultRole.setUtente(dipendente);
+        defaultRole.setRuolo(ruoloDipendente);
+        dipendente.getUtenteRuoli().add(defaultRole);
 
         repository.save(dipendente);
         return jwtService.generateToken(dipendente);
