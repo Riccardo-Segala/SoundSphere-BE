@@ -1,5 +1,6 @@
 package backend.dto.utente.admin;
 
+import backend.dto.common.HasRole;
 import backend.model.enums.Sesso;
 
 import java.io.Serializable;
@@ -20,4 +21,4 @@ public record CreateUserFromAdminDTO(
         Sesso sesso,
         UUID vantaggioId,
         Set<UUID> ruoliIds
-) implements Serializable {}
+) implements Serializable, HasRole {}

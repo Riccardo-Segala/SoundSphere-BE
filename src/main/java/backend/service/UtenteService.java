@@ -1,6 +1,7 @@
 package backend.service;
 
 import backend.dto.utente.ResponseUserDTO;
+import backend.dto.utente.RoleAssignmentDTO;
 import backend.dto.utente.UpdateUserDTO;
 import backend.dto.utente.admin.CreateUserFromAdminDTO;
 import backend.dto.utente.admin.UpdateUserFromAdminDTO;
@@ -8,17 +9,17 @@ import backend.exception.ResourceNotFoundException;
 import backend.mapper.UserMapper;
 import backend.model.Ruolo;
 import backend.model.Utente;
+import backend.model.UtenteRuolo;
 import backend.model.Vantaggio;
 import backend.model.enums.Tipologia;
 import backend.repository.UtenteRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,8 +104,12 @@ public class UtenteService extends GenericService<Utente, UUID> {
         utente.setPunti(0);
         utente.setTipologia(Tipologia.UTENTE);
 
+        // Assegna il ruolo "UTENTE"
         Ruolo ruoloUtente = ruoloService.findByName("UTENTE");
-        utente.setRuoli(Collections.singleton(ruoloUtente));
+        UtenteRuolo defaultAssignment = new UtenteRuolo();
+        defaultAssignment.setUtente(utente);
+        defaultAssignment.setRuolo(ruoloUtente);
+        utente.getUtenteRuoli().add(defaultAssignment);
 
         Vantaggio vantaggio = vantaggioService.findById(dto.vantaggioId())
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
@@ -154,6 +159,35 @@ public class UtenteService extends GenericService<Utente, UUID> {
         }
 
         userRepository.deleteAll(usersToDelete);
+    }
+
+    @Transactional
+    public void assignEventManagerRole(List<RoleAssignmentDTO> assignments) {
+        if (CollectionUtils.isEmpty(assignments)) {
+            return;
+        }
+
+        // 1. ORCHESTRAZIONE: Recupera il ruolo una sola volta
+        Ruolo ruoloOrganizzatore = ruoloService.findByName("ORGANIZZATORE_EVENTI");
+
+        // 2. ORCHESTRAZIONE: Recupera tutti gli utenti in una sola query
+        Set<UUID> utenteIds = assignments.stream().map(RoleAssignmentDTO::userId).collect(Collectors.toSet());
+        List<Utente> utentiTrovati = userRepository.findAllById(utenteIds);
+
+        // 3. VALIDAZIONE: Controlla che tutti gli utenti esistano
+        if (utentiTrovati.size() != utenteIds.size()) {
+            throw new ResourceNotFoundException("Uno o più utenti non sono stati trovati.");
+        }
+
+        // Mappa per efficienza
+        Map<UUID, RoleAssignmentDTO> mappaAssignments = assignments.stream()
+                .collect(Collectors.toMap(RoleAssignmentDTO::userId, dto -> dto));
+
+        // 4. DELEGA: Itera e chiama il mapper per ogni utente
+        for (Utente utente : utentiTrovati) {
+            RoleAssignmentDTO assignmentDto = mappaAssignments.get(utente.getId());
+            userMapper.updateRoleFromDto(assignmentDto, ruoloOrganizzatore, utente); // <-- LOGICA DELEGATA
+        }
     }
 
     // metodi di utilità

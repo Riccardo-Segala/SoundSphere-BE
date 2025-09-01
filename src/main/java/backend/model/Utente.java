@@ -3,8 +3,10 @@ package backend.model;
 import backend.model.enums.Sesso;
 import backend.model.enums.Tipologia;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Check;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -57,13 +59,10 @@ public class Utente implements UserDetails {
     @JoinColumn(name = "id_vantaggio")
     private Vantaggio vantaggio;
 
-    @ManyToMany(fetch = FetchType.LAZY) // Carica subito i ruoli
-    @JoinTable(
-            name = "utente_ruolo",
-            joinColumns = @JoinColumn(name = "id_utente"),
-            inverseJoinColumns = @JoinColumn(name = "id_ruolo")
-    )
-    private Set<Ruolo> ruoli = new HashSet<>();
+    @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @EqualsAndHashCode.Exclude // Per prevenire cicli infiniti
+    @ToString.Exclude          // Per prevenire cicli infiniti
+    private Set<UtenteRuolo> utenteRuoli = new HashSet<>();
 
     @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ordine> ordini = new ArrayList<>();
@@ -74,10 +73,14 @@ public class Utente implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        for (Ruolo ruolo : this.ruoli) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + ruolo.getNome()));
-            for (Permesso permesso : ruolo.getPermessi()) {
-                authorities.add(new SimpleGrantedAuthority(permesso.getNome()));
+        for (UtenteRuolo ur : this.utenteRuoli) {
+            // Controlla che il ruolo non sia scaduto
+            if (ur.getDataScadenza() == null || ur.getDataScadenza().isAfter(LocalDate.now())) {
+                Ruolo ruolo = ur.getRuolo();
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + ruolo.getNome()));
+                for (Permesso permesso : ruolo.getPermessi()) {
+                    authorities.add(new SimpleGrantedAuthority(permesso.getNome()));
+                }
             }
         }
         return authorities;
