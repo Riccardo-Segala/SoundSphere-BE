@@ -1,7 +1,6 @@
 package backend.dto.utente.admin;
 
 import backend.model.enums.Sesso;
-import backend.model.enums.Tipologia;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -17,7 +16,6 @@ public record CreateUserFromAdminDTO(
         String email,
         String password,
         LocalDate dataDiNascita,
-        Tipologia tipologia,
         String pathImmagine,
         Sesso sesso,
         UUID vantaggioId,

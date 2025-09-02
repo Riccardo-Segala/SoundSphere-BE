@@ -145,9 +145,20 @@ public class UtenteService extends GenericService<Utente, UUID> {
         userRepository.deleteById(id);
     }
 
+    @Transactional
+    public void deleteUsers(List<UUID> userIds) {
+        List<Utente> usersToDelete = userRepository.findAllById(userIds);
+
+        if (usersToDelete.size() != userIds.size()) {
+            throw new ResourceNotFoundException("Uno o più utenti non trovati per gli ID forniti.");
+        }
+
+        userRepository.deleteAll(usersToDelete);
+    }
+
+    // metodi di utilità
+
     public boolean existsById(UUID userId) {
         return userRepository.existsById(userId);
     }
-
-
 }

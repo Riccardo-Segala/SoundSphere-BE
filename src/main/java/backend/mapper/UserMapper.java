@@ -22,15 +22,15 @@ public interface UserMapper extends GenericMapper<Utente, CreateUserDTO, UpdateU
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Utente partialUpdateFromUpdate(UpdateUserDTO updateUserDto, @MappingTarget Utente utente);
-    @Mapping(target = "ruoli", source = "ruoliIds")
+    @Mapping(target = "ruoli", source = "ruoliIds", qualifiedByName = "findRolesByIds")
     Utente fromAdminCreateDto(CreateUserFromAdminDTO createDto);
-    @Mapping(target = "ruoli", source = "ruoliIds")
+    @Mapping(target = "ruoli", source = "ruoliIds", qualifiedByName = "findRolesByIds")
     Utente fromAdminUpdateDto(UpdateUserFromAdminDTO updateDto);
 
-    @Mapping(target = "ruoli", source = "ruoliIds")
+    @Mapping(target = "ruoli", source = "ruoliIds", qualifiedByName = "findRolesByIds")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Utente partialUpdateFromAdminCreate(CreateUserFromAdminDTO createDto, @MappingTarget Utente utente);
-    @Mapping(target = "ruoli", source = "ruoliIds")
+    @Mapping(target = "ruoli", source = "ruoliIds", qualifiedByName = "findRolesByIds")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Utente partialUpdateFromAdminUpdate(UpdateUserFromAdminDTO updateDto, @MappingTarget Utente utente);
 }
