@@ -15,10 +15,10 @@ public interface UtenteRepository extends JpaRepository<Utente, UUID> {
     Optional<Utente> findByEmail(String email);
     Boolean existsByEmail(String email);
 
-    @Query("SELECT u FROM Utente u JOIN FETCH u.ruoli WHERE u.email = :email")
+    @Query("SELECT u FROM Utente u LEFT JOIN FETCH u.utenteRuoli ur LEFT JOIN FETCH ur.ruolo r LEFT JOIN FETCH r.permessi WHERE u.email = :email")
     Optional<Utente> findByEmailWithRuoli(@Param("email") String email);
 
-    @Query("SELECT u FROM Utente u LEFT JOIN FETCH u.ruoli LEFT JOIN FETCH u.vantaggio WHERE u.id = :id")
+    @Query("SELECT u FROM Utente u LEFT JOIN FETCH u.utenteRuoli ur LEFT JOIN FETCH ur.ruolo LEFT JOIN FETCH u.vantaggio WHERE u.id = :id")
     Optional<Utente> findUtenteByIdWithDetails(@Param("id") UUID id);
 
 }

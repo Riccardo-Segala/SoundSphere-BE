@@ -5,13 +5,14 @@ import backend.dto.dipendente.ResponseEmployeeDTO;
 import backend.dto.dipendente.UpdateEmployeeDTO;
 import backend.dto.dipendente.admin.CreateEmployeeFromAdminDTO;
 import backend.dto.dipendente.admin.UpdateEmployeeFromAdminDTO;
+import backend.mapper.common.UserRoleMappingSupport;
 import backend.mapper.resolver.BranchResolver;
 import backend.mapper.resolver.RoleResolver;
 import backend.model.Dipendente;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {RoleResolver.class, RoleMapper.class, BranchResolver.class})
-public interface EmployeeMapper extends UserMapper {
+public interface EmployeeMapper extends UserRoleMappingSupport {
 
 
     Dipendente fromCreateDto(CreateEmployeeDTO createEmployeeDTO);

@@ -1,9 +1,7 @@
 package backend.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +28,12 @@ public class Ruolo {
     )
     private Set<Permesso> permessi = new HashSet<>();
 
-    @ManyToMany(mappedBy = "ruoli")
-    private Set<Utente> utenti = new HashSet<>();
+    @OneToMany(
+            mappedBy = "ruolo",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<UtenteRuolo> assegnazioni = new HashSet<>();
 }
