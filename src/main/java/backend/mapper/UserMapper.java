@@ -47,27 +47,4 @@ public interface UserMapper extends GenericMapper<Utente, CreateUserDTO, UpdateU
     @Mapping(target = "password", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Utente partialUpdateFromAdminUpdate(UpdateUserFromAdminDTO updateDto, @MappingTarget Utente utente);
-
-    default void updateRoleFromDto(RoleAssignmentDTO dto, Ruolo ruolo, @MappingTarget Utente utente) {
-        if (dto == null || ruolo == null || utente == null) {
-            return;
-        }
-
-        Optional<UtenteRuolo> existingAssignment = utente.getUtenteRuoli().stream()
-                .filter(ur -> ur.getRuolo().equals(ruolo))
-                .findFirst();
-
-        if (existingAssignment.isPresent()) {
-            // Se esiste, aggiorna solo la data di scadenza sull'oggetto esistente
-            existingAssignment.get().setDataScadenza(dto.expirationDate());
-        } else {
-            // Se non esiste, crea una nuova assegnazione
-            UtenteRuolo newAssignment = new UtenteRuolo();
-            newAssignment.setUtente(utente);
-            newAssignment.setRuolo(ruolo);
-            newAssignment.setDataScadenza(dto.expirationDate());
-
-            utente.getUtenteRuoli().add(newAssignment);
-        }
-    }
 }

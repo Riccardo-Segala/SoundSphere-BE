@@ -167,26 +167,43 @@ public class UtenteService extends GenericService<Utente, UUID> {
             return;
         }
 
-        // 1. ORCHESTRAZIONE: Recupera il ruolo una sola volta
-        Ruolo ruoloOrganizzatore = ruoloService.findByName("ORGANIZZATORE_EVENTI");
+        // 1. Fetch del ruolo "EVENT_MANAGER"
+            Ruolo eventManagerRole = ruoloService.findByName("ORGANIZZATORE_EVENTI"); // Assuming role name is also in English
 
-        // 2. ORCHESTRAZIONE: Recupera tutti gli utenti in una sola query
-        Set<UUID> utenteIds = assignments.stream().map(RoleAssignmentDTO::userId).collect(Collectors.toSet());
-        List<Utente> utentiTrovati = userRepository.findAllById(utenteIds);
+        // 2. Fetch degli utenti coinvolti
+        Set<UUID> userIds = assignments.stream()
+                .map(RoleAssignmentDTO::userId)
+                .collect(Collectors.toSet());
+        List<Utente> foundUsers = userRepository.findAllById(userIds);
 
-        // 3. VALIDAZIONE: Controlla che tutti gli utenti esistano
-        if (utentiTrovati.size() != utenteIds.size()) {
-            throw new ResourceNotFoundException("Uno o più utenti non sono stati trovati.");
+        // 3. Valida gli utenti trovati
+        if (foundUsers.size() != userIds.size()) {
+            throw new ResourceNotFoundException("One or more users were not found.");
         }
 
-        // Mappa per efficienza
-        Map<UUID, RoleAssignmentDTO> mappaAssignments = assignments.stream()
+        // Mappa gli userId alle assegnazioni per accesso rapido
+        Map<UUID, RoleAssignmentDTO> assignmentMap = assignments.stream()
                 .collect(Collectors.toMap(RoleAssignmentDTO::userId, dto -> dto));
 
-        // 4. DELEGA: Itera e chiama il mapper per ogni utente
-        for (Utente utente : utentiTrovati) {
-            RoleAssignmentDTO assignmentDto = mappaAssignments.get(utente.getId());
-            userMapper.updateRoleFromDto(assignmentDto, ruoloOrganizzatore, utente); // <-- LOGICA DELEGATA
+        // 4. ESEGUE LE ASSEGNAZIONI
+        for (Utente user : foundUsers) {
+            RoleAssignmentDTO assignmentDto = assignmentMap.get(user.getId());
+
+            Optional<UtenteRuolo> existingAssignment = user.getUtenteRuoli().stream()
+                    .filter(userRole -> userRole.getRuolo().equals(eventManagerRole))
+                    .findFirst();
+
+            if (existingAssignment.isPresent()) {
+                // se esiste già, aggiorna la data di scadenza
+                existingAssignment.get().setDataScadenza(assignmentDto.expirationDate());
+            } else {
+                // se non esiste, crea una nuova assegnazione
+                UtenteRuolo newAssignment = new UtenteRuolo();
+                newAssignment.setUtente(user);
+                newAssignment.setRuolo(eventManagerRole);
+                newAssignment.setDataScadenza(assignmentDto.expirationDate());
+                user.getUtenteRuoli().add(newAssignment);
+            }
         }
     }
 
