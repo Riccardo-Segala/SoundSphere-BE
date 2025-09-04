@@ -1,6 +1,5 @@
 package backend.dto.dipendente.admin;
 
-import backend.dto.common.HasRole;
 import backend.model.enums.Sesso;
 
 import java.io.Serializable;
@@ -21,4 +20,4 @@ public record UpdateEmployeeFromAdminDTO(
         LocalDate scadenzaContratto,
         LocalDate dataAssunzione,
         UUID filialeId
-) implements Serializable, HasRole {}
+) implements Serializable{}

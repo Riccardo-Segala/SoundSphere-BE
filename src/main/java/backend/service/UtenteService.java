@@ -106,9 +106,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
 
         // Assegna il ruolo "UTENTE"
         Ruolo ruoloUtente = ruoloService.findByName("UTENTE");
-        UtenteRuolo defaultAssignment = new UtenteRuolo();
-        defaultAssignment.setUtente(utente);
-        defaultAssignment.setRuolo(ruoloUtente);
+        UtenteRuolo defaultAssignment = new UtenteRuolo(utente, ruoloUtente, null);
         utente.getUtenteRuoli().add(defaultAssignment);
 
         Vantaggio vantaggio = vantaggioService.findById(dto.vantaggioId())
@@ -198,10 +196,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
                 existingAssignment.get().setDataScadenza(assignmentDto.expirationDate());
             } else {
                 // se non esiste, crea una nuova assegnazione
-                UtenteRuolo newAssignment = new UtenteRuolo();
-                newAssignment.setUtente(user);
-                newAssignment.setRuolo(eventManagerRole);
-                newAssignment.setDataScadenza(assignmentDto.expirationDate());
+                UtenteRuolo newAssignment = new UtenteRuolo(user, eventManagerRole, assignmentDto.expirationDate());
                 user.getUtenteRuoli().add(newAssignment);
             }
         }

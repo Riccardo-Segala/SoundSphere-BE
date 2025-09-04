@@ -5,42 +5,58 @@ import backend.dto.dipendente.ResponseEmployeeDTO;
 import backend.dto.dipendente.UpdateEmployeeDTO;
 import backend.dto.dipendente.admin.CreateEmployeeFromAdminDTO;
 import backend.dto.dipendente.admin.UpdateEmployeeFromAdminDTO;
-import backend.mapper.common.UserRoleMappingSupport;
+import backend.mapper.helper.RoleAssignmentHelper;
 import backend.mapper.resolver.BranchResolver;
 import backend.mapper.resolver.RoleResolver;
 import backend.model.Dipendente;
+import backend.repository.RuoloRepository;
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {RoleResolver.class, RoleMapper.class, BranchResolver.class})
-public interface EmployeeMapper extends UserRoleMappingSupport {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {RoleResolver.class, RoleMapper.class, BranchResolver.class, RuoloRepository.class})
+public abstract class EmployeeMapper {
 
+    @Autowired
+    protected RoleAssignmentHelper roleAssignmentHelper;
 
-    Dipendente fromCreateDto(CreateEmployeeDTO createEmployeeDTO);
+    public abstract Dipendente fromCreateDto(CreateEmployeeDTO createEmployeeDTO);
 
     @Mapping(source = "filiale.id", target = "filialeId")
     @Mapping(source = "utenteRuoli", target = "ruoli", qualifiedByName = "mapUtenteRuoliToRuoliStrings")
-    ResponseEmployeeDTO toDto(Dipendente dipendente);
+    public abstract ResponseEmployeeDTO toDto(Dipendente dipendente);
 
 
-    Dipendente fromUpdateDto(UpdateEmployeeDTO updateEmployeeDTO);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-
-    Dipendente partialUpdateFromCreate(CreateEmployeeDTO createEmployeeDTO, @MappingTarget Dipendente dipendente);
+    public abstract Dipendente fromUpdateDto(UpdateEmployeeDTO updateEmployeeDTO);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    public abstract Dipendente partialUpdateFromCreate(CreateEmployeeDTO createEmployeeDTO, @MappingTarget Dipendente dipendente);
 
-    Dipendente partialUpdateFromUpdate(UpdateEmployeeDTO updateEmployeeDTO, @MappingTarget Dipendente dipendente);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    public abstract Dipendente partialUpdateFromUpdate(UpdateEmployeeDTO updateEmployeeDTO, @MappingTarget Dipendente dipendente);
 
     @Mapping(target = "dataRegistrazione", expression = "java(LocalDate.now())")
     @Mapping(source = "filialeId", target = "filiale")
     @Mapping(source = "utente", target = ".")
     @Mapping(target = "utenteRuoli", ignore = true)
-    Dipendente fromAdminCreateDto(CreateEmployeeFromAdminDTO createDTO);
+    public abstract Dipendente fromAdminCreateDto(CreateEmployeeFromAdminDTO createDTO);
 
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "filialeId", target = "filiale")
     @Mapping(target = "utenteRuoli", ignore = true)
-    Dipendente partialUpdateFromAdminUpdate(UpdateEmployeeFromAdminDTO createDTO, @MappingTarget Dipendente dipendente);
+    public abstract Dipendente partialUpdateFromAdminUpdate(UpdateEmployeeFromAdminDTO updateDTO, @MappingTarget Dipendente dipendente);
+
+    @AfterMapping
+    protected void linkRolesToUser(UpdateEmployeeFromAdminDTO dto, @MappingTarget Dipendente dipendente) {
+        // Logica delegata e ora ottimizzata
+        roleAssignmentHelper.synchronizeRoles(dipendente, dto.ruoliIds());
+    }
+
+    @AfterMapping
+    protected void linkRolesToUser(CreateEmployeeFromAdminDTO dto, @MappingTarget Dipendente dipendente) {
+        // Logica delegata e ora ottimizzata
+        if (dto.utente() != null) {
+            roleAssignmentHelper.synchronizeRoles(dipendente, dto.utente().ruoliIds());
+        }
+    }
 }

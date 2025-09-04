@@ -54,9 +54,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
         utente.setVantaggio(vantaggioDefault);
 
-        UtenteRuolo defaultRole = new UtenteRuolo();
-        defaultRole.setUtente(utente);
-        defaultRole.setRuolo(ruoloUtente);
+        UtenteRuolo defaultRole = new UtenteRuolo(utente, ruoloUtente, null);
         utente.getUtenteRuoli().add(defaultRole);
 
         repository.save(utente);
@@ -97,9 +95,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new IllegalStateException("Filiale non trovata"));
         dipendente.setFiliale(filiale);
 
-        UtenteRuolo defaultRole = new UtenteRuolo();
-        defaultRole.setUtente(dipendente);
-        defaultRole.setRuolo(ruoloDipendente);
+        UtenteRuolo defaultRole = new UtenteRuolo(dipendente, ruoloDipendente, null);
         dipendente.getUtenteRuoli().add(defaultRole);
 
         repository.save(dipendente);
