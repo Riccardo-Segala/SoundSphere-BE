@@ -1,11 +1,7 @@
 package backend.controller;
 
-import backend.dto.utente.CreateUserDTO;
 import backend.dto.utente.ResponseUserDTO;
 import backend.dto.utente.UpdateUserDTO;
-import backend.mapper.EmployeeMapper;
-import backend.mapper.UserMapper;
-import backend.model.Utente;
 import backend.security.CustomUserDetails;
 import backend.service.UtenteService;
 import org.springframework.http.MediaType;
@@ -13,29 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path="/api/utenti", produces = MediaType.APPLICATION_JSON_VALUE)
-public class UtenteController extends GenericController<Utente, UUID, CreateUserDTO, UpdateUserDTO, ResponseUserDTO> {
-    private final EmployeeMapper employeeMapper;
-    private final UserMapper userMapper;
-    private final UtenteService utenteService;
+public class UtenteController{
     private final UtenteService userService;
 
-    public UtenteController(UtenteService service, UserMapper mapper, EmployeeMapper employeeMapper, UtenteService utenteService, UtenteService userService) {
-        super(service, mapper);
-        this.employeeMapper = employeeMapper;
-        this.userMapper = mapper;
-        this.utenteService = utenteService;
+    public UtenteController(UtenteService userService) {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<ResponseUserDTO>> getAllUsers() {
-        return super.getAll();
-    }
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -59,11 +43,6 @@ public class UtenteController extends GenericController<Utente, UUID, CreateUser
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         UUID userId = userDetails.getId();
-        return ResponseEntity.ok(utenteService.updateCurrentUser(userId, dto));
-    }
-
-    @Override
-    protected UUID getId(Utente entity) {
-        return entity.getId();
+        return ResponseEntity.ok(userService.updateCurrentUser(userId, dto));
     }
 }

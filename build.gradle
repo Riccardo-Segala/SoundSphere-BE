@@ -58,7 +58,11 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	options.annotationProcessorPath = configurations.annotationProcessor
+    options.compilerArgs = [
+            '-Amapstruct.defaultComponentModel=spring',
+            '-Amapstruct.unmappedTargetPolicy=IGNORE',
+            '-parameters'
+    ]
 }
 
 openApi {

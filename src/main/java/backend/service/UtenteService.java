@@ -1,6 +1,7 @@
 package backend.service;
 
 import backend.dto.utente.ResponseUserDTO;
+import backend.dto.utente.RoleAssignmentDTO;
 import backend.dto.utente.UpdateUserDTO;
 import backend.dto.utente.admin.CreateUserFromAdminDTO;
 import backend.dto.utente.admin.UpdateUserFromAdminDTO;
@@ -8,17 +9,17 @@ import backend.exception.ResourceNotFoundException;
 import backend.mapper.UserMapper;
 import backend.model.Ruolo;
 import backend.model.Utente;
+import backend.model.UtenteRuolo;
 import backend.model.Vantaggio;
 import backend.model.enums.Tipologia;
 import backend.repository.UtenteRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,8 +104,10 @@ public class UtenteService extends GenericService<Utente, UUID> {
         utente.setPunti(0);
         utente.setTipologia(Tipologia.UTENTE);
 
+        // Assegna il ruolo "UTENTE"
         Ruolo ruoloUtente = ruoloService.findByName("UTENTE");
-        utente.setRuoli(Collections.singleton(ruoloUtente));
+        UtenteRuolo defaultAssignment = new UtenteRuolo(utente, ruoloUtente, null);
+        utente.getUtenteRuoli().add(defaultAssignment);
 
         Vantaggio vantaggio = vantaggioService.findById(dto.vantaggioId())
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
@@ -154,6 +157,49 @@ public class UtenteService extends GenericService<Utente, UUID> {
         }
 
         userRepository.deleteAll(usersToDelete);
+    }
+
+    @Transactional
+    public void assignEventManagerRole(List<RoleAssignmentDTO> assignments) {
+        if (CollectionUtils.isEmpty(assignments)) {
+            return;
+        }
+
+        // 1. Fetch del ruolo "EVENT_MANAGER"
+            Ruolo eventManagerRole = ruoloService.findByName("ORGANIZZATORE_EVENTI"); // Assuming role name is also in English
+
+        // 2. Fetch degli utenti coinvolti
+        Set<UUID> userIds = assignments.stream()
+                .map(RoleAssignmentDTO::userId)
+                .collect(Collectors.toSet());
+        List<Utente> foundUsers = userRepository.findAllById(userIds);
+
+        // 3. Valida gli utenti trovati
+        if (foundUsers.size() != userIds.size()) {
+            throw new ResourceNotFoundException("One or more users were not found.");
+        }
+
+        // Mappa gli userId alle assegnazioni per accesso rapido
+        Map<UUID, RoleAssignmentDTO> assignmentMap = assignments.stream()
+                .collect(Collectors.toMap(RoleAssignmentDTO::userId, dto -> dto));
+
+        // 4. ESEGUE LE ASSEGNAZIONI
+        for (Utente user : foundUsers) {
+            RoleAssignmentDTO assignmentDto = assignmentMap.get(user.getId());
+
+            Optional<UtenteRuolo> existingAssignment = user.getUtenteRuoli().stream()
+                    .filter(userRole -> userRole.getRuolo().equals(eventManagerRole))
+                    .findFirst();
+
+            if (existingAssignment.isPresent()) {
+                // se esiste già, aggiorna la data di scadenza
+                existingAssignment.get().setDataScadenza(assignmentDto.expirationDate());
+            } else {
+                // se non esiste, crea una nuova assegnazione
+                UtenteRuolo newAssignment = new UtenteRuolo(user, eventManagerRole, assignmentDto.expirationDate());
+                user.getUtenteRuoli().add(newAssignment);
+            }
+        }
     }
 
     // metodi di utilità

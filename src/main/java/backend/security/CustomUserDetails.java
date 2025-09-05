@@ -1,11 +1,13 @@
 package backend.security;
 
 import backend.model.Utente;
+import backend.model.UtenteRuolo;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -35,7 +37,9 @@ public class CustomUserDetails implements UserDetails {
 
         // Mappa i ruoli dell'entità in una collezione di GrantedAuthority.
         // Il prefisso 'ROLE_' è una convenzione standard di Spring Security.
-        this.authorities = utente.getRuoli().stream()
+        this.authorities = utente.getUtenteRuoli().stream()
+                .filter(ur -> ur.getDataScadenza() == null || ur.getDataScadenza().isAfter(LocalDate.now()))
+                .map(UtenteRuolo::getRuolo)
                 .flatMap(ruolo -> {
                     Stream<GrantedAuthority> ruoloStream = Stream.of(
                             new SimpleGrantedAuthority("ROLE_" + ruolo.getNome().toUpperCase())

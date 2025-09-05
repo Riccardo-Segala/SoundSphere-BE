@@ -20,4 +20,4 @@ public record CreateUserFromAdminDTO(
         Sesso sesso,
         UUID vantaggioId,
         Set<UUID> ruoliIds
-) implements Serializable {}
+) implements Serializable{}

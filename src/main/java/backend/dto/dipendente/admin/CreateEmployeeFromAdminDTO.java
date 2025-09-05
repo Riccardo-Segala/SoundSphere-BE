@@ -1,5 +1,4 @@
 package backend.dto.dipendente.admin;
-
 import backend.dto.utente.admin.CreateUserFromAdminDTO;
 import jakarta.validation.constraints.NotNull;
 
@@ -17,4 +16,4 @@ public record CreateEmployeeFromAdminDTO(
         LocalDate dataAssunzione,
         @NotNull
         UUID filialeId
-)implements Serializable {}
+)implements Serializable{}

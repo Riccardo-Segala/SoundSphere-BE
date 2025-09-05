@@ -11,6 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface DipendenteRepository extends JpaRepository<Dipendente, UUID> {
-    @Query("SELECT d FROM Dipendente d LEFT JOIN FETCH d.ruoli WHERE d.id = :id")
+    @Query("SELECT d FROM Dipendente d LEFT JOIN FETCH d.utenteRuoli ur LEFT JOIN FETCH ur.ruolo WHERE d.id = :id")
     Optional<Dipendente> findDipendenteByIdWithDetails(@Param("id") UUID id);
 }

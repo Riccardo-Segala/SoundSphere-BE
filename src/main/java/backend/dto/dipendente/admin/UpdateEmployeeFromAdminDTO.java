@@ -20,4 +20,4 @@ public record UpdateEmployeeFromAdminDTO(
         LocalDate scadenzaContratto,
         LocalDate dataAssunzione,
         UUID filialeId
-) implements Serializable {}
+) implements Serializable{}
