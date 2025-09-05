@@ -1,14 +1,17 @@
 package backend.controller;
-import backend.dto.prodotto.ResponseProductDTO;
 import backend.dto.stock.CreateStockDTO;
 import backend.dto.stock.ResponseStockDTO;
 import backend.dto.stock.UpdateStockDTO;
+import backend.dto.stock.UpdateStockQuantityDTO;
 import backend.mapper.StockMapper;
 import backend.model.Stock;
 import backend.model.embeddable.FilialeProdottoId;
+import backend.security.CustomUserDetails;
 import backend.service.StockService;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -80,4 +83,35 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     protected FilialeProdottoId getId(Stock entity) {
         return entity.getId();
     }
+
+
+    // --- ENDPOINT PER IL DIPENDENTE ---
+
+    @GetMapping("/my-filiale")
+    public ResponseEntity<List<ResponseStockDTO>> getMyFilialeStock(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<ResponseStockDTO> stock = stockService.getStockForMyFiliale(userDetails.getId());
+        return ResponseEntity.ok(stock);
+    }
+
+    @GetMapping("/my-filiale/{prodottoId}")
+    public ResponseEntity<ResponseStockDTO> getSpecificProductStock(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable UUID prodottoId) {
+
+        ResponseStockDTO stockDetails = stockService.getStockForSpecificProductInMyFiliale(userDetails.getId(), prodottoId);
+
+        return ResponseEntity.ok(stockDetails);
+    }
+
+    @PutMapping("/my-filiale/{prodottoId}")
+    public ResponseEntity<ResponseStockDTO> updateMyFilialeStock(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable UUID prodottoId,
+            @RequestBody @Valid UpdateStockQuantityDTO quantityUpdateDTO) {
+
+        ResponseStockDTO updatedStock = stockService.updateStockForMyFiliale(userDetails.getId(), prodottoId, quantityUpdateDTO);
+        return ResponseEntity.ok(updatedStock);
+    }
+
 }

@@ -17,6 +17,7 @@ public interface StockRepository extends JpaRepository<Stock, FilialeProdottoId>
     //Restituisce la lista di marche dei prodotti presenti in una determinata filiale
     @Query("SELECT DISTINCT s.prodotto.marca FROM Stock s WHERE s.filiale.nome = :nomeFiliale")
     List<String> findDistinctMarcaByFilialeNome(@Param("nomeFiliale") String nomeFiliale);
+
     List<Stock> findByFilialeId(UUID id);
     @Transactional
     void deleteAllByFilialeId(UUID filialeId);

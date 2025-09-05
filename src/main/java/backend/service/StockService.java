@@ -1,7 +1,12 @@
 package backend.service;
 
+import backend.dto.dipendente.ResponseEmployeeDTO;
+import backend.dto.filiale.ResponseBranchDTO;
 import backend.dto.stock.ResponseStockDTO;
+import backend.dto.stock.UpdateStockDTO;
+import backend.dto.stock.UpdateStockQuantityDTO;
 import backend.exception.OutOfStockException;
+import backend.exception.ResourceNotFoundException;
 import backend.mapper.StockMapper;
 import backend.model.Filiale;
 import backend.model.Stock;
@@ -21,14 +26,16 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     private final StockRepository stockRepository;
     private final FilialeService filialService;
     private final StockMapper stockMapper;
+    private final DipendenteService dipendenteService;
 
 
     @Autowired
-    public StockService(StockRepository stockRepository, FilialeService filialService, StockMapper stockMapper) {
+    public StockService(StockRepository stockRepository, FilialeService filialService, StockMapper stockMapper, DipendenteService dipendenteService) {
         super(stockRepository); // Passa il repository al costruttore della classe base
         this.stockRepository = stockRepository;
         this.filialService = filialService;
         this.stockMapper = stockMapper;
+        this.dipendenteService = dipendenteService;
     }
 
     @Transactional
@@ -91,5 +98,74 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
     public void deleteAllByProdottoId(UUID id) {
         stockRepository.deleteAllByProdottoId(id);
+    }
+
+
+    // --- METODI PER IL DIPENDENTE ---
+
+    // Recupera tutto lo stock (anche a quantità 0) per la filiale del dipendente autenticato
+    @Transactional
+    public List<ResponseStockDTO> getStockForMyFiliale(UUID dipendenteId) {
+        // 1. Delega al DipendenteService il compito di trovare la filiale.
+        ResponseBranchDTO filialeDTO = dipendenteService.getMyBranch(dipendenteId);
+        UUID filialeId = filialeDTO.id();
+
+        // 2. Recupera i dati specifici dello stock.
+        List<Stock> stockDellaFiliale = stockRepository.findByFilialeId(filialeId);
+
+        // 3. Delega la mappatura allo StockMapper.
+        return stockDellaFiliale.stream()
+                .map(stockMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ResponseStockDTO getStockForSpecificProductInMyFiliale(UUID dipendenteId, UUID prodottoId) {
+        // 1. Ottiene la filiale del dipendente tramite il DipendenteService.
+        ResponseBranchDTO filialeDTO = dipendenteService.getMyBranch(dipendenteId);
+        UUID filialeId = filialeDTO.id();
+
+        // 2. Costruisce l'ID composito per la ricerca.
+        FilialeProdottoId stockId = new FilialeProdottoId(filialeId, prodottoId);
+
+        // 3. Cerca la specifica voce di stock nel repository.
+        // Se non la trova, lancia un'eccezione chiara.
+        Stock stock = stockRepository.findById(stockId)
+                .orElseThrow(() -> new ResourceNotFoundException("Il prodotto con ID " + prodottoId + " non è gestito in questa filiale."));
+
+        // 4. Usa lo StockMapper esistente per convertire l'entità nel DTO di risposta.
+        return stockMapper.toDto(stock);
+    }
+
+
+    @Transactional
+    public ResponseStockDTO updateStockForMyFiliale(UUID dipendenteId, UUID prodottoId, UpdateStockQuantityDTO quantityUpdateDTO) {
+        // 1. Usa il DipendenteService per ottenere il DTO del dipendente.
+        ResponseEmployeeDTO dipendenteDTO = dipendenteService.getEmployeeDetailsById(dipendenteId);
+
+        // Estrai l'ID della filiale direttamente dal DTO.
+        UUID filialeDelDipendenteId = dipendenteDTO.filialeId();
+
+        // 2. Sicurezza e recupero dati: Cerca lo stock usando l'ID della filiale ottenuto dal DTO.
+        FilialeProdottoId stockId = new FilialeProdottoId(filialeDelDipendenteId, prodottoId);
+        Stock stock = stockRepository.findById(stockId)
+                .orElseThrow(() -> new ResourceNotFoundException("Stock non trovato per questo prodotto nella tua filiale."));
+
+        // 3. Regole di business specifiche per il dipendente:
+        int nuovaQuantita = quantityUpdateDTO.quantita();
+
+        // Regola: La quantità non può essere negativa.
+        // Questo è un secondo livello di sicurezza rispetto alla validazione sul DTO.
+        if (nuovaQuantita < 0) {
+            throw new IllegalArgumentException("La quantità di stock non può essere impostata a un valore negativo.");
+        }
+
+        // Regola: Il dipendente può aggiornare solo la quantità.
+        stock.setQuantita(nuovaQuantita);
+        // Il campo 'quantitaPerNoleggio' non viene toccato e salvo
+        Stock updatedStock = stockRepository.save(stock);
+
+        // 4. Restituisce il DTO aggiornato.
+        return stockMapper.toDto(updatedStock);
     }
 }
