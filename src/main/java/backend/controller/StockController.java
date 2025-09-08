@@ -2,7 +2,6 @@ package backend.controller;
 import backend.dto.stock.CreateStockDTO;
 import backend.dto.stock.ResponseStockDTO;
 import backend.dto.stock.UpdateStockDTO;
-import backend.dto.stock.UpdateStockQuantityDTO;
 import backend.mapper.StockMapper;
 import backend.model.Stock;
 import backend.model.embeddable.FilialeProdottoId;
@@ -108,9 +107,9 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     public ResponseEntity<ResponseStockDTO> updateMyFilialeStock(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID prodottoId,
-            @RequestBody @Valid UpdateStockQuantityDTO quantityUpdateDTO) {
+            @Valid @RequestBody UpdateStockDTO updateDTO) {
 
-        ResponseStockDTO updatedStock = stockService.updateStockForMyFiliale(userDetails.getId(), prodottoId, quantityUpdateDTO);
+        ResponseStockDTO updatedStock = stockService.updateStockForMyFiliale(userDetails.getId(), prodottoId, updateDTO);
         return ResponseEntity.ok(updatedStock);
     }
 

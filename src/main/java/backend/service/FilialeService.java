@@ -1,14 +1,13 @@
 package backend.service;
 
 import backend.model.Filiale;
-import backend.model.Prodotto;
 import backend.repository.FilialeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,6 +29,11 @@ public class FilialeService extends GenericService<Filiale, UUID> {
 
     public Filiale getOnlineBranch() {
         return this.getByName(nomeFilialeOnline);
+    }
+
+    @Transactional(readOnly = true) // Ottimo per le operazioni di sola lettura
+    public boolean existsById(UUID id) {
+        return filialeRepository.existsById(id);
     }
 
 

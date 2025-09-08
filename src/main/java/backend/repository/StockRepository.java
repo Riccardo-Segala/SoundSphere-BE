@@ -19,6 +19,7 @@ public interface StockRepository extends JpaRepository<Stock, FilialeProdottoId>
     List<String> findDistinctMarcaByFilialeNome(@Param("nomeFiliale") String nomeFiliale);
 
     List<Stock> findByFilialeId(UUID id);
+    List<Stock> findByProdottoId(UUID id);
     @Transactional
     void deleteAllByFilialeId(UUID filialeId);
     @Transactional

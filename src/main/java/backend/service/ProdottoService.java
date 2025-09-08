@@ -91,4 +91,9 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
     public List<String> getAvailableBrandsOnline() {
         return stockRepository.findDistinctMarcaByFilialeNome(nomeFilialeOnline);
     }
+
+    @Transactional(readOnly = true) // Ottimo per le operazioni di sola lettura
+    public boolean existsById(UUID id) {
+        return repository.existsById(id);
+    }
 }
