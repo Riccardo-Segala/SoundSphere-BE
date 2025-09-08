@@ -16,7 +16,6 @@ public interface StockMapper extends GenericMapper<Stock, CreateStockDTO, Update
     Stock fromCreateDto(CreateStockDTO createStockDTO);
 
     @Override
-    @Mapping(source = "filialeId", target = "filiale.id")
     Stock fromUpdateDto(UpdateStockDTO updateStockDTO);
 
     @Override

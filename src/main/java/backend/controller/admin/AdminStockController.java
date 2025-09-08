@@ -48,12 +48,10 @@ public class AdminStockController {
     }
 
 
-    @PutMapping("/{filialeId}/{prodottoId}")
-    public ResponseEntity<ResponseStockDTO> updateStock(@PathVariable UUID filialeId,
-                                                        @PathVariable UUID prodottoId,
-                                                        @Valid @RequestBody UpdateStockFromAdminDTO updateAdminDTO) {
-        FilialeProdottoId id = new FilialeProdottoId(filialeId, prodottoId);
-        return ResponseEntity.ok(stockService.updateAdminStock(id, updateAdminDTO));
+    @PutMapping
+    public ResponseEntity<ResponseStockDTO> updateStock(@Valid @RequestBody UpdateStockFromAdminDTO updateAdminDTO) {
+
+        return ResponseEntity.ok(stockService.updateAdminStock(updateAdminDTO));
     }
 
 }

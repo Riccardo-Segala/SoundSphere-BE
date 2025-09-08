@@ -9,7 +9,6 @@ import java.util.UUID;
  * DTO for {@link backend.model.Stock}
  */
 public record UpdateStockDTO (
-        UUID filialeId,
         UUID prodottoId,
         @Min(value = 0, message = "La quantità non può essere negativa.")
         Integer quantita

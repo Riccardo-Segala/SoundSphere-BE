@@ -103,13 +103,12 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
         return ResponseEntity.ok(stockDetails);
     }
 
-    @PutMapping("/my-filiale/{prodottoId}")
+    @PutMapping("/my-filiale")
     public ResponseEntity<ResponseStockDTO> updateMyFilialeStock(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable UUID prodottoId,
             @Valid @RequestBody UpdateStockDTO updateDTO) {
 
-        ResponseStockDTO updatedStock = stockService.updateStockForMyFiliale(userDetails.getId(), prodottoId, updateDTO);
+        ResponseStockDTO updatedStock = stockService.updateStockForMyFiliale(userDetails.getId(), updateDTO);
         return ResponseEntity.ok(updatedStock);
     }
 

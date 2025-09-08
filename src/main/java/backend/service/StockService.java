@@ -141,15 +141,20 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
 
     @Transactional
-    public ResponseStockDTO updateStockForMyFiliale(UUID dipendenteId, UUID prodottoId, UpdateStockDTO updateDTO) {
+    public ResponseStockDTO updateStockForMyFiliale(UUID dipendenteId, UpdateStockDTO updateDTO) {
         // 1. Usa il DipendenteService per ottenere il DTO del dipendente.
         ResponseEmployeeDTO dipendenteDTO = dipendenteService.getEmployeeDetailsById(dipendenteId);
 
         // Estrai l'ID della filiale direttamente dal DTO.
         UUID filialeDelDipendenteId = dipendenteDTO.filialeId();
 
+        //Controllo che l' id del prodotto nel dto sia valido
+        if (!prodottoService.existsById(updateDTO.prodottoId())) {
+            throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + updateDTO.prodottoId());
+        }
+
         // 2. Sicurezza e recupero dati: Cerca lo stock usando l'ID della filiale ottenuto dal DTO.
-        FilialeProdottoId stockId = new FilialeProdottoId(filialeDelDipendenteId, prodottoId);
+        FilialeProdottoId stockId = new FilialeProdottoId(filialeDelDipendenteId, updateDTO.prodottoId());
         Stock stock = stockRepository.findById(stockId)
                 .orElseThrow(() -> new ResourceNotFoundException("Stock non trovato per questo prodotto nella tua filiale."));
 
@@ -228,7 +233,19 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
     // Aggiorna una giacenza di magazzino esistente.
     @Transactional
-    public ResponseStockDTO updateAdminStock(FilialeProdottoId id, UpdateStockFromAdminDTO updateAdminDTO) {
+    public ResponseStockDTO updateAdminStock(UpdateStockFromAdminDTO updateAdminDTO) {
+        //Controllo che gli id di filiale e prodotto nel dto siano validi
+        //A-Prodotto
+        if (!prodottoService.existsById(updateAdminDTO.prodottoId())) {
+            throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + updateAdminDTO.prodottoId());
+        }
+        //B-Filiale
+        if (!filialService.existsById(updateAdminDTO.filialeId())) { // FilialeService ha un metodo existsById
+            throw new ResourceNotFoundException("Nessuna filiale trovata con ID: " + updateAdminDTO.filialeId());
+        }
+
+        FilialeProdottoId id = new FilialeProdottoId(updateAdminDTO.filialeId(), updateAdminDTO.prodottoId());
+        // 1. Recupera l'entità esistente dal database.
         Stock stock = stockRepository.findById(id)
                       .orElseThrow(() -> new ResourceNotFoundException("Entità Stock non trovata (filiale-prodotto) con id: " + id));
 
