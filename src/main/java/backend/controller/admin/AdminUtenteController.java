@@ -1,8 +1,8 @@
 package backend.controller.admin;
 
-import backend.dto.utente.BulkRoleAssignmentDTO;
 import backend.dto.utente.DeleteUsersDTO;
 import backend.dto.utente.ResponseUserDTO;
+import backend.dto.utente.UserIdListDTO;
 import backend.dto.utente.admin.CreateUserFromAdminDTO;
 import backend.dto.utente.admin.UpdateUserFromAdminDTO;
 import backend.service.UtenteService;
@@ -44,10 +44,21 @@ public class AdminUtenteController {
 
     @PostMapping("/promote-to-organizer") // URL specifico per l'azione di business
     public ResponseEntity<Void> promoteUsersToOrganizers(
-            @Valid @RequestBody BulkRoleAssignmentDTO dto) {
+            @Valid @RequestBody UserIdListDTO dto) {
 
         // Il controller delega tutta la logica complessa al service.
-        userService.assignEventManagerRole(dto.roleAssignments());
+        userService.assignEventManagerRole(dto.userIdList());
+
+        // Restituisce una risposta positiva con corpo vuoto.
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/demote-to-user") // URL specifico per l'azione di business
+    public ResponseEntity<Void> demoteOrganizersToUsers(
+            @Valid @RequestBody UserIdListDTO dto) {
+
+        // Il controller delega tutta la logica complessa al service.
+        userService.demoteUsersFromEventManager(dto.userIdList());
 
         // Restituisce una risposta positiva con corpo vuoto.
         return ResponseEntity.ok().build();

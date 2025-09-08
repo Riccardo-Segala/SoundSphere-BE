@@ -3,28 +3,22 @@ package backend.mapper.helper;
 import backend.mapper.resolver.RoleResolver;
 import backend.model.Ruolo;
 import backend.model.Utente;
-import backend.model.UtenteRuolo;
+import backend.service.UtenteRuoloService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 public class RoleAssignmentHelper {
 
     private final RoleResolver roleResolver;
+    private final UtenteRuoloService utenteRuoloService;
 
     public void synchronizeRoles(Utente utente, Set<UUID> ruoliIds) {
-        if (ruoliIds == null || ruoliIds.isEmpty()) {
-            if (utente.getUtenteRuoli() != null) {
-                utente.getUtenteRuoli().clear();
-            }
-            return;
+        if (utente == null) {
+            throw new IllegalArgumentException("L'utente non può essere nullo.");
         }
 
         Set<Ruolo> nuoviRuoli = roleResolver.findRolesByIds(ruoliIds);
@@ -33,24 +27,6 @@ public class RoleAssignmentHelper {
             throw new RuntimeException("Uno o più ruoli non trovati");
         }
 
-        Map<UUID, UtenteRuolo> ruoliEsistentiMap = utente.getUtenteRuoli().stream()
-                .collect(Collectors.toMap(ur -> ur.getRuolo().getId(), ur -> ur));
-
-        utente.getUtenteRuoli().removeIf(utenteRuolo ->
-                !ruoliIds.contains(utenteRuolo.getRuolo().getId())
-        );
-
-        for (Ruolo nuovoRuolo : nuoviRuoli) {
-            if (!ruoliEsistentiMap.containsKey(nuovoRuolo.getId())) {
-                LocalDate dataScadenza = null;
-
-                if ("ORGANIZZATORE_EVENTI".equals(nuovoRuolo.getNome())) {
-                    dataScadenza = LocalDate.now().plusMonths(6);
-                }
-
-                UtenteRuolo nuovaRelazione = new UtenteRuolo(utente, nuovoRuolo, dataScadenza);
-                utente.getUtenteRuoli().add(nuovaRelazione);
-            }
-        }
+        utenteRuoloService.handleRoleTransition(List.of(utente), List.copyOf(nuoviRuoli));
     }
 }
