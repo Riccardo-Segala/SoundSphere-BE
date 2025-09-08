@@ -1,18 +1,19 @@
 package backend.service;
 
 import backend.dto.utente.ResponseUserDTO;
-import backend.dto.utente.RoleAssignmentDTO;
 import backend.dto.utente.UpdateUserDTO;
 import backend.dto.utente.admin.CreateUserFromAdminDTO;
 import backend.dto.utente.admin.UpdateUserFromAdminDTO;
 import backend.exception.ResourceNotFoundException;
 import backend.mapper.UserMapper;
+import backend.mapper.resolver.RoleResolver;
 import backend.model.Ruolo;
 import backend.model.Utente;
-import backend.model.UtenteRuolo;
 import backend.model.Vantaggio;
 import backend.model.enums.Tipologia;
 import backend.repository.UtenteRepository;
+import backend.repository.UtenteRuoloRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,18 +29,26 @@ public class UtenteService extends GenericService<Utente, UUID> {
     private final UserMapper userMapper;
     private final DipendenteService dipendenteService;
     private final UtenteRepository userRepository;
+    private final UtenteRuoloRepository utenteRuoloRepository;
     private final PasswordEncoder passwordEncoder;
     private final RuoloService ruoloService;
     private final VantaggioService vantaggioService;
+    private final UtenteRuoloService utenteRuoloService;
+    private final RoleResolver roleResolver;
+    private final EntityManager entityManager;
 
-    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService) {
+    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager) {
         super(repository); // Passa il repository al costruttore della classe base
         this.userMapper = userMapper;
         this.dipendenteService = dipendenteService;
         this.userRepository = userRepository;
+        this.utenteRuoloRepository = utenteRuoloRepository;
         this.passwordEncoder = passwordEncoder;
         this.ruoloService = ruoloService;
         this.vantaggioService = vantaggioService;
+        this.utenteRuoloService = utenteRuoloService;
+        this.roleResolver = roleResolver;
+        this.entityManager = entityManager;
     }
 
 
@@ -104,17 +113,22 @@ public class UtenteService extends GenericService<Utente, UUID> {
         utente.setPunti(0);
         utente.setTipologia(Tipologia.UTENTE);
 
-        // Assegna il ruolo "UTENTE"
-        Ruolo ruoloUtente = ruoloService.findByName("UTENTE");
-        UtenteRuolo defaultAssignment = new UtenteRuolo(utente, ruoloUtente, null);
-        utente.getUtenteRuoli().add(defaultAssignment);
-
         Vantaggio vantaggio = vantaggioService.findById(dto.vantaggioId())
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
         utente.setVantaggio(vantaggio);
 
         // 5. Salva l'entità nel database
         Utente savedUtente = userRepository.save(utente);
+
+        // Assegna il ruolo "UTENTE"
+        if(dto.ruoliIds() != null) {
+            Set<Ruolo> ruoli = roleResolver.findRolesByIds(dto.ruoliIds());
+            utenteRuoloService.handleRoleTransition(List.of(savedUtente), List.copyOf(ruoli));
+        }
+        else {
+            Ruolo ruoloUtente = ruoloService.findByName("UTENTE");
+            utenteRuoloService.handleRoleTransition(List.of(savedUtente), List.of(ruoloUtente));
+        }
 
         // 6. Mappa l'entità salvata nel DTO di risposta e la restituisce
         return userMapper.toDto(savedUtente);
@@ -160,51 +174,46 @@ public class UtenteService extends GenericService<Utente, UUID> {
     }
 
     @Transactional
-    public void assignEventManagerRole(List<RoleAssignmentDTO> assignments) {
-        if (CollectionUtils.isEmpty(assignments)) {
+    public void assignEventManagerRole(List<UUID> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
             return;
         }
 
-        // 1. Fetch del ruolo "EVENT_MANAGER"
-            Ruolo eventManagerRole = ruoloService.findByName("ORGANIZZATORE_EVENTI"); // Assuming role name is also in English
+        // 1. Carica i ruoli di riferimento
+        Ruolo eventManagerRole = ruoloService.findByName("ORGANIZZATORE_EVENTI");
 
-        // 2. Fetch degli utenti coinvolti
-        Set<UUID> userIds = assignments.stream()
-                .map(RoleAssignmentDTO::userId)
-                .collect(Collectors.toSet());
-        List<Utente> foundUsers = userRepository.findAllById(userIds);
-
-        // 3. Valida gli utenti trovati
-        if (foundUsers.size() != userIds.size()) {
-            throw new ResourceNotFoundException("One or more users were not found.");
+        // 2. Carica e valida gli utenti
+        List<Utente> users = userRepository.findAllById(userIds);
+        if (users.size() != userIds.size()) {
+            throw new ResourceNotFoundException("Uno o più utenti non sono stati trovati.");
         }
 
-        // Mappa gli userId alle assegnazioni per accesso rapido
-        Map<UUID, RoleAssignmentDTO> assignmentMap = assignments.stream()
-                .collect(Collectors.toMap(RoleAssignmentDTO::userId, dto -> dto));
-
-        // 4. ESEGUE LE ASSEGNAZIONI
-        for (Utente user : foundUsers) {
-            RoleAssignmentDTO assignmentDto = assignmentMap.get(user.getId());
-
-            Optional<UtenteRuolo> existingAssignment = user.getUtenteRuoli().stream()
-                    .filter(userRole -> userRole.getRuolo().equals(eventManagerRole))
-                    .findFirst();
-
-            if (existingAssignment.isPresent()) {
-                // se esiste già, aggiorna la data di scadenza
-                existingAssignment.get().setDataScadenza(assignmentDto.expirationDate());
-            } else {
-                // se non esiste, crea una nuova assegnazione
-                UtenteRuolo newAssignment = new UtenteRuolo(user, eventManagerRole, assignmentDto.expirationDate());
-                user.getUtenteRuoli().add(newAssignment);
-            }
-        }
+        // 3. Delega la logica complessa al metodo privato
+        utenteRuoloService.handleRoleTransition(users, List.of(eventManagerRole));
     }
+    @Transactional
+    public void demoteUsersFromEventManager(List<UUID> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            return;
+        }
 
+        // 1. Carica i ruoli di riferimento
+        Ruolo userRoleToAdd = ruoloService.findByName("UTENTE");
+
+        // 2. Carica e valida gli utenti
+        List<Utente> users = userRepository.findAllById(userIds);
+        if (users.size() != userIds.size()) {
+            throw new ResourceNotFoundException("Uno o più utenti non sono stati trovati.");
+        }
+
+        // 3. Delega la logica complessa al metodo privato
+        utenteRuoloService.handleRoleTransition(users, List.of(userRoleToAdd));
+    }
     // metodi di utilità
 
     public boolean existsById(UUID userId) {
         return userRepository.existsById(userId);
     }
+
+
 }

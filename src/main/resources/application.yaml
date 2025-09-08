@@ -34,3 +34,5 @@ app:
   filiale:
     online:
       name: OnlineStore
+  static-data:
+    renewal-duration: DURATA_RINNOVO_RUOLO

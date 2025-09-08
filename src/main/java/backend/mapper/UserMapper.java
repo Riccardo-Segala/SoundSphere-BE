@@ -55,10 +55,4 @@ public abstract class UserMapper implements GenericMapper<Utente, CreateUserDTO,
         // Logica delegata a una sola riga
         roleAssignmentHelper.synchronizeRoles(utente, dto.ruoliIds());
     }
-
-    @AfterMapping
-    protected void linkRolesToUserForCreate(CreateUserFromAdminDTO dto, @MappingTarget Utente utente) {
-        // Logica delegata a una sola riga
-        roleAssignmentHelper.synchronizeRoles(utente, dto.ruoliIds());
-    }
 }
