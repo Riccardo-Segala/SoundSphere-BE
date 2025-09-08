@@ -3,6 +3,7 @@ package backend.mapper;
 import backend.dto.stock.CreateStockDTO;
 import backend.dto.stock.ResponseStockDTO;
 import backend.dto.stock.UpdateStockDTO;
+import backend.dto.stock.admin.UpdateStockFromAdminDTO;
 import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.model.Stock;
@@ -15,7 +16,6 @@ public interface StockMapper extends GenericMapper<Stock, CreateStockDTO, Update
     Stock fromCreateDto(CreateStockDTO createStockDTO);
 
     @Override
-    @Mapping(source = "filialeId", target = "filiale.id")
     Stock fromUpdateDto(UpdateStockDTO updateStockDTO);
 
     @Override
@@ -30,6 +30,10 @@ public interface StockMapper extends GenericMapper<Stock, CreateStockDTO, Update
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Stock partialUpdateFromUpdate(UpdateStockDTO updateStockDTO, @MappingTarget Stock stock);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdateFromAdminUpdate(UpdateStockFromAdminDTO updateAdminDTO, @MappingTarget Stock stock);
+
 
     @Mapping(target = "id", ignore = true) // Ignora l'ID perché è una nuova entità
     @Mapping(target = "quantita", constant = "0") // Imposta la quantità a 0

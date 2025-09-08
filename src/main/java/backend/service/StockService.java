@@ -1,7 +1,12 @@
 package backend.service;
 
+import backend.dto.dipendente.ResponseEmployeeDTO;
+import backend.dto.filiale.ResponseBranchDTO;
 import backend.dto.stock.ResponseStockDTO;
+import backend.dto.stock.UpdateStockDTO;
+import backend.dto.stock.admin.UpdateStockFromAdminDTO;
 import backend.exception.OutOfStockException;
+import backend.exception.ResourceNotFoundException;
 import backend.mapper.StockMapper;
 import backend.model.Filiale;
 import backend.model.Stock;
@@ -21,14 +26,18 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     private final StockRepository stockRepository;
     private final FilialeService filialService;
     private final StockMapper stockMapper;
+    private final DipendenteService dipendenteService;
+    private final ProdottoService prodottoService;
 
 
     @Autowired
-    public StockService(StockRepository stockRepository, FilialeService filialService, StockMapper stockMapper) {
+    public StockService(StockRepository stockRepository, FilialeService filialService, StockMapper stockMapper, DipendenteService dipendenteService, ProdottoService prodottoService) {
         super(stockRepository); // Passa il repository al costruttore della classe base
         this.stockRepository = stockRepository;
         this.filialService = filialService;
         this.stockMapper = stockMapper;
+        this.dipendenteService = dipendenteService;
+        this.prodottoService = prodottoService;
     }
 
     @Transactional
@@ -92,4 +101,173 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     public void deleteAllByProdottoId(UUID id) {
         stockRepository.deleteAllByProdottoId(id);
     }
+
+
+    // --- METODI PER IL DIPENDENTE ---
+
+    // Recupera tutto lo stock (anche a quantità 0) per la filiale del dipendente autenticato
+    @Transactional
+    public List<ResponseStockDTO> getStockForMyFiliale(UUID dipendenteId) {
+        // 1. Delega al DipendenteService il compito di trovare la filiale.
+        ResponseBranchDTO filialeDTO = dipendenteService.getMyBranch(dipendenteId);
+        UUID filialeId = filialeDTO.id();
+
+        // 2. Recupera i dati specifici dello stock.
+        List<Stock> stockDellaFiliale = stockRepository.findByFilialeId(filialeId);
+
+        // 3. Delega la mappatura allo StockMapper.
+        return stockDellaFiliale.stream()
+                .map(stockMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ResponseStockDTO getStockForSpecificProductInMyFiliale(UUID dipendenteId, UUID prodottoId) {
+        // 1. Ottiene la filiale del dipendente tramite il DipendenteService.
+        ResponseBranchDTO filialeDTO = dipendenteService.getMyBranch(dipendenteId);
+        UUID filialeId = filialeDTO.id();
+
+        // 2. Costruisce l'ID composito per la ricerca.
+        FilialeProdottoId stockId = new FilialeProdottoId(filialeId, prodottoId);
+
+        // 3. Cerca la specifica voce di stock nel repository.
+        // Se non la trova, lancia un'eccezione chiara.
+        Stock stock = stockRepository.findById(stockId)
+                .orElseThrow(() -> new ResourceNotFoundException("Il prodotto con ID " + prodottoId + " non è gestito in questa filiale."));
+
+        // 4. Usa lo StockMapper esistente per convertire l'entità nel DTO di risposta.
+        return stockMapper.toDto(stock);
+    }
+
+
+    @Transactional
+    public ResponseStockDTO updateStockForMyFiliale(UUID dipendenteId, UpdateStockDTO updateDTO) {
+        // 1. Usa il DipendenteService per ottenere il DTO del dipendente.
+        ResponseEmployeeDTO dipendenteDTO = dipendenteService.getEmployeeDetailsById(dipendenteId);
+
+        // Estrai l'ID della filiale direttamente dal DTO.
+        UUID filialeDelDipendenteId = dipendenteDTO.filialeId();
+
+        //Controllo che l' id del prodotto nel dto sia valido
+        if (!prodottoService.existsById(updateDTO.prodottoId())) {
+            throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + updateDTO.prodottoId());
+        }
+
+        // 2. Sicurezza e recupero dati: Cerca lo stock usando l'ID della filiale ottenuto dal DTO.
+        FilialeProdottoId stockId = new FilialeProdottoId(filialeDelDipendenteId, updateDTO.prodottoId());
+        Stock stock = stockRepository.findById(stockId)
+                .orElseThrow(() -> new ResourceNotFoundException("Stock non trovato per questo prodotto nella tua filiale."));
+
+        // Regola: La quantità non può essere negativa.
+        // Questo è un secondo livello di sicurezza rispetto alla validazione sul DTO.
+        if (updateDTO.quantita() != null && updateDTO.quantita() < 0) {
+            throw new IllegalArgumentException("La quantità non può essere negativa.");
+        }
+
+        // 2. Il mapper aggiorna l'entità esistente con i dati del DTO
+        stockMapper.partialUpdateFromUpdate(updateDTO, stock);
+
+        // Il campo 'quantitaPerNoleggio' non viene toccato e salvo
+        Stock updatedStock = stockRepository.save(stock);
+
+        // 4. Restituisce il DTO aggiornato.
+        return stockMapper.toDto(updatedStock);
+    }
+
+
+    // --- METODI PER L'ADMIN ---
+
+    // Recupera tutte le giacenze di magazzino presenti nel database
+    @Transactional
+    public List<ResponseStockDTO> getAllStock() {
+        return stockRepository.findAll()
+                .stream()
+                .map(stockMapper::toDto) // Converte ogni entità Stock in un ResponseStockDTO
+                .collect(Collectors.toList());
+    }
+
+    // Recupera una singola giacenza di magazzino tramite il suo ID composito.
+    @Transactional
+    public ResponseStockDTO getStockById(FilialeProdottoId id) {
+        Stock stock = stockRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Entità Stock non trovata (filiale-prodotto) con id: " + id));
+
+        return stockMapper.toDto(stock);
+    }
+
+    @Transactional
+    public List<ResponseStockDTO> getAllStockByBranch(UUID filialeId) {
+        // 1. Best practice: Verifica prima che la risorsa correlata (la filiale) esista.
+        //    Questo fornisce un messaggio di errore 404 più chiaro se l'ID è sbagliato.
+        if (!filialService.existsById(filialeId)) { // FilialeService ha un metodo existsById
+            throw new ResourceNotFoundException("Nessuna filiale trovata con ID: " + filialeId);
+        }
+
+        // 2. Recupera i dati grezzi dal repository.
+        List<Stock> stocks = stockRepository.findByFilialeId(filialeId);
+
+        // 3. Converte la lista di entità in una lista di DTO usando lo stream e il mapper.
+        //    Se non ci sono stock per una filiale valida, restituirà correttamente una lista vuota.
+        return stocks.stream()
+                .map(stockMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    //Recupera tutte le voci di stock per un prodotto specifico, cercandolo in tutte le filiali.
+    @Transactional
+    public List<ResponseStockDTO> getAllStockByProduct(UUID prodottoId) {
+        // Se l'ID è invalido, restituisci un errore 404 chiaro.
+        if (!prodottoService.existsById(prodottoId)) {
+            throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + prodottoId);
+        }
+
+        // 1. Recupera i dati grezzi dal repository.
+        List<Stock> stocks = stockRepository.findByProdottoId(prodottoId);
+
+        // 2. Converte la lista di entità in una lista di DTO.
+        //    Se il prodotto non è presente in nessuna filiale, restituirà correttamente una lista vuota.
+        return stocks.stream()
+                .map(stockMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // Aggiorna una giacenza di magazzino esistente.
+    @Transactional
+    public ResponseStockDTO updateAdminStock(UpdateStockFromAdminDTO updateAdminDTO) {
+        //Controllo che gli id di filiale e prodotto nel dto siano validi
+        //A-Prodotto
+        if (!prodottoService.existsById(updateAdminDTO.prodottoId())) {
+            throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + updateAdminDTO.prodottoId());
+        }
+        //B-Filiale
+        if (!filialService.existsById(updateAdminDTO.filialeId())) { // FilialeService ha un metodo existsById
+            throw new ResourceNotFoundException("Nessuna filiale trovata con ID: " + updateAdminDTO.filialeId());
+        }
+
+        FilialeProdottoId id = new FilialeProdottoId(updateAdminDTO.filialeId(), updateAdminDTO.prodottoId());
+        // 1. Recupera l'entità esistente dal database.
+        Stock stock = stockRepository.findById(id)
+                      .orElseThrow(() -> new ResourceNotFoundException("Entità Stock non trovata (filiale-prodotto) con id: " + id));
+
+        // --- BLOCCO DI VALIDAZIONE AGGIORNATO E NULL-SAFE ---
+        // Controlla la quantità solo se è stata fornita nel DTO (non è null)
+        if (updateAdminDTO.quantita() != null && updateAdminDTO.quantita() < 0) {
+            throw new IllegalArgumentException("La quantità non può essere negativa.");
+        }
+
+        // Controlla la quantità per noleggio solo se è stata fornita nel DTO (non è null)
+        if (updateAdminDTO.quantitaPerNoleggio() != null && updateAdminDTO.quantitaPerNoleggio() < 0) {
+            throw new IllegalArgumentException("La quantità per noleggio non può essere negativa.");
+        }
+
+        // 2. Il mapper aggiorna l'entità esistente con i dati del DTO
+        stockMapper.partialUpdateFromAdminUpdate(updateAdminDTO, stock);
+
+        // 3. Salva l'entità aggiornata nel database
+        Stock updatedStock = stockRepository.save(stock);
+
+        // 4. Converte l'entità aggiornata in un DTO da restituire
+        return stockMapper.toDto(updatedStock);
+    }
+
 }
