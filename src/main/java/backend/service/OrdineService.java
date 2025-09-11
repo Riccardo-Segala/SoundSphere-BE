@@ -2,6 +2,7 @@ package backend.service;
 
 import backend.dto.checkout.CheckoutInputDTO;
 import backend.dto.checkout.CheckoutOutputDTO;
+import backend.dto.ordine.ResponseOrderDTO;
 import backend.mapper.OrderMapper;
 import backend.model.*;
 import backend.model.embeddable.OrdineProdottoId;
@@ -116,5 +117,31 @@ public class OrdineService extends GenericService<Ordine, UUID> {
 
         // --- 5. MAPPATURA DELLA RISPOSTA ---
         return orderMapper.toCheckoutOutputDTO(ordineSalvato);
+    }
+
+
+     // METODO PER L'UTENTE:
+     // Restituisce la lista di ordini per un singolo utente
+    public List<ResponseOrderDTO> findOrdersByUserId(UUID utenteId) {
+        // 1. Usa il nuovo metodo del repository per trovare gli ordini
+        List<Ordine> ordini = ordineRepository.findByUtenteId(utenteId);
+
+        // 2. Usa il mapper per convertire la lista di entità in una lista di DTO
+        return ordini.stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+     // METODO PER L'ADMIN:
+     // Restituisce la lista di TUTTI gli ordini presenti nel sistema.
+    public List<ResponseOrderDTO> findAllOrdersForAdmin() {
+        // 1. Usa il metodo findAll() per recuperare tutti gli ordini
+        List<Ordine> tuttiGliOrdini = ordineRepository.findAll();
+
+        // 2. Mappa il risultato in DTO
+        return tuttiGliOrdini.stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

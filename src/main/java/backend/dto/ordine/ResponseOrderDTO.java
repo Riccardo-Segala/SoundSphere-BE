@@ -1,9 +1,11 @@
 package backend.dto.ordine;
 
+import backend.dto.dettagli_ordine.ResponseOrderDetailsDTO;
 import backend.model.enums.StatoOrdine;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,6 +17,7 @@ public record ResponseOrderDTO (
         LocalDate dataConsegna,
         boolean spedizioneGratuita,
         double totale,
-        StatoOrdine stato
+        StatoOrdine stato,
+         List<ResponseOrderDetailsDTO> dettagli
 ) implements Serializable {
 }
