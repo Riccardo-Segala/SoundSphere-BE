@@ -22,6 +22,24 @@ ENTITY_MAPPING = {
     "carrello": "Cart"
 }
 
+def set_unique_items_to_false(data):
+    """
+    Funzione ricorsiva per attraversare l'intera specifica OpenAPI e
+    impostare ogni occorrenza di 'uniqueItems' a False.
+    """
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if key == 'uniqueItems':
+                # Modifica il valore se la chiave è 'uniqueItems'
+                data[key] = False
+            else:
+                # Continua la ricerca ricorsiva nel valore
+                set_unique_items_to_false(value)
+    elif isinstance(data, list):
+        # Se è una lista, itera su ogni elemento
+        for item in data:
+            set_unique_items_to_false(item)
+
 def get_entity_name_from_path(path):
     """
     Estrae il nome dell'entità dal percorso API. Se non trova una corrispondenza
@@ -73,6 +91,10 @@ def process_openapi_file(file_path):
     except (yaml.YAMLError, ValueError) as e:
         print(f"Errore durante il parsing del file: {e}", file=sys.stderr)
         sys.exit(1)
+
+    print("\n--- Impostazione di tutti gli 'uniqueItems' a 'false' ---")
+    set_unique_items_to_false(openapi_spec)
+    print("Scansione e modifica di 'uniqueItems' completata.")
 
     if 'paths' not in openapi_spec:
         print("Il file OpenAPI non contiene la sezione 'paths'.", file=sys.stderr)

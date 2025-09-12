@@ -17,27 +17,27 @@ import java.util.UUID;
 public class AdminDatiStaticiController {
     private final DatiStaticiService datiStaticiService;
     @GetMapping
-    public ResponseEntity<List<ResponseStaticDataDTO>> getAllRoles() {
+    public ResponseEntity<List<ResponseStaticDataDTO>> getAllDatas() {
         return ResponseEntity.ok(datiStaticiService.getAllDatas());
     }
 
     @GetMapping("/{dataId}")
-    public ResponseEntity<ResponseStaticDataDTO> getRoleById(@PathVariable UUID dataId) {
+    public ResponseEntity<ResponseStaticDataDTO> getDataById(@PathVariable UUID dataId) {
         return ResponseEntity.ok(datiStaticiService.getDataById(dataId));
     }
 
     @PostMapping
-    public ResponseEntity<ResponseStaticDataDTO> createRole(@RequestBody CreateOrUpdateStaticDataDTO createDTO) {
+    public ResponseEntity<ResponseStaticDataDTO> createData(@RequestBody CreateOrUpdateStaticDataDTO createDTO) {
         return ResponseEntity.ok(datiStaticiService.createData(createDTO));
     }
 
     @PutMapping("/{dataId}")
-    public ResponseEntity<ResponseStaticDataDTO> updateRole(@PathVariable UUID dataId, @RequestBody CreateOrUpdateStaticDataDTO updateDTO) {
+    public ResponseEntity<ResponseStaticDataDTO> updateData(@PathVariable UUID dataId, @RequestBody CreateOrUpdateStaticDataDTO updateDTO) {
         return ResponseEntity.ok(datiStaticiService.updateData(dataId, updateDTO));
     }
 
     @DeleteMapping("/{dataId}")
-    public ResponseEntity<Void> deleteRole(@PathVariable UUID dataId) {
+    public ResponseEntity<Void> deleteData(@PathVariable UUID dataId) {
         return ResponseEntity.ok(datiStaticiService.deleteData(dataId));
     }
 }
