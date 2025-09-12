@@ -78,4 +78,20 @@ class OrdineController extends GenericController<Ordine, UUID, CreateOrderDTO, U
         return new ResponseEntity<>(ordineConfermato, HttpStatus.CREATED);
     }
 
+    // --- METODO PER LA STORIA ORDINI DELL'UTENTE ---
+    @GetMapping("/miei-ordini")
+    public ResponseEntity<List<ResponseOrderDTO>> getMyOrders(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        // 1. Recupera l'ID utente in modo sicuro dal token
+        UUID utenteId = userDetails.getId();
+
+        // 2. Chiama il service per ottenere la lista di DTO
+        List<ResponseOrderDTO> mieiOrdini = ordineService.findOrdersByUserId(utenteId);
+
+        // 3. Restituisci la lista
+        return ResponseEntity.ok(mieiOrdini);
+    }
+
+
 }

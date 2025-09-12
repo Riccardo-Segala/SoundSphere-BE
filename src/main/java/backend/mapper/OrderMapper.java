@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING,
         imports = {BigDecimal.class, Instant.class, ZoneOffset.class},
-        uses = OrderDetailsMapper.class)
+        uses = {OrderDetailsMapper.class, ProductMapper.class})
 public interface OrderMapper extends GenericMapper<Ordine, CreateOrderDTO, UpdateOrderDTO, ResponseOrderDTO> {
 
     @Override
