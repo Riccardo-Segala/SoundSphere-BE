@@ -7,13 +7,17 @@ import backend.dto.utente.admin.UpdateUserFromAdminDTO;
 import backend.exception.ResourceNotFoundException;
 import backend.mapper.UserMapper;
 import backend.mapper.resolver.RoleResolver;
+import backend.model.Ordine;
 import backend.model.Ruolo;
 import backend.model.Utente;
 import backend.model.Vantaggio;
 import backend.model.enums.Tipologia;
+import backend.repository.OrdineRepository;
 import backend.repository.UtenteRepository;
 import backend.repository.UtenteRuoloRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +40,13 @@ public class UtenteService extends GenericService<Utente, UUID> {
     private final UtenteRuoloService utenteRuoloService;
     private final RoleResolver roleResolver;
     private final EntityManager entityManager;
+    private final OrdineRepository ordineRepository;
+    private final DatiStaticiService datiStaticiService;
 
-    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager) {
+    @Value("${app.static-data.delivery-cost}")
+    private String deliveryCostName;
+
+    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager, OrdineRepository ordineRepository, DatiStaticiService datiStaticiService) {
         super(repository); // Passa il repository al costruttore della classe base
         this.userMapper = userMapper;
         this.dipendenteService = dipendenteService;
@@ -49,6 +58,8 @@ public class UtenteService extends GenericService<Utente, UUID> {
         this.utenteRuoloService = utenteRuoloService;
         this.roleResolver = roleResolver;
         this.entityManager = entityManager;
+        this.ordineRepository = ordineRepository;
+        this.datiStaticiService = datiStaticiService;
     }
 
 
@@ -216,4 +227,67 @@ public class UtenteService extends GenericService<Utente, UUID> {
     }
 
 
+    @Transactional
+    public int updatePointsAndAdvantages(UUID userId, UUID orderId) {
+        // 1. Recupera le entità e valida la loro relazione
+        Utente user = findAndValidateUser(userId);
+        Ordine order = findAndValidateOrder(orderId, user);
+
+        // 2. Esegue il calcolo dei punti
+        int puntiGuadagnati = calculatePointsForOrder(order);
+
+        // 3. Applica i punti e il nuovo vantaggio all'utente
+        applyPointsAndAdvantageToUser(user, puntiGuadagnati);
+
+        // 4. Salva e restituisce l'utente aggiornato
+        Utente updatedUser = userRepository.save(user);
+
+        return updatedUser.getPunti();
+    }
+
+    private Utente findAndValidateUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con id: " + userId));
+    }
+
+    /**
+     * Trova un ordine e valida che appartenga all'utente specificato.
+     */
+    private Ordine findAndValidateOrder(UUID ordineId, Utente utente) {
+        Ordine ordine = ordineRepository.findById(ordineId)
+                .orElseThrow(() -> new EntityNotFoundException("Ordine non trovato con id: " + ordineId));
+
+        if (!ordine.getUtente().getId().equals(utente.getId())) {
+            throw new IllegalStateException("L'ordine non appartiene all'utente specificato.");
+        }
+        return ordine;
+    }
+
+    /**
+     * Calcola i punti guadagnati. Metodo "puro", non tocca il database.
+     * Restituisce il 10% del valore dell'ordine, arrotondato.
+     */
+    private int calculatePointsForOrder(Ordine order) {
+        if(!order.isSpedizioneGratuita())
+        {
+            int deliveryCost = (int)datiStaticiService.getStaticDataByName(deliveryCostName).valore();
+            return (int) Math.round((order.getTotale()-deliveryCost) * 0.10);
+        }
+        return (int) Math.round(order.getTotale() * 0.10);
+    }
+
+    /**
+     * Modifica lo stato dell'oggetto Utente aggiungendo i punti e aggiornando il vantaggio.
+     */
+    private void applyPointsAndAdvantageToUser(Utente utente, int pointsToAdd) {
+        int newScore = utente.getPunti() + pointsToAdd;
+        utente.setPunti(newScore);
+
+        Vantaggio newBenefit = vantaggioService.findVantaggioByPunti(newScore);
+
+        if(utente.getVantaggio() != newBenefit)
+        {
+            utente.setVantaggio(newBenefit);
+        }
+    }
 }
