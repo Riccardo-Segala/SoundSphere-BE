@@ -36,3 +36,5 @@ app:
       name: OnlineStore
   static-data:
     renewal-duration: DURATA_RINNOVO_RUOLO
+    delivery-cost: COSTO_SPEDIZIONE
+    free-delivery-threshold: COSTO_MINIMO_SPEDIZIONE_GRATUITA
