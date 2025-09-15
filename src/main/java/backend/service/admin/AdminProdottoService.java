@@ -7,16 +7,20 @@ import backend.dto.prodotto.UpdateProductDTO;
 import backend.exception.ResourceNotFoundException;
 import backend.mapper.ProductMapper;
 import backend.mapper.StockMapper;
+import backend.model.Categoria;
 import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.model.Stock;
 import backend.repository.ProdottoRepository;
+import backend.service.CategoriaService;
 import backend.service.FilialeService;
 import backend.service.StockService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,14 +31,16 @@ public class AdminProdottoService {
     private final ProductMapper productMapper;
     private final StockMapper stockMapper;
     private final StockService stockService;
+    private final CategoriaService categoriaService;
 
-    AdminProdottoService(FilialeService filialeService, ProdottoRepository prodottoRepository, ProductMapper productMapper, StockMapper stockMapper, StockService stockService)
+    AdminProdottoService(FilialeService filialeService, ProdottoRepository prodottoRepository, ProductMapper productMapper, StockMapper stockMapper, StockService stockService, CategoriaService categoriaService)
     {
         this.filialeService = filialeService;
         this.prodottoRepository = prodottoRepository;
         this.productMapper = productMapper;
         this.stockMapper = stockMapper;
         this.stockService = stockService;
+        this.categoriaService = categoriaService;
     }
 
     public List<ResponseProductDTO> getAll() {
@@ -62,6 +68,9 @@ public class AdminProdottoService {
             stockService.saveAll(nuoviStock);
         }
 
+        // 6. Setta le cateforie al prodotto
+        updateCategorieProdotto(prodottoSalvato, createDTO.categorieIds());
+
         // 5. Mappa l'entità salvata nel DTO di risposta e restituiscila
         return productMapper.toDto(prodottoSalvato);
 
@@ -75,7 +84,17 @@ public class AdminProdottoService {
         productMapper.partialUpdateFromUpdate(updateDTO, prodottoEsistente);
 
         Prodotto prodottoAggiornato = prodottoRepository.save(prodottoEsistente);
+
+        updateCategorieProdotto(prodottoAggiornato, updateDTO.categorieIds());
+
         return productMapper.toDto(prodottoAggiornato);
+    }
+
+    private void updateCategorieProdotto(Prodotto prodotto, List<UUID> nuoviIdCategorie){
+        Set<Categoria> nuoveCategorie = new HashSet<>(
+                categoriaService.findAndValidateCategoriesByIds(nuoviIdCategorie)
+        );
+        prodotto.setCategorie(nuoveCategorie);
     }
 
     @Transactional

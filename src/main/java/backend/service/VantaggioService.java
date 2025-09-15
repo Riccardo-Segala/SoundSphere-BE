@@ -7,7 +7,6 @@ import backend.repository.VantaggioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,4 +38,8 @@ public class VantaggioService extends GenericService<Vantaggio, UUID> {
         return vantaggioOptional.get().getSconto();
     }
 
+    public Vantaggio findVantaggioByPunti(int nuovoPunteggio) {
+        return vantaggioRepository.findVantaggioByPunteggio(nuovoPunteggio)
+                .orElseThrow(() -> new RuntimeException("Nessun vantaggio trovato per il punteggio: " + nuovoPunteggio));
+    }
 }
