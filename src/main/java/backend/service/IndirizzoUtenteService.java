@@ -8,6 +8,7 @@ import backend.model.IndirizzoUtente;
 import backend.model.Utente;
 import backend.repository.IndirizzoUtenteRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;

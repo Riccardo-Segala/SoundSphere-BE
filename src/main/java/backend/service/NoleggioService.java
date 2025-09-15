@@ -7,6 +7,7 @@ import backend.model.Noleggio;
 import backend.model.*;
 import backend.model.embeddable.NoleggioProdottoId;
 import backend.repository.NoleggioRepository;
+import backend.repository.UtenteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
     }
 
     @Autowired
-    private UtenteService utenteService;
+    private UtenteRepository utenteRepository;
     @Autowired
     private IndirizzoUtenteService indirizzoUtenteService;
     @Autowired
@@ -51,8 +52,9 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
     public CheckoutOutputRentalDTO checkoutNoleggio(CheckoutInputRentalDTO dto, UUID utenteId) {
 
         // --- 1. RECUPERO E VALIDAZIONE TRAMITE SERVICE ---
-        // Validazione utente e ruolo di organizzatore di eventi
-        Utente utente = utenteService.findAndValidateUserWithRole(utenteId, "ORGANIZZATORE_EVENTI");
+        // 1. Trova l'utente o lancia l'eccezione se non esiste.
+        Utente utente = utenteRepository.findById(utenteId)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + utenteId));
 
         IndirizzoUtente indirizzo = indirizzoUtenteService.findByIdAndValidateOwnership(dto.indirizzoSpedizioneId(), utenteId);
         MetodoPagamento metodoPagamento = metodoPagamentoService.findById(dto.metodoPagamentoId())

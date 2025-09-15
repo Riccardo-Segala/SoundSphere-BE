@@ -9,12 +9,12 @@ import backend.mapper.UserMapper;
 import backend.mapper.resolver.RoleResolver;
 import backend.model.*;
 import backend.model.enums.Tipologia;
+import backend.repository.NoleggioRepository;
 import backend.repository.OrdineRepository;
 import backend.repository.UtenteRepository;
 import backend.repository.UtenteRuoloRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,12 +40,12 @@ public class UtenteService extends GenericService<Utente, UUID> {
     private final EntityManager entityManager;
     private final OrdineRepository ordineRepository;
     private final DatiStaticiService datiStaticiService;
-    private final NoleggioService noleggioService;
+    private final NoleggioRepository noleggioRepository ;
 
     @Value("${app.static-data.delivery-cost}")
     private String deliveryCostName;
 
-    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager, OrdineRepository ordineRepository, DatiStaticiService datiStaticiService, NoleggioService noleggioService) {
+    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager, OrdineRepository ordineRepository, DatiStaticiService datiStaticiService, NoleggioRepository noleggioRepository) {
         super(repository); // Passa il repository al costruttore della classe base
         this.userMapper = userMapper;
         this.dipendenteService = dipendenteService;
@@ -59,7 +59,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
         this.entityManager = entityManager;
         this.ordineRepository = ordineRepository;
         this.datiStaticiService = datiStaticiService;
-        this.noleggioService = noleggioService;
+        this.noleggioRepository = noleggioRepository;
     }
 
 
@@ -226,35 +226,6 @@ public class UtenteService extends GenericService<Utente, UUID> {
         return userRepository.existsById(userId);
     }
 
-    // Verifica che un utente esista e possieda un ruolo specifico e attivo.
-    // Se la validazione fallisce, lancia un'eccezione.
-    @Transactional
-    public Utente findAndValidateUserWithRole(UUID utenteId, String nomeRuolo) {
-        // 1. Trova l'utente o lancia l'eccezione se non esiste.
-        Utente utente = userRepository.findById(utenteId)
-                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + utenteId));
-
-        // 2. Controlla se tra i ruoli assegnati ce n'è uno che corrisponde al nome richiesto
-        //    e che non sia scaduto.
-        boolean hasValidRole = utente.getUtenteRuoli().stream()
-                .anyMatch(assegnazione ->
-                        assegnazione.getRuolo() != null &&
-                        // Condizione 1: Il nome del ruolo deve corrispondere
-                        assegnazione.getRuolo().getNome().equals(nomeRuolo) &&
-
-                                // Condizione 2: La data di scadenza non deve esistere (null) OPPURE deve essere futura
-                                (assegnazione.getDataScadenza() == null || assegnazione.getDataScadenza().isAfter(LocalDate.now()))
-                );
-
-        // 3. Se nessun ruolo valido è stato trovato, lancia un'eccezione di accesso negato.
-        if (!hasValidRole) {
-            throw new AccessDeniedException("L'utente non ha il ruolo necessario (" + nomeRuolo + ") per eseguire questa operazione.");
-        }
-
-        // 4. Se tutto è ok, restituisci l'utente.
-        return utente;
-    }
-
 
     @Transactional
     public int updatePointsAndAdvantagesForOrder(UUID userId, UUID orderId) {
@@ -293,7 +264,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
     }
 
     private Noleggio findAndValidateRenral(UUID rentalId, Utente user) {
-        Noleggio rental = noleggioService.findById(rentalId)
+        Noleggio rental = noleggioRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException("Noleggio non trovato con id: " + rentalId));
 
         if (!rental.getUtente().getId().equals(user.getId())) {
