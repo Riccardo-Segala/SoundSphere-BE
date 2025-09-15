@@ -7,10 +7,7 @@ import backend.dto.utente.admin.UpdateUserFromAdminDTO;
 import backend.exception.ResourceNotFoundException;
 import backend.mapper.UserMapper;
 import backend.mapper.resolver.RoleResolver;
-import backend.model.Ordine;
-import backend.model.Ruolo;
-import backend.model.Utente;
-import backend.model.Vantaggio;
+import backend.model.*;
 import backend.model.enums.Tipologia;
 import backend.repository.OrdineRepository;
 import backend.repository.UtenteRepository;
@@ -42,11 +39,12 @@ public class UtenteService extends GenericService<Utente, UUID> {
     private final EntityManager entityManager;
     private final OrdineRepository ordineRepository;
     private final DatiStaticiService datiStaticiService;
+    private final NoleggioService noleggioService;
 
     @Value("${app.static-data.delivery-cost}")
     private String deliveryCostName;
 
-    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager, OrdineRepository ordineRepository, DatiStaticiService datiStaticiService) {
+    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager, OrdineRepository ordineRepository, DatiStaticiService datiStaticiService, NoleggioService noleggioService) {
         super(repository); // Passa il repository al costruttore della classe base
         this.userMapper = userMapper;
         this.dipendenteService = dipendenteService;
@@ -60,6 +58,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
         this.entityManager = entityManager;
         this.ordineRepository = ordineRepository;
         this.datiStaticiService = datiStaticiService;
+        this.noleggioService = noleggioService;
     }
 
 
@@ -228,7 +227,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
 
 
     @Transactional
-    public int updatePointsAndAdvantages(UUID userId, UUID orderId) {
+    public int updatePointsAndAdvantagesForOrder(UUID userId, UUID orderId) {
         // 1. Recupera le entità e valida la loro relazione
         Utente user = findAndValidateUser(userId);
         Ordine order = findAndValidateOrder(orderId, user);
@@ -243,6 +242,34 @@ public class UtenteService extends GenericService<Utente, UUID> {
         Utente updatedUser = userRepository.save(user);
 
         return updatedUser.getPunti();
+    }
+
+    @Transactional
+    public int updatePointsAndAdvantagesForRental(UUID userId, UUID rentalId) {
+        // 1. Recupera le entità e valida la loro relazione
+        Utente user = findAndValidateUser(userId);
+        Noleggio rental = findAndValidateRenral(rentalId, user);
+
+        // 2. Esegue il calcolo dei punti
+        int puntiGuadagnati = (int) Math.round(rental.getTotale() * 0.10);
+
+        // 3. Applica i punti e il nuovo vantaggio all'utente
+        applyPointsAndAdvantageToUser(user, puntiGuadagnati);
+
+        // 4. Salva e restituisce l'utente aggiornato
+        Utente updatedUser = userRepository.save(user);
+
+        return updatedUser.getPunti();
+    }
+
+    private Noleggio findAndValidateRenral(UUID rentalId, Utente user) {
+        Noleggio rental = noleggioService.findById(rentalId)
+                .orElseThrow(() -> new EntityNotFoundException("Noleggio non trovato con id: " + rentalId));
+
+        if (!rental.getUtente().getId().equals(user.getId())) {
+            throw new IllegalStateException("Il noleggio non appartiene all'utente specificato.");
+        }
+        return rental;
     }
 
     private Utente findAndValidateUser(UUID userId) {

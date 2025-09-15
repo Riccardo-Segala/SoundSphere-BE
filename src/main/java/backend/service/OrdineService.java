@@ -75,6 +75,9 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         // L'oggetto 'ordineSalvato' è ora un'entità "managed" da JPA e ha un ID valido.
         Ordine ordineSalvato = ordineRepository.save(nuovoOrdine);
 
+        // calcolo dei punti e aggiornamento del vantaggio utente
+        int puntiTotaliUtente = utenteService.updatePointsAndAdvantagesForOrder(utenteId,ordineSalvato.getId());
+
         // --- 3. LOGICA DI BUSINESS E CREAZIONE DEI DETTAGLI "FIGLI" ---
         List<DettagliOrdine> dettagliOrdine = carrello.stream()
                 .map(cartElement -> {
@@ -115,6 +118,6 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         // emailService.inviaConfermaOrdine(ordineSalvato);
 
         // --- 5. MAPPATURA DELLA RISPOSTA ---
-        return orderMapper.toCheckoutOutputDTO(ordineSalvato);
+        return orderMapper.toCheckoutOutputDTO(ordineSalvato, puntiTotaliUtente);
     }
 }
