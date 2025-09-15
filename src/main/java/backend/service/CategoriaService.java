@@ -50,6 +50,18 @@ public class CategoriaService extends GenericService<Categoria, UUID>{
                 .toList();
     }
 
+    public List<Categoria> findAndValidateCategoriesByIds(List<UUID> ids) {
+        List<Categoria> categorie = categoriaRepository.findAllById(ids);
+
+        // Se il numero di categorie trovate è diverso dal numero di ID passati,
+        // significa che almeno un ID non era valido.
+        if (categorie.size() != ids.size()) {
+            throw new EntityNotFoundException("Una o più categorie specificate non sono valide.");
+        }
+
+        return categorie;
+    }
+
     @Transactional
     public Categoria create(CreateCategoryDTO dto) {
 
