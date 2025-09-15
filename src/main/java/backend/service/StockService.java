@@ -57,7 +57,22 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
         // Il salvataggio avverrà automaticamente alla fine della transazione @Transactional
     }
 
-    // Restituisce una lista di stringhe con i nomi delle marche disponibili nella filiale "online"
+    @Transactional
+    public void reserveStockRental(String nomeFiliale, UUID prodottoId, int quantitaRichiesta) {
+        Filiale filiale = filialService.getByName(nomeFiliale);
+
+        FilialeProdottoId stockId = new FilialeProdottoId(filiale.getId(), prodottoId);
+
+        Stock stock = stockRepository.findById(stockId)
+                .orElseThrow(() -> new EntityNotFoundException("Stock non trovato per il prodotto: " + prodottoId));
+
+        if (stock.getQuantitaPerNoleggio() < quantitaRichiesta) {
+            throw new OutOfStockException("Quantità Per Noleggio non disponibile per il prodotto: " + prodottoId);
+        }
+
+        stock.setQuantitaPerNoleggio(stock.getQuantitaPerNoleggio() - quantitaRichiesta);
+        // Il salvataggio avverrà automaticamente alla fine della transazione @Transactional
+    }
 
 
     public List<ResponseStockDTO> getOnlineStock() {
