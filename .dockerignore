@@ -30,5 +30,6 @@ DBdata/
 
 # Node modules (if you have frontend parts)
 node_modules/
+appdata/
 
 # ATTENZIONE: NON ignoriamo gradlew, gradlew.bat, gradle/wrapper

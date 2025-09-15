@@ -18,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,8 +48,7 @@ public class AuthenticationService {
         utente.setDataRegistrazione(java.time.LocalDate.now());
 
         // Assegno vantaggio di default
-        UUID defaultVantaggioId = UUID.fromString("f8c3b3e0-4f5a-4a3c-9c7b-3f1a2b3c4d5e");
-        Vantaggio vantaggioDefault = vantaggioRepository.findById(defaultVantaggioId)
+        Vantaggio vantaggioDefault = vantaggioRepository.findVantaggioByPunteggio(utente.getPunti())
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
         utente.setVantaggio(vantaggioDefault);
 
@@ -85,10 +83,9 @@ public class AuthenticationService {
         dipendente.setTipologia(Tipologia.DIPENDENTE);
 
         // Setto il vantaggio di default
-        UUID defaultVantaggioId = UUID.fromString("f8c3b3e0-4f5a-4a3c-9c7b-3f1a2b3c4d5e");
-        Vantaggio vantaggioDefault = vantaggioRepository.findById(defaultVantaggioId)
+        /*Vantaggio vantaggioDefault = vantaggioRepository.findVantaggioByPunteggio(dipendente.getPunti())
                 .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
-        dipendente.setVantaggio(vantaggioDefault);
+        dipendente.setVantaggio(vantaggioDefault);*/
 
         // Associo la filiale (controllo esistenza)
         Filiale filiale = filialeRepository.findById(request.filialeId())

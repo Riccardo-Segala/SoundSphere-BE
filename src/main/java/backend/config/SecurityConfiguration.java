@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/images/**","/documents/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/recensioni/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/prodotti/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/stock/online").permitAll()

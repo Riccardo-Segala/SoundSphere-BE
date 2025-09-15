@@ -16,5 +16,6 @@ public record CheckoutOutputDTO(
         BigDecimal importoTotale,
         ResponseUserAddressDTO indirizzoSpedizione,
         LocalDate dataConsegnaStimata,
-        List<ProductOrderOutputDTO> prodottiOrdinati
+        List<ProductOrderOutputDTO> prodottiOrdinati,
+        int puntiTotaliUtente
 )implements Serializable {}

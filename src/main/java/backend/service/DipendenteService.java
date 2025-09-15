@@ -7,8 +7,10 @@ import backend.dto.filiale.ResponseBranchDTO;
 import backend.exception.ResourceNotFoundException;
 import backend.mapper.BranchMapper;
 import backend.mapper.EmployeeMapper;
+import backend.mapper.resolver.RoleResolver;
 import backend.model.Dipendente;
 import backend.model.Filiale;
+import backend.model.Ruolo;
 import backend.model.enums.Tipologia;
 import backend.repository.DipendenteRepository;
 import backend.repository.UtenteRepository;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -29,8 +32,11 @@ public class DipendenteService extends GenericService<Dipendente, UUID> {
     private final FilialeService filialeService;
     private final PasswordEncoder passwordEncoder;
     private final UtenteRepository utenteRepository;
+    private final RoleResolver roleResolver;
+    private final UtenteRuoloService utenteRuoloService;
+    private final RuoloService ruoloService;
 
-    public DipendenteService(DipendenteRepository repository, DipendenteRepository employeeRepository, EmployeeMapper employeeMapper, BranchMapper branchMapper, FilialeService filialeService, PasswordEncoder passwordEncoder, UtenteRepository utenteRepository) {
+    public DipendenteService(DipendenteRepository repository, DipendenteRepository employeeRepository, EmployeeMapper employeeMapper, BranchMapper branchMapper, FilialeService filialeService, PasswordEncoder passwordEncoder, UtenteRepository utenteRepository, RoleResolver roleResolver, UtenteRuoloService utenteRuoloService, RuoloService ruoloService) {
         super(repository); // Passa il repository al costruttore della classe base
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
@@ -38,6 +44,9 @@ public class DipendenteService extends GenericService<Dipendente, UUID> {
         this.filialeService = filialeService;
         this.passwordEncoder = passwordEncoder;
         this.utenteRepository = utenteRepository;
+        this.roleResolver = roleResolver;
+        this.utenteRuoloService = utenteRuoloService;
+        this.ruoloService = ruoloService;
     }
 
     public ResponseEmployeeDTO getEmployeeDetailsById(UUID id) {
@@ -89,6 +98,15 @@ public class DipendenteService extends GenericService<Dipendente, UUID> {
         // 4. Salva l'entità nel database
         Dipendente savedDipendente = employeeRepository.save(dipendente);
         savedDipendente.setTipologia(Tipologia.DIPENDENTE);
+
+        if(dto.utente().ruoliIds() != null) {
+            Set<Ruolo> ruoli = roleResolver.findRolesByIds(dto.utente().ruoliIds());
+            utenteRuoloService.handleRoleTransition(List.of(savedDipendente), List.copyOf(ruoli));
+        }
+        else {
+            Ruolo ruoloUtente = ruoloService.findByName("DIPENDENTE");
+            utenteRuoloService.handleRoleTransition(List.of(savedDipendente), List.of(ruoloUtente));
+        }
 
         // 5. Ritorna il DTO di risposta mappando l'entità appena salvata
         return employeeMapper.toDto(savedDipendente);

@@ -38,6 +38,7 @@ services:
     volumes:
       - gradle_cache:/home/gradle/.gradle
       - openapi-spec:/app/openapi
+      - ./appdata:/app/data
     command: >
       sh -c "
                 if [ \"$API_UPDATE\" != \"false\" ]; then
