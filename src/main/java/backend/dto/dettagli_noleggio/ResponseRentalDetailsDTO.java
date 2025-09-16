@@ -1,5 +1,7 @@
 package backend.dto.dettagli_noleggio;
 
+import backend.dto.prodotto.ResponseProductDTO;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -9,12 +11,7 @@ import java.util.UUID;
 
 public record ResponseRentalDetailsDTO (
         UUID noleggioId,
-        UUID prodottoId,
-        String prodottoNome,
-        String prodottoDescrizione,
-        double prodottoCostoGiornaliero,
-        String prodottoPathImmagine,
-        UUID organizzatoreEventiId,
+        ResponseProductDTO prodotto,
         int quantita
 )implements Serializable {
 }

@@ -73,4 +73,19 @@ class NoleggioController extends GenericController<Noleggio, UUID, CreateRentalD
         return new ResponseEntity<>(noleggioConfermato, HttpStatus.CREATED);
     }
 
+    // --- METODO PER LA STORIA NOLEGGI DELL'ORGANIZZATORE ---
+    @GetMapping("/miei-noleggi")
+    public ResponseEntity<List<ResponseRentalDTO>> getMyRentals(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        // 1. Recupera l'ID utente in modo sicuro dal token
+        UUID utenteId = userDetails.getId();
+
+        // 2. Chiama il service per ottenere la lista di DTO
+        List<ResponseRentalDTO> mieiNoleggi = noleggioService.findRentalsByUserId(utenteId);
+
+        // 3. Restituisci la lista
+        return ResponseEntity.ok(mieiNoleggi);
+    }
+
 }

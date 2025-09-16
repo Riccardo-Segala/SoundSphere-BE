@@ -2,6 +2,7 @@ package backend.service;
 
 import backend.dto.checkout.CheckoutInputRentalDTO;
 import backend.dto.checkout.CheckoutOutputRentalDTO;
+import backend.dto.noleggio.ResponseRentalDTO;
 import backend.mapper.RentalMapper;
 import backend.model.Noleggio;
 import backend.model.*;
@@ -139,5 +140,29 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
             totaleParziale += (prezzoGiornaliero * item.getQuantita() * giorniNoleggio);
         }
         return totaleParziale;
+    }
+
+    // METODO PER ORGANIZZATORE EVENTI:
+    // Restituisce la lista di tutti i noleggi per un singolo organizzatore
+    public List<ResponseRentalDTO> findRentalsByUserId(UUID utenteId) {
+        // 1. Usa il nuovo metodo del repository per trovare i noleggi
+        List<Noleggio> noleggi = noleggioRepository.findByUtenteId(utenteId);
+
+        // 2. Usa il mapper per convertire la lista di entità in una lista di DTO
+        return noleggi.stream()
+                .map(rentalMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // METODO PER L'ADMIN:
+    // Restituisce la lista di TUTTI i noleggi presenti nel sistema.
+    public List<ResponseRentalDTO> findAllRentalsForAdmin() {
+        // 1. Usa il metodo findAll() per recuperare tutti i noleggi
+        List<Noleggio> tuttiINoleggi = noleggioRepository.findAll();
+
+        // 2. Mappa il risultato in DTO
+        return tuttiINoleggi.stream()
+                .map(rentalMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

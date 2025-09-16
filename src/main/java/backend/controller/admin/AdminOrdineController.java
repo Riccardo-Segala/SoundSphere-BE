@@ -28,7 +28,4 @@ public class AdminOrdineController {
         return ResponseEntity.ok(tuttiGliOrdini);
     }
 
-    // Qui in futuro potrai aggiungere altre API per admin, ad esempio:
-    // @PatchMapping("/{id}/stato") per cambiare lo stato di un ordine
-    // @GetMapping("/statistiche") per avere dati aggregati
 }

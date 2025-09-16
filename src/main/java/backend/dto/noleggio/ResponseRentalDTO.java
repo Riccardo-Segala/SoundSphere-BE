@@ -1,7 +1,10 @@
 package backend.dto.noleggio;
 
+import backend.dto.dettagli_noleggio.ResponseRentalDetailsDTO;
+
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -13,6 +16,7 @@ public record ResponseRentalDTO (
         LocalDate dataScadenza,
         LocalDate dataRestituzione,
         LocalDate dataPagamento,
-        double totale
+        double totale,
+        List<ResponseRentalDetailsDTO> dettagli
 ) implements Serializable {
 }
