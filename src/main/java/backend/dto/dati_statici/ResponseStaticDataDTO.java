@@ -8,5 +8,10 @@ import java.util.UUID;
 /**
  * DTO for {@link backend.model.DatiStatici}
  */
-public record ResponseStaticDataDTO(UUID id, String nome, @PositiveOrZero double valore) implements Serializable {
+public record ResponseStaticDataDTO(
+        UUID id,
+        String nome,
+        @PositiveOrZero
+        double valore
+) implements Serializable {
 }

@@ -4,7 +4,6 @@ import backend.dto.carrello.UpdateCartItemDTO;
 import backend.dto.carrello.ResponseCartDTO;
 import backend.mapper.CartMapper;
 import backend.model.Carrello;
-import backend.model.DatiStatici;
 import backend.model.Prodotto;
 import backend.model.Utente;
 import backend.model.embeddable.UtenteProdottoId;
@@ -23,8 +22,6 @@ import java.util.UUID;
 public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> {
     @Autowired
     private CarrelloRepository carrelloRepository;
-    @Autowired
-    private DatiStaticiRepository datiStaticiRepository;
     @Autowired
     private VantaggioService vantaggioService;
 
@@ -57,18 +54,13 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         return totaleParziale;
     }
 
-    //Calcola il totale finale del carrello con le spese di spedizione ed eventuali sconti
+    //Calcola il totale finale del carrello con eventuali sconti
     public double calcolaTotaleFinale(UUID utenteId) {
         double totParziale = calcolaTotaleParziale(utenteId);
 
-        Optional<DatiStatici> spedizioneDati = datiStaticiRepository.findByNome("spedizione");
-
-        // Se il valore non è presente, assumiamo che sia 0.0
-        double speseDiSpedizione = spedizioneDati.map(DatiStatici::getValore).orElse(0.0);
-
         double sconto = vantaggioService.calcolaSconto(utenteId);
 
-        double totaleFinale = totParziale + speseDiSpedizione - sconto;
+        double totaleFinale = totParziale - sconto;
 
         // Totale non negativo
         return Math.max(0.0, totaleFinale);

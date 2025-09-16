@@ -1,5 +1,6 @@
 package backend.mapper;
 
+import backend.dto.checkout.ProductOrderOutputDTO;
 import backend.dto.dettagli_noleggio.CreateRentalDetailsDTO;
 import backend.dto.dettagli_noleggio.ResponseRentalDetailsDTO;
 import backend.dto.dettagli_noleggio.UpdateRentalDetailsDTO;
@@ -35,4 +36,8 @@ public interface RentalDetailsMapper extends GenericMapper<DettagliNoleggio, Cre
     @Mapping(source = "prodottoId", target = "prodotto.id")
     @Mapping(source = "noleggioId", target = "noleggio.id")
     DettagliNoleggio partialUpdateFromUpdate(UpdateRentalDetailsDTO updateRentalDetailsDTO, @MappingTarget DettagliNoleggio dettagliNoleggio);
+
+    @Mapping(source = "prodotto.id", target = "prodottoId")
+    @Mapping(source = "prodotto.nome", target = "nomeProdotto")
+    ProductOrderOutputDTO toProductOrderOutputDTO(DettagliNoleggio dettaglio);
 }

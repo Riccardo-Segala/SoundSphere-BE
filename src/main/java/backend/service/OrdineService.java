@@ -2,6 +2,7 @@ package backend.service;
 
 import backend.dto.checkout.CheckoutInputDTO;
 import backend.dto.checkout.CheckoutOutputDTO;
+import backend.dto.dati_statici.ResponseStaticDataDTO;
 import backend.dto.ordine.ResponseOrderDTO;
 import backend.mapper.OrderMapper;
 import backend.model.*;
@@ -29,7 +30,6 @@ public class OrdineService extends GenericService<Ordine, UUID> {
     private String filialeOnlineName;
 
 
-
     @Autowired
     private UtenteService utenteService;
     @Autowired
@@ -42,8 +42,8 @@ public class OrdineService extends GenericService<Ordine, UUID> {
     private CarrelloService carrelloService;
     @Autowired
     private DettagliOrdineService dettagliOrdineService;
-
-
+    @Autowired
+    private DatiStaticiService datiStaticiService;
 
     public OrdineService(OrdineRepository repository, OrdineRepository ordineRepository, OrderMapper orderMapper) {
         super(repository); // Passa il repository al costruttore della classe base
@@ -105,7 +105,18 @@ public class OrdineService extends GenericService<Ordine, UUID> {
 
         // --- 4. AGGIORNAMENTO FINALE E AZIONI POST-PERSISTENZA ---
         // Ora che abbiamo i dettagli, calcoliamo il totale e aggiorniamo l'ordine
+
+        //Logica per la spedizione gratuita
         double totaleFinale = carrelloService.calcolaTotaleFinale(utenteId);
+        ResponseStaticDataDTO limiteGratuita = datiStaticiService.getStaticDataByName("COSTO_MINIMO_SPEDIZIONE_GRATUITA");
+        if (totaleFinale <= limiteGratuita.valore()) {
+            ResponseStaticDataDTO spedizioneDati = datiStaticiService.getStaticDataByName("COSTO_SPEDIZIONE");
+            totaleFinale += spedizioneDati.valore();
+            nuovoOrdine.setSpedizioneGratuita(false);
+        } else {
+            nuovoOrdine.setSpedizioneGratuita(true);
+        }
+
         ordineSalvato.setTotale(totaleFinale);
 
         ordineSalvato.setDettagli(dettagliOrdine);

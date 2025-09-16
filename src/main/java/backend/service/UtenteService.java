@@ -9,6 +9,7 @@ import backend.mapper.UserMapper;
 import backend.mapper.resolver.RoleResolver;
 import backend.model.*;
 import backend.model.enums.Tipologia;
+import backend.repository.NoleggioRepository;
 import backend.repository.OrdineRepository;
 import backend.repository.UtenteRepository;
 import backend.repository.UtenteRuoloRepository;
@@ -39,12 +40,12 @@ public class UtenteService extends GenericService<Utente, UUID> {
     private final EntityManager entityManager;
     private final OrdineRepository ordineRepository;
     private final DatiStaticiService datiStaticiService;
-    private final NoleggioService noleggioService;
+    private final NoleggioRepository noleggioRepository ;
 
     @Value("${app.static-data.delivery-cost}")
     private String deliveryCostName;
 
-    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager, OrdineRepository ordineRepository, DatiStaticiService datiStaticiService, NoleggioService noleggioService) {
+    public UtenteService(UtenteRepository repository, UserMapper userMapper, DipendenteService dipendenteService, UtenteRepository userRepository, UtenteRuoloRepository utenteRuoloRepository, PasswordEncoder passwordEncoder, RuoloService ruoloService, VantaggioService vantaggioService, UtenteRuoloService utenteRuoloService, RoleResolver roleResolver, EntityManager entityManager, OrdineRepository ordineRepository, DatiStaticiService datiStaticiService, NoleggioRepository noleggioRepository) {
         super(repository); // Passa il repository al costruttore della classe base
         this.userMapper = userMapper;
         this.dipendenteService = dipendenteService;
@@ -58,7 +59,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
         this.entityManager = entityManager;
         this.ordineRepository = ordineRepository;
         this.datiStaticiService = datiStaticiService;
-        this.noleggioService = noleggioService;
+        this.noleggioRepository = noleggioRepository;
     }
 
 
@@ -263,7 +264,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
     }
 
     private Noleggio findAndValidateRenral(UUID rentalId, Utente user) {
-        Noleggio rental = noleggioService.findById(rentalId)
+        Noleggio rental = noleggioRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException("Noleggio non trovato con id: " + rentalId));
 
         if (!rental.getUtente().getId().equals(user.getId())) {

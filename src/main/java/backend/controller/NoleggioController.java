@@ -1,13 +1,20 @@
 package backend.controller;
 
+import backend.dto.checkout.CheckoutInputRentalDTO;
+import backend.dto.checkout.CheckoutOutputRentalDTO;
 import backend.dto.noleggio.CreateRentalDTO;
 import backend.dto.noleggio.ResponseRentalDTO;
 import backend.dto.noleggio.UpdateRentalDTO;
 import backend.mapper.RentalMapper;
 import backend.model.Noleggio;
+import backend.security.CustomUserDetails;
 import backend.service.NoleggioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +26,9 @@ class NoleggioController extends GenericController<Noleggio, UUID, CreateRentalD
     public NoleggioController(NoleggioService service, RentalMapper mapper) {
         super(service, mapper);
     }
+
+    @Autowired
+    private NoleggioService noleggioService;
 
     @GetMapping
     public ResponseEntity<List<ResponseRentalDTO>> getAllRentals() {
@@ -48,6 +58,19 @@ class NoleggioController extends GenericController<Noleggio, UUID, CreateRentalD
     @Override
     protected UUID getId(Noleggio entity) {
         return entity.getId();
+    }
+
+    @PostMapping("/checkout")
+    @PreAuthorize("hasAuthority('NOLEGGIO')") // 2. Permesso specifico per il noleggio
+    public ResponseEntity<CheckoutOutputRentalDTO> noleggia(
+            @RequestBody CheckoutInputRentalDTO noleggioDto, // 3. DTO di input per il noleggio
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UUID utenteId = userDetails.getId();
+
+        CheckoutOutputRentalDTO noleggioConfermato = noleggioService.checkoutNoleggio(noleggioDto, utenteId);
+
+        return new ResponseEntity<>(noleggioConfermato, HttpStatus.CREATED);
     }
 
 }
