@@ -21,7 +21,6 @@ public interface RentalDetailsMapper extends GenericMapper<DettagliNoleggio, Cre
     DettagliNoleggio fromUpdateDto(UpdateRentalDetailsDTO updateRentalDetailsDTO);
 
     @Override
-    @Mapping(source = "prodotto.id", target = "prodottoId")
     @Mapping(source = "noleggio.id", target = "noleggioId")
     ResponseRentalDetailsDTO toDto(DettagliNoleggio dettagliNoleggio);
 
