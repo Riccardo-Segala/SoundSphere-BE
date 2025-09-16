@@ -15,7 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping(path="/api/upload", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ImageUploadController {
     private final ImageStorageService storageService;
-    @PostMapping("/image")
+    @PostMapping(path="/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImage(@RequestParam("imageFile") MultipartFile file) {
         try {
             // Delega la logica di salvataggio al servizio
