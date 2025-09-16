@@ -1,6 +1,9 @@
 package backend.dto.prodotto;
 
+import backend.dto.categoria.ResponseCategoryDTO;
+
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,6 +18,7 @@ public record ResponseProductDTO(
         String marca,
         boolean rentable,
         double costoGiornaliero,
-        String pathImmagine
+        String pathImmagine,
+        List<ResponseCategoryDTO> categorie
 ) implements Serializable {
 }

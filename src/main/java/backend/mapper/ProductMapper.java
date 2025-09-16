@@ -8,7 +8,7 @@ import backend.model.Prodotto;
 import backend.model.Stock;
 import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {CategoryMapper.class})
 public interface ProductMapper extends GenericMapper<Prodotto, CreateProductDTO, UpdateProductDTO, ResponseProductDTO> {
 
 
