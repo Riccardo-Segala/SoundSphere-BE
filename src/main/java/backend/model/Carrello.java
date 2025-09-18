@@ -28,4 +28,22 @@ public class Carrello {
 
     private boolean wishlist;
 
+    // Costruttore vuoto, richiesto da JPA
+    public Carrello() {
+    }
+
+    // Il nostro costruttore "di comodo" per i test
+    public Carrello(Utente utente, Prodotto prodotto, int quantita) {
+        // Creiamo e impostiamo l'ID composto
+        this.id = new UtenteProdottoId(utente.getId(), prodotto.getId());
+
+        // Impostiamo le relazioni
+        this.utente = utente;
+        this.prodotto = prodotto;
+
+        // Impostiamo i dati rimanenti
+        this.quantita = quantita;
+        this.wishlist = false; // Valore di default
+    }
+
 }
