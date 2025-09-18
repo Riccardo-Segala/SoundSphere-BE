@@ -1,5 +1,6 @@
 package backend.repository;
 
+import backend.model.Categoria;
 import backend.model.Prodotto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,8 @@ public interface ProdottoRepository extends JpaRepository<Prodotto, UUID> {
         SELECT p, s
         FROM Prodotto p
         LEFT JOIN Stock s ON p.id = s.prodotto.id AND s.filiale.id = :branchId
+        WHERE (:categoria IS NULL OR :categoria MEMBER OF p.categorie)
     """)
-    List<Object[]> findAllProductsWithStockInfoByBranchId(@Param("branchId") UUID branchId);
+    List<Object[]> findAllProductsWithStockInfoByBranchId(@Param("branchId") UUID branchId,
+                                                          @Param("categoria") Categoria categoria);
 }

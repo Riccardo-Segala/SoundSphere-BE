@@ -61,9 +61,9 @@ class ProdottoController{
         return ResponseEntity.ok(prodotti);
     }
 
-    @GetMapping("/catalog/online")
-    public ResponseEntity<List<CatalogProductDTO>> getOnlineCatalog() {
-        List<CatalogProductDTO> catalog = prodottoService.getOnlineProductCatalog();
+    @GetMapping("/catalog/online/{slug}")
+    public ResponseEntity<List<CatalogProductDTO>> getOnlineCatalogBySlug(@PathVariable String slug) {
+        List<CatalogProductDTO> catalog = prodottoService.getOnlineProductCatalog(slug);
         return ResponseEntity.ok(catalog);
     }
 }
