@@ -4,6 +4,7 @@ import backend.dto.prodotto.CatalogProductDTO;
 import backend.dto.prodotto.ResponseProductDTO;
 import backend.exception.ResourceNotFoundException;
 import backend.mapper.ProductMapper;
+import backend.model.Categoria;
 import backend.model.Filiale;
 import backend.model.Prodotto;
 import backend.model.Stock;
@@ -26,17 +27,19 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
     private final ProductMapper productMapper;
     private final FilialeService filialeService;
     private final StockRepository stockRepository;
+    private final CategoriaService categoriaService;
 
     @Value("${app.filiale.online.name}")
     private String nomeFilialeOnline;
 
-    public ProdottoService(ProdottoRepository repository, RecensioneRepository recensioneRepository, ProductMapper productMapper, FilialeService filialeService, StockRepository stockRepository) {
+    public ProdottoService(ProdottoRepository repository, RecensioneRepository recensioneRepository, ProductMapper productMapper, FilialeService filialeService, StockRepository stockRepository, CategoriaService categoriaService) {
         super(repository); // Passa il repository al costruttore della classe base
         this.repository = repository;
         this.recensioneRepository = recensioneRepository;
         this.productMapper = productMapper;
         this.filialeService = filialeService;
         this.stockRepository = stockRepository;
+        this.categoriaService = categoriaService;
     }
 
     public ResponseProductDTO getProductById(UUID id) {
@@ -65,12 +68,16 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
                 .toList();
     }
 
-    public List<CatalogProductDTO> getOnlineProductCatalog() {
+    public List<CatalogProductDTO> getOnlineProductCatalog(String slug) {
+        List<Object[]> results;
+
         // 1. Trova la filiale online
         Filiale onlineBranch = filialeService.getOnlineBranch();
 
         // 2. Chiama il repository per ottenere i dati grezzi (entità)
-        List<Object[]> results = repository.findAllProductsWithStockInfoByBranchId(onlineBranch.getId());
+
+        Categoria category = categoriaService.findCategoryDetailsBySlug(slug);
+        results = repository.findAllProductsWithStockInfoByBranchId(onlineBranch.getId(), category);
 
         // 3. Usa il mapper per trasformare ogni riga di risultato nel DTO finale
         return results.stream()

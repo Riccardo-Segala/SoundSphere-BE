@@ -4,6 +4,7 @@ import backend.dto.categoria.CreateCategoryDTO;
 import backend.dto.categoria.ResponseCategoryNavigationDTO;
 import backend.dto.categoria.ResponseParentCategoryDTO;
 import backend.dto.categoria.UpdateCategoryDTO;
+import backend.exception.ResourceNotFoundException;
 import backend.mapper.CategoryMapper;
 import backend.model.Categoria;
 import backend.repository.CategoriaRepository;
@@ -182,5 +183,10 @@ public class CategoriaService extends GenericService<Categoria, UUID>{
         slug = slug.replaceAll("-+", "-"); // Rimuove trattini duplicati
         slug = slug.replaceAll("^-|-$", ""); // Rimuove trattini all'inizio/fine
         return slug;
+    }
+
+    public Categoria findCategoryDetailsBySlug(String slug) {
+        return categoriaRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria non trovata con slug: " + slug));
     }
 }
