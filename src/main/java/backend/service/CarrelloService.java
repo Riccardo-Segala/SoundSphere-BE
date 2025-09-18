@@ -20,8 +20,7 @@ import java.util.UUID;
 
 @Service
 public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> {
-    @Autowired
-    private CarrelloRepository carrelloRepository;
+    private final CarrelloRepository carrelloRepository;
     @Autowired
     private VantaggioService vantaggioService;
 
@@ -31,8 +30,9 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
     @Autowired
     private ProdottoService prodottoService;
 
-    public CarrelloService(CarrelloRepository repository, CartMapper cartMapper) {
-        super(repository); // Passa il repository al costruttore della classe base
+    public CarrelloService(CarrelloRepository carrelloRepository, CartMapper cartMapper) {
+        super(carrelloRepository); // Passa il repository al costruttore della classe base
+        this.carrelloRepository = carrelloRepository;
         this.cartMapper = cartMapper;
     }
 
