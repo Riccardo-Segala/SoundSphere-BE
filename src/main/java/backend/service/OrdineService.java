@@ -11,7 +11,6 @@ import backend.model.enums.StatoOrdine;
 import backend.repository.OrdineRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,30 +24,37 @@ import java.util.stream.Collectors;
 public class OrdineService extends GenericService<Ordine, UUID> {
     private final OrdineRepository ordineRepository;
     private final OrderMapper orderMapper;
+    private final UtenteService utenteService;
+    private final IndirizzoUtenteService indirizzoUtenteService;
+    private final MetodoPagamentoService metodoPagamentoService;
+    private final StockService stockService;
+    private final CarrelloService carrelloService;
+    private final DettagliOrdineService dettagliOrdineService;
+    private final DatiStaticiService datiStaticiService;
 
     @Value("${app.filiale.online.name}")
     private String filialeOnlineName;
 
-
-    @Autowired
-    private UtenteService utenteService;
-    @Autowired
-    private IndirizzoUtenteService indirizzoUtenteService;
-    @Autowired
-    private MetodoPagamentoService metodoPagamentoService;
-    @Autowired
-    private StockService stockService;
-    @Autowired
-    private CarrelloService carrelloService;
-    @Autowired
-    private DettagliOrdineService dettagliOrdineService;
-    @Autowired
-    private DatiStaticiService datiStaticiService;
-
-    public OrdineService(OrdineRepository repository, OrdineRepository ordineRepository, OrderMapper orderMapper) {
-        super(repository); // Passa il repository al costruttore della classe base
+    public OrdineService(OrdineRepository repository,
+                         OrdineRepository ordineRepository,
+                         OrderMapper orderMapper,
+                         UtenteService utenteService,
+                         IndirizzoUtenteService indirizzoUtenteService,
+                         MetodoPagamentoService metodoPagamentoService,
+                         StockService stockService,
+                         CarrelloService carrelloService,
+                         DettagliOrdineService dettagliOrdineService,
+                         DatiStaticiService datiStaticiService) {
+        super(repository);
         this.ordineRepository = ordineRepository;
         this.orderMapper = orderMapper;
+        this.utenteService = utenteService;
+        this.indirizzoUtenteService = indirizzoUtenteService;
+        this.metodoPagamentoService = metodoPagamentoService;
+        this.stockService = stockService;
+        this.carrelloService = carrelloService;
+        this.dettagliOrdineService = dettagliOrdineService;
+        this.datiStaticiService = datiStaticiService;
     }
 
     @Transactional
@@ -62,6 +68,9 @@ public class OrdineService extends GenericService<Ordine, UUID> {
                 .orElseThrow(() -> new EntityNotFoundException("Metodo di pagamento non valido"));
 
         List<Carrello> carrello = carrelloService.getCartByUtenteId(utenteId);
+        if (carrello.isEmpty()) {
+            throw new IllegalStateException("Impossibile procedere con il noleggio: il carrello è vuoto.");
+        }
 
         // --- 2. CREA E SALVA L'ORDINE "PADRE" PER PRIMO ---
         // Creiamo l'ordine con i dati che già conosciamo. Il totale verrà aggiornato dopo.
@@ -75,9 +84,6 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         // Salva l'ordine per ottenere un ID generato dal database.
         // L'oggetto 'ordineSalvato' è ora un'entità "managed" da JPA e ha un ID valido.
         Ordine ordineSalvato = ordineRepository.save(nuovoOrdine);
-
-        // calcolo dei punti e aggiornamento del vantaggio utente
-        int puntiTotaliUtente = utenteService.updatePointsAndAdvantagesForOrder(utenteId,ordineSalvato.getId());
 
         // --- 3. LOGICA DI BUSINESS E CREAZIONE DEI DETTAGLI "FIGLI" ---
         List<DettagliOrdine> dettagliOrdine = carrello.stream()
@@ -112,9 +118,9 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         if (totaleFinale <= limiteGratuita.valore()) {
             ResponseStaticDataDTO spedizioneDati = datiStaticiService.getStaticDataByName("COSTO_SPEDIZIONE");
             totaleFinale += spedizioneDati.valore();
-            nuovoOrdine.setSpedizioneGratuita(false);
+            ordineSalvato.setSpedizioneGratuita(false);
         } else {
-            nuovoOrdine.setSpedizioneGratuita(true);
+            ordineSalvato.setSpedizioneGratuita(true);
         }
 
         ordineSalvato.setTotale(totaleFinale);
@@ -125,6 +131,9 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         // è già un'entità managed e JPA rileverà la modifica al totale al commit
         // della transazione. Tuttavia, chiamarlo rende il codice più esplicito.
         ordineRepository.save(ordineSalvato);
+
+        // calcolo dei punti e aggiornamento del vantaggio utente
+        int puntiTotaliUtente = utenteService.updatePointsAndAdvantagesForOrder(utenteId, ordineSalvato.getId());
 
         carrelloService.deleteAllItems(carrello);
         // emailService.inviaConfermaOrdine(ordineSalvato);
