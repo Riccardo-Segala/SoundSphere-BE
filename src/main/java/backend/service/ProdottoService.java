@@ -68,7 +68,7 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
                 .toList();
     }
 
-    public List<CatalogProductDTO> getOnlineProductCatalog(String slug) {
+    public List<CatalogProductDTO> getOnlineProductCatalogBySlug(String slug) {
         List<Object[]> results;
 
         // 1. Trova la filiale online
@@ -76,7 +76,7 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
 
         // 2. Chiama il repository per ottenere i dati grezzi (entità)
 
-        Categoria category = categoriaService.findCategoryDetailsBySlug(slug);
+        Categoria category = categoriaService.findCategoryBySlug(slug);
         results = repository.findAllProductsWithStockInfoByBranchId(onlineBranch.getId(), category);
 
         // 3. Usa il mapper per trasformare ogni riga di risultato nel DTO finale

@@ -63,7 +63,7 @@ class ProdottoController{
 
     @GetMapping("/catalog/online/{slug}")
     public ResponseEntity<List<CatalogProductDTO>> getOnlineCatalogBySlug(@PathVariable String slug) {
-        List<CatalogProductDTO> catalog = prodottoService.getOnlineProductCatalog(slug);
+        List<CatalogProductDTO> catalog = prodottoService.getOnlineProductCatalogBySlug(slug);
         return ResponseEntity.ok(catalog);
     }
 }

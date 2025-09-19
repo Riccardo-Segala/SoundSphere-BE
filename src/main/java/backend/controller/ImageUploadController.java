@@ -26,8 +26,7 @@ public class ImageUploadController {
             return ResponseEntity.ok(publicPath);
 
         } catch (RuntimeException e) {
-            // ERRORE: Restituisce 500 Internal Server Error con la stringa
-            // del messaggio di errore nel corpo.
+
             return ResponseEntity
                     .status(500)
                     .body("Errore durante l'upload: " + e.getMessage());

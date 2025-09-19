@@ -31,9 +31,15 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
      * Endpoint pubblico per la navigazione passo-passo.
      * Restituisce i dettagli e i figli diretti di una categoria.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/byId/{id}")
     public ResponseEntity<ResponseCategoryNavigationDTO> getCategoryDetailsById(@PathVariable UUID id) {
         ResponseCategoryNavigationDTO details = categoriaService.findCategoryDetailsById(id);
+        return ResponseEntity.ok(details);
+    }
+
+    @GetMapping("/bySlug/{slug}")
+    public ResponseEntity<ResponseCategoryNavigationDTO> getCategoryDetailsBySlug(@PathVariable String slug) {
+        ResponseCategoryNavigationDTO details = categoriaService.findCategoryDetailsBySlug(slug);
         return ResponseEntity.ok(details);
     }
 
