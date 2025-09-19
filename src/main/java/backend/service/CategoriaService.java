@@ -33,7 +33,13 @@ public class CategoriaService extends GenericService<Categoria, UUID>{
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria non trovata con id: " + id));
 
-        // Il mapper si occuperà della conversione, inclusa la logica per 'isLeaf'
+        return categoryMapper.toNavigationDto(categoria);
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseCategoryNavigationDTO findCategoryDetailsBySlug(String slug) {
+        Categoria categoria = findCategoryBySlug(slug);
+
         return categoryMapper.toNavigationDto(categoria);
     }
 
@@ -185,7 +191,7 @@ public class CategoriaService extends GenericService<Categoria, UUID>{
         return slug;
     }
 
-    public Categoria findCategoryDetailsBySlug(String slug) {
+    public Categoria findCategoryBySlug(String slug) {
         return categoriaRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria non trovata con slug: " + slug));
     }
