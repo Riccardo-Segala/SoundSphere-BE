@@ -48,7 +48,7 @@ public class AuthenticationController {
 
         } catch (BadCredentialsException e) {
             // Restituisci una risposta 401 Unauthorized con un messaggio di errore specifico
-            return new ResponseEntity<>("Password errata", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("Email o Password errati", HttpStatus.UNAUTHORIZED);
 
         }
     }
