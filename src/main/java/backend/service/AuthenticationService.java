@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UtenteRepository repository;
+    private final UtenteRepository utenteRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -34,7 +34,7 @@ public class AuthenticationService {
     private final RuoloRepository ruoloRepository;
 
     public String registerUser(CreateUserDTO dto) {
-        if (repository.existsByEmail(dto.email())) {
+        if (utenteRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email già in uso.");
         }
         // Trova il ruolo "UTENTE"
@@ -55,14 +55,14 @@ public class AuthenticationService {
         UtenteRuolo defaultRole = new UtenteRuolo(utente, ruoloUtente, null);
         utente.getUtenteRuoli().add(defaultRole);
 
-        repository.save(utente);
+        utenteRepository.save(utente);
         return jwtService.generateToken(utente);
     }
 
     public String registerEmployee(CreateEmployeeDTO request) {
         CreateUserDTO userDto = request.utente();
 
-        if (repository.existsByEmail(userDto.email())) {
+        if (utenteRepository.existsByEmail(userDto.email())) {
             throw new IllegalArgumentException("Email già in uso.");
         }
 
@@ -95,7 +95,7 @@ public class AuthenticationService {
         UtenteRuolo defaultRole = new UtenteRuolo(dipendente, ruoloDipendente, null);
         dipendente.getUtenteRuoli().add(defaultRole);
 
-        repository.save(dipendente);
+        utenteRepository.save(dipendente);
         return jwtService.generateToken(dipendente);
     }
 
@@ -114,7 +114,7 @@ public class AuthenticationService {
 
         // 2. Se l'autenticazione ha successo, recupera l'utente completo dal database.
         //    Questo oggetto 'user' contiene l'ID e tutti gli altri dati necessari.
-        var user = repository.findByEmail(request.email())
+        var user = utenteRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException("Email non registrata."));
 
         // 3. Genera il token passando l'intera entità 'Utente'.
