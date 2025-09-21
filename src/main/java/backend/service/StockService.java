@@ -24,17 +24,17 @@ import java.util.stream.Collectors;
 @Service
 public class StockService extends GenericService<Stock, FilialeProdottoId> {
     private final StockRepository stockRepository;
-    private final FilialeService filialService;
+    private final FilialeService filialeService;
     private final StockMapper stockMapper;
     private final DipendenteService dipendenteService;
     private final ProdottoService prodottoService;
 
 
     @Autowired
-    public StockService(StockRepository stockRepository, FilialeService filialService, StockMapper stockMapper, DipendenteService dipendenteService, ProdottoService prodottoService) {
+    public StockService(StockRepository stockRepository, FilialeService filialeService, StockMapper stockMapper, DipendenteService dipendenteService, ProdottoService prodottoService) {
         super(stockRepository); // Passa il repository al costruttore della classe base
         this.stockRepository = stockRepository;
-        this.filialService = filialService;
+        this.filialeService = filialeService;
         this.stockMapper = stockMapper;
         this.dipendenteService = dipendenteService;
         this.prodottoService = prodottoService;
@@ -42,7 +42,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
     @Transactional
     public void reserveStock(String nomeFiliale, UUID prodottoId, int quantitaRichiesta) {
-        Filiale filiale = filialService.getByName(nomeFiliale);
+        Filiale filiale = filialeService.getByName(nomeFiliale);
 
         FilialeProdottoId stockId = new FilialeProdottoId(filiale.getId(), prodottoId);
 
@@ -59,7 +59,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
     @Transactional
     public void reserveStockRental(String nomeFiliale, UUID prodottoId, int quantitaRichiesta) {
-        Filiale filiale = filialService.getByName(nomeFiliale);
+        Filiale filiale = filialeService.getByName(nomeFiliale);
 
         FilialeProdottoId stockId = new FilialeProdottoId(filiale.getId(), prodottoId);
 
@@ -86,13 +86,13 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
      * Private helper method that retrieves the raw Stock entities from the repository.
      */
     private List<Stock> getOnlineStockEntries() {
-        Filiale onlineBranch = filialService.getOnlineBranch();
+        Filiale onlineBranch = filialeService.getOnlineBranch();
         return stockRepository.findByFilialeId(onlineBranch.getId()); // Assumendo findByBranchId
     }
 
     public int getOnlineStockProductQuantity(UUID prodottoId) {
         // 1. Trova l'entità della filiale "online" (riutilizzando il nostro metodo helper)
-        Filiale filialeOnline = filialService.getOnlineBranch();
+        Filiale filialeOnline = filialeService.getOnlineBranch();
 
         // 2. Crea l'ID composito per la tabella stock
         FilialeProdottoId stockId = new FilialeProdottoId(filialeOnline.getId(), prodottoId);
@@ -214,7 +214,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     public List<ResponseStockDTO> getAllStockByBranch(UUID filialeId) {
         // 1. Best practice: Verifica prima che la risorsa correlata (la filiale) esista.
         //    Questo fornisce un messaggio di errore 404 più chiaro se l'ID è sbagliato.
-        if (!filialService.existsById(filialeId)) { // FilialeService ha un metodo existsById
+        if (!filialeService.existsById(filialeId)) { // FilialeService ha un metodo existsById
             throw new ResourceNotFoundException("Nessuna filiale trovata con ID: " + filialeId);
         }
 
@@ -255,7 +255,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
             throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + updateAdminDTO.prodottoId());
         }
         //B-Filiale
-        if (!filialService.existsById(updateAdminDTO.filialeId())) { // FilialeService ha un metodo existsById
+        if (!filialeService.existsById(updateAdminDTO.filialeId())) { // FilialeService ha un metodo existsById
             throw new ResourceNotFoundException("Nessuna filiale trovata con ID: " + updateAdminDTO.filialeId());
         }
 
