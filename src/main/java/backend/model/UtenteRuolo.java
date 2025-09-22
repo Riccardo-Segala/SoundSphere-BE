@@ -1,4 +1,4 @@
-package backend.model; // Assicurati che il package sia corretto
+package backend.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
