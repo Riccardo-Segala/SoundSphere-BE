@@ -25,6 +25,19 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    // Gestore per argomenti non validi, come un'email duplicata.
+    // Restituisce 400 Bad Request.
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDTO> handleIllegalArgument(IllegalArgumentException ex) {
+        ErrorDTO errorResponse = new ErrorDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     // Potresti aggiungere altri @ExceptionHandler qui per gestire altri tipi di eccezioni!
     // @ExceptionHandler(MethodArgumentNotValidException.class) -> per errori di validazione 400
     // @ExceptionHandler(AccessDeniedException.class) -> per errori di permessi 403
