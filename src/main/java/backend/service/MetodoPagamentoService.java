@@ -9,7 +9,6 @@ import backend.model.Utente;
 import backend.repository.MetodoPagamentoRepository;
 import backend.repository.UtenteRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +18,18 @@ import java.util.UUID;
 
 @Service
 public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID> {
-    @Autowired
-    private MetodoPagamentoRepository metodoPagamentoRepository;
-    @Autowired
-    private PaymentMethodMapper paymentMethodMapper;
-    @Autowired
-    private UtenteRepository utenteRepository;
 
-    public MetodoPagamentoService(MetodoPagamentoRepository repository) {
-        super(repository); // Passa il repository al costruttore della classe base
+    private final MetodoPagamentoRepository metodoPagamentoRepository;
+    private final PaymentMethodMapper paymentMethodMapper;
+    private final UtenteRepository utenteRepository;
+
+    public MetodoPagamentoService(MetodoPagamentoRepository metodoPagamentoRepository,
+                                  PaymentMethodMapper paymentMethodMapper,
+                                  UtenteRepository utenteRepository) {
+        super(metodoPagamentoRepository);
+        this.metodoPagamentoRepository = metodoPagamentoRepository;
+        this.paymentMethodMapper = paymentMethodMapper;
+        this.utenteRepository = utenteRepository;
     }
 
     public Optional<MetodoPagamento> findByIdAndUserId(UUID methodId, UUID userId) {
