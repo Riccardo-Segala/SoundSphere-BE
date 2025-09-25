@@ -124,8 +124,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
         utente.setPunti(0);
         utente.setTipologia(Tipologia.UTENTE);
 
-        Vantaggio vantaggio = vantaggioService.findById(dto.vantaggioId())
-                .orElseThrow(() -> new IllegalStateException("Vantaggio default non trovato"));
+        Vantaggio vantaggio = vantaggioService.findVantaggioByPunti(utente.getPunti());
         utente.setVantaggio(vantaggio);
 
         // 5. Salva l'entità nel database

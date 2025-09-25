@@ -19,6 +19,8 @@ public class Prodotto {
     private UUID id;
 
     private String nome;
+
+    @Column(columnDefinition = "TEXT")
     private String descrizione;
 
     @Column(nullable = false)
