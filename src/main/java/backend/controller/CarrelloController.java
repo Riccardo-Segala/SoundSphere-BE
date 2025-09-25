@@ -46,7 +46,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     @GetMapping
     public ResponseEntity<List<ResponseCartDTO>> getAllCartOfUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId();
-        // Chiamata al servizio per ottenere tutti gli elementi del carrello
+        // Chiamata per ottenere tutti gli elementi del carrello
         List<ResponseCartDTO> cartItems = carrelloService.getAllCartItemsByUserId(userId);
 
         // Restituisce la lista degli elementi del carrello
@@ -57,10 +57,10 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     public ResponseEntity<List<ResponseCartDTO>> getAllWishlist(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId();
 
-        // Chiamata al servizio per ottenere tutti gli elementi della wishlist
+        // Chiamata per ottenere tutti gli elementi della wishlist
         List<ResponseCartDTO> wishlistItems = carrelloService.getAllWishlistItemsByUserId(userId);
 
-        // 4. Restituisci la lista di DTO con uno status HTTP 200 OK
+        // Restituisce la lista di DTO con uno status HTTP 200 OK
         return ResponseEntity.ok(wishlistItems);
     }
 
@@ -71,7 +71,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
                                                                        @RequestBody UpdateCartItemDTO dto)
     {
         UUID userId = userDetails.getId();
-        // Chiamata al servizio per rimuovere l'elemento dal carrello
+        // Chiamata per rimuovere l'elemento dal carrello
         ResponseCartDTO updatedCart = carrelloService.updateItemInCart(userId, dto);
 
         // Restituisce la lista aggiornata del carrello
@@ -84,7 +84,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     {
         UUID userId = userDetails.getId();
         UtenteProdottoId cartId = new UtenteProdottoId(userId, productId);
-        // Chiamata al servizio per rimuovere l'elemento dal carrello
+        // Chiamata per rimuovere l'elemento dal carrello
         carrelloService.delete(cartId);
 
         // Restituisce la lista aggiornata del carrello
@@ -100,10 +100,10 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
         UUID userId = userDetails.getId();
         carrelloService.removeItemsFromCart(userId, dto.productIds());
 
-        // La risposta standard per una DELETE andata a buon fine è "204 No Content".
+        // La risposta standard per una DELETE a buon fine è 204 No Content
         return ResponseEntity.noContent().build();
     }
-    // PUT by ID composto
+
 
     // implementazione del metodo astratto getId
     @Override

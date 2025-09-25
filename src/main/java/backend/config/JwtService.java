@@ -30,7 +30,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Per estrarre l'ID utente che ho aggiunto.
+    // Per estrarre l'ID utente
     public Optional<UUID> extractUserId(String token) {
         try
         {
@@ -65,7 +65,7 @@ public class JwtService {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    // Il costruttore centrale flessibile.
+    // Il costruttore centrale
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(extraClaims)

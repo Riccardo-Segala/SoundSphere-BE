@@ -28,7 +28,7 @@ public class CategoriaService extends GenericService<Categoria, UUID>{
         this.categoryMapper = categoryMapper;
     }
 
-    @Transactional(readOnly = true) // Ottimizzazione per operazioni di sola lettura
+    @Transactional(readOnly = true)
     public ResponseCategoryNavigationDTO findCategoryDetailsById(UUID id) {
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria non trovata con id: " + id));
@@ -179,7 +179,7 @@ public class CategoriaService extends GenericService<Categoria, UUID>{
     }
 
     private String normalizeSlugFromName(String name) {
-        // ... logica per pulire la stringa
+        // logica per pulire la stringa
         if (name == null) return "";
         String slug = Normalizer.normalize(name, Normalizer.Form.NFD);
         slug = slug.replaceAll("\\p{M}", ""); // Rimuove accenti

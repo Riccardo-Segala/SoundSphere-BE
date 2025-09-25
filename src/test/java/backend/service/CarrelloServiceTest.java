@@ -16,22 +16,21 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-// Questa annotazione attiva le funzionalità di Mockito per i test
+
 @ExtendWith(MockitoExtension.class)
 class CarrelloServiceTest {
 
-    @Mock // 1. Dice a Mockito di creare un oggetto finto di CarrelloRepository
+    @Mock
     private CarrelloRepository carrelloRepository;
 
-    @InjectMocks // 2. Crea un'istanza REALE di CarrelloService e ci "inietta" dentro i mock definiti sopra
+    @InjectMocks
     private CarrelloService carrelloService;
 
     @Test
-        // Identifica questo metodo come un test
     void calcolaTotaleParziale_conCarrelloPieno_restituisceSommaCorretta() {
 
         // 1. ARRANGE
-        // a) Crea un utente e dei prodotti finti per il test
+        // Creo un utente e dei prodotti finti per il test
         UUID utenteId = UUID.randomUUID();
         Utente utenteFinto = new Utente();
         utenteFinto.setId(utenteId);
@@ -46,27 +45,25 @@ class CarrelloServiceTest {
         violino.setId(prodottoId2);
         violino.setPrezzo(500.0);
 
-        // b) Ora usa il nuovo costruttore! È molto più pulito.
         Carrello riga1 = new Carrello(utenteFinto, chitarra, 1); // 1 chitarra
         Carrello riga2 = new Carrello(utenteFinto, violino, 2); // 2 violini
 
         List<Carrello> righeCarrelloSimulate = Arrays.asList(riga1, riga2);
 
-        // c) Configura il mock come prima
+        // Configuro il mock
         when(carrelloRepository.findCartByUserId(utenteId)).thenReturn(righeCarrelloSimulate);
 
         // 2. ACT (Azione)
-        // Chiamiamo il metodo che vogliamo testare
+        // Chiamo il metodo che voglo testare
         double totaleCalcolato = carrelloService.calcolaTotaleParziale(utenteId);
 
 
         // 3. ASSERT (Verifica)
-        // Controlliamo che il risultato sia quello che ci aspettiamo
+        // Controllo che il risultato sia quello che mi aspetto
         // Calcolo atteso: (300.0 * 1) + (500.0 * 2) = 300.0 + 1000.0 = 1300.0
         assertEquals(1300.0, totaleCalcolato, "Il totale del carrello non è stato calcolato correttamente.");
     }
 
-    // ... dentro la classe CarrelloServiceTest
 
     @Test
     void calcolaTotaleParziale_conCarrelloVuoto_restituisceZero() {
@@ -74,14 +71,14 @@ class CarrelloServiceTest {
         // 1. ARRANGE
         UUID utenteId = UUID.randomUUID();
 
-        // Istruiamo il mock a restituire una lista vuota per questo utente
+        // Istruisco il mock a restituire una lista vuota per questo utente
         when(carrelloRepository.findCartByUserId(utenteId)).thenReturn(Collections.emptyList());
 
         // 2. ACT
         double totaleCalcolato = carrelloService.calcolaTotaleParziale(utenteId);
 
         // 3. ASSERT
-        // Verifichiamo che il risultato sia esattamente 0
+        // Verifico che il risultato sia esattamente 0
         assertEquals(0.0, totaleCalcolato, "Il totale per un carrello vuoto dovrebbe essere 0.");
     }
 

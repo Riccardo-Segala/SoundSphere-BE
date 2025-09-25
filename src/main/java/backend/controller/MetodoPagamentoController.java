@@ -39,9 +39,7 @@ class MetodoPagamentoController extends GenericController<MetodoPagamento, UUID,
 
         Optional<MetodoPagamento> entity = metodoPagamentoService.findByIdAndUserId(id, userId);
 
-        // 3. Mappa il risultato o restituisci 404 Not Found.
-        // Se l'optional è vuoto (perché il metodo non esiste O non è dell'utente),
-        // il client riceverà un 404, senza rivelare informazioni.
+        // Mappa il risultato o restituisce 404 Not Found.
         return entity.map(e -> ResponseEntity.ok(paymentMethodMapper.toDto(e)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -79,10 +77,10 @@ class MetodoPagamentoController extends GenericController<MetodoPagamento, UUID,
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePaymentMethod(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable UUID id) {
         UUID userId = userDetails.getId();
-        // Delega tutta la logica complessa al service
+
         metodoPagamentoService.delete(userId, id);
 
-        // Se il service non lancia eccezioni, la cancellazione è andata a buon fine.
+        // Se il service non lancia eccezioni, la cancellazione è andata a buon fine
         // Restituisci 204 No Content come da standard per una DELETE.
         return ResponseEntity.noContent().build();
     }

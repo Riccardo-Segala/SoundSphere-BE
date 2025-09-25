@@ -91,7 +91,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
     }
 
     public int getOnlineStockProductQuantity(UUID prodottoId) {
-        // 1. Trova l'entità della filiale "online" (riutilizzando il nostro metodo helper)
+        // 1. Trova l'entità della filiale "online"
         Filiale filialeOnline = filialeService.getOnlineBranch();
 
         // 2. Crea l'ID composito per la tabella stock
@@ -157,7 +157,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
     @Transactional
     public ResponseStockDTO updateStockForMyFiliale(UUID dipendenteId, UpdateStockDTO updateDTO) {
-        // 1. Usa il DipendenteService per ottenere il DTO del dipendente.
+        // Usa il DipendenteService per ottenere il DTO del dipendente.
         ResponseEmployeeDTO dipendenteDTO = dipendenteService.getEmployeeDetailsById(dipendenteId);
 
         // Estrai l'ID della filiale direttamente dal DTO.
@@ -168,24 +168,23 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
             throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + updateDTO.prodottoId());
         }
 
-        // 2. Sicurezza e recupero dati: Cerca lo stock usando l'ID della filiale ottenuto dal DTO.
+        // Sicurezza e recupero dati: Cerca lo stock usando l'ID della filiale ottenuto dal DTO.
         FilialeProdottoId stockId = new FilialeProdottoId(filialeDelDipendenteId, updateDTO.prodottoId());
         Stock stock = stockRepository.findById(stockId)
                 .orElseThrow(() -> new ResourceNotFoundException("Stock non trovato per questo prodotto nella tua filiale."));
 
-        // Regola: La quantità non può essere negativa.
-        // Questo è un secondo livello di sicurezza rispetto alla validazione sul DTO.
+        // Regola: La quantità non può essere negativa
         if (updateDTO.quantita() != null && updateDTO.quantita() < 0) {
             throw new IllegalArgumentException("La quantità non può essere negativa.");
         }
 
-        // 2. Il mapper aggiorna l'entità esistente con i dati del DTO
+        // Il mapper aggiorna l'entità esistente con i dati del DTO
         stockMapper.partialUpdateFromUpdate(updateDTO, stock);
 
         // Il campo 'quantitaPerNoleggio' non viene toccato e salvo
         Stock updatedStock = stockRepository.save(stock);
 
-        // 4. Restituisce il DTO aggiornato.
+        // Restituisce il DTO aggiornato.
         return stockMapper.toDto(updatedStock);
     }
 
@@ -212,17 +211,16 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
 
     @Transactional
     public List<ResponseStockDTO> getAllStockByBranch(UUID filialeId) {
-        // 1. Best practice: Verifica prima che la risorsa correlata (la filiale) esista.
-        //    Questo fornisce un messaggio di errore 404 più chiaro se l'ID è sbagliato.
-        if (!filialeService.existsById(filialeId)) { // FilialeService ha un metodo existsById
+        // Fornisce un messaggio di errore 404 più chiaro se l'ID è sbagliato.
+        if (!filialeService.existsById(filialeId)) {
             throw new ResourceNotFoundException("Nessuna filiale trovata con ID: " + filialeId);
         }
 
-        // 2. Recupera i dati grezzi dal repository.
+        // Recupera i dati grezzi dal repository.
         List<Stock> stocks = stockRepository.findByFilialeId(filialeId);
 
-        // 3. Converte la lista di entità in una lista di DTO usando lo stream e il mapper.
-        //    Se non ci sono stock per una filiale valida, restituirà correttamente una lista vuota.
+        // Converte la lista di entità in una lista di DTO usando lo stream e il mapper.
+        // Se non ci sono stock per una filiale valida, restituirà correttamente una lista vuota.
         return stocks.stream()
                 .map(stockMapper::toDto)
                 .collect(Collectors.toList());
@@ -255,7 +253,7 @@ public class StockService extends GenericService<Stock, FilialeProdottoId> {
             throw new ResourceNotFoundException("Nessun prodotto trovato con ID: " + updateAdminDTO.prodottoId());
         }
         //B-Filiale
-        if (!filialeService.existsById(updateAdminDTO.filialeId())) { // FilialeService ha un metodo existsById
+        if (!filialeService.existsById(updateAdminDTO.filialeId())) {
             throw new ResourceNotFoundException("Nessuna filiale trovata con ID: " + updateAdminDTO.filialeId());
         }
 

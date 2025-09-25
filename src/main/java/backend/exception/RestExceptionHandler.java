@@ -49,8 +49,4 @@ public class RestExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-
-    // Potresti aggiungere altri @ExceptionHandler qui per gestire altri tipi di eccezioni!
-    // @ExceptionHandler(MethodArgumentNotValidException.class) -> per errori di validazione 400
-    // @ExceptionHandler(AccessDeniedException.class) -> per errori di permessi 403
 }

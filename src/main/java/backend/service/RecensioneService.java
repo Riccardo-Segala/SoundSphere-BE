@@ -24,7 +24,7 @@ public class RecensioneService extends GenericService<Recensione, UUID> {
     private final UtenteService utenteService;
 
     public RecensioneService(RecensioneRepository repository, ReviewMapper reviewMapper, ProdottoService prodottoService, UtenteService utenteService) {
-        super(repository); // Passa il repository al costruttore della classe base
+        super(repository);
         this.repository = repository;
         this.reviewMapper = reviewMapper;
         this.prodottoService = prodottoService;
@@ -36,18 +36,14 @@ public class RecensioneService extends GenericService<Recensione, UUID> {
     }
 
     @Transactional
-    // La firma del metodo ora accetta UUID, non UserDetails
     public ResponseReviewDTO createReview(CreateReviewDTO dto, UUID utenteId) {
 
-        // La logica per trovare il prodotto non cambia
         Prodotto product = prodottoService.findById(dto.prodottoId())
                 .orElseThrow(() -> new EntityNotFoundException("Prodotto non trovato"));
 
-        // Ora trova l'utente direttamente tramite il suo ID. È più pulito e veloce.
         Utente user = utenteService.findById(utenteId)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
 
-        // Il resto della logica di creazione rimane identico
         Recensione newReview = reviewMapper.toEntity(dto, product, user);
 
         Recensione savedReview = repository.save(newReview);
@@ -60,7 +56,7 @@ public class RecensioneService extends GenericService<Recensione, UUID> {
         Recensione reviewToUpdate = repository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("Recensione non trovata con ID: " + reviewId));
 
-        // 2. CONTROLLO DI SICUREZZA 🛡️
+        // 2. CONTROLLO DI SICUREZZA
         //    Verifica che l'utente che fa la richiesta sia il proprietario della recensione.
         if (!reviewToUpdate.getUtente().getId().equals(userId)) {
             throw new AccessDeniedException("Non hai il permesso di modificare questa recensione.");

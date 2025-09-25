@@ -8,7 +8,6 @@ import backend.model.Prodotto;
 import backend.model.Utente;
 import backend.model.embeddable.UtenteProdottoId;
 import backend.repository.CarrelloRepository;
-import backend.repository.DatiStaticiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,8 +72,6 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         carrelloRepository.deleteAll(carrelli);
     }
 
-    // aggiunta di un elemento al carrello o alla wishlist
-
     public List<Carrello> getWishlistByUtenteId(UUID utenteId) {
         return carrelloRepository.findWishlistByUserId(utenteId);
     }
@@ -83,10 +80,10 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
         return carrelloRepository.findCartByUserId(utenteId);
     }
 
-    @Transactional // È un'operazione di scrittura, quindi deve essere transazionale
+    @Transactional
     public List<ResponseCartDTO> addItemToCart(UUID userId, UpdateCartItemDTO createDTO) {
 
-        // 1. Controllo se l'articolo esiste già nel carrello
+        // Controllo se l'articolo esiste già nel carrello
         UtenteProdottoId cartId = new UtenteProdottoId(userId, createDTO.prodottoId());
         Optional<Carrello> existingItem = carrelloRepository.findById(cartId);
 
@@ -108,7 +105,7 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
             carrelloRepository.save(newItem);
         }
 
-        // 3. Recupero e restituisco l'intero carrello aggiornato
+        // Recupero e restituisco l'intero carrello aggiornato
         List<Carrello> updatedCart = carrelloRepository.findCartByUserId(userId);
 
         // Uso il mapper per convertire la lista di entità in una lista di DTO

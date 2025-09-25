@@ -23,7 +23,7 @@ public interface MetodoPagamentoRepository extends JpaRepository<MetodoPagamento
     void demoteAllOtherMainMethodsForUser(@Param("userId") UUID userId, @Param("newMainMethodId") UUID newMainMethodId);
 
 
-     // Controlla in modo efficiente se esiste almeno un metodo di pagamento per un dato utente
+     // Controlla se esiste almeno un metodo di pagamento per un dato utente
      // che sia contrassegnato come main.
     boolean existsByUtenteIdAndMain(UUID utenteId, boolean main);
 

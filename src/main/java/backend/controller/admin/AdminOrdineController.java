@@ -21,7 +21,7 @@ public class AdminOrdineController {
     }
 
 
-     // API per ADMIN: Recupera l'elenco completo di tutti gli ordini di tutti gli utenti nel sistema
+     // ADMIN: Recupera l'elenco completo di tutti gli ordini di tutti gli utenti nel sistema
     @GetMapping
     public ResponseEntity<List<ResponseOrderDTO>> getAllOrdersForAdmin() {
         List<ResponseOrderDTO> tuttiGliOrdini = ordineService.findAllOrdersForAdmin();

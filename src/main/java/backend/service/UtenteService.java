@@ -63,7 +63,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
     }
 
 
-    @Transactional(readOnly = true) // Le operazioni di lettura dovrebbero essere transazionali
+    @Transactional(readOnly = true)
     public Object getUserDetailsById(UUID userId, boolean isDipendente) {
         if (isDipendente) {
             return dipendenteService.getEmployeeDetailsById(userId);
@@ -164,6 +164,7 @@ public class UtenteService extends GenericService<Utente, UUID> {
         // 5. Mappa nel DTO di risposta e restituisce
         return userMapper.toDto(updatedUser);
     }
+
     @Transactional
     public void deleteUser(UUID id) {
         if (!userRepository.existsById(id)) {
@@ -219,7 +220,6 @@ public class UtenteService extends GenericService<Utente, UUID> {
         // 3. Delega la logica complessa al metodo privato
         utenteRuoloService.handleRoleTransition(users, List.of(userRoleToAdd));
     }
-    // metodi di utilità
 
     public boolean existsById(UUID userId) {
         return userRepository.existsById(userId);

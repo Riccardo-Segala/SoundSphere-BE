@@ -19,9 +19,9 @@ import java.util.*;
 @Setter
 @Entity
 @Table(name = "utente")
-@Inheritance(strategy = InheritanceType.JOINED) // Strategia JOINED (tabelle separate per le sotto-classi)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorValue("UTENTE")
-@DiscriminatorColumn(name = "tipologia", discriminatorType = DiscriminatorType.STRING) // Nome della colonna discriminante
+@DiscriminatorColumn(name = "tipologia", discriminatorType = DiscriminatorType.STRING)
 @Check(constraints = "(tipologia <> 'UTENTE' OR id_vantaggio IS NOT NULL)")
 public class Utente implements UserDetails {
     @Id
@@ -60,8 +60,8 @@ public class Utente implements UserDetails {
     private Vantaggio vantaggio;
 
     @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude // Per prevenire cicli infiniti
-    @ToString.Exclude          // Per prevenire cicli infiniti
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<UtenteRuolo> utenteRuoli = new HashSet<>();
 
     @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -21,7 +21,7 @@ public class AdminNoleggioController {
     }
 
 
-    // API per ADMIN: Recupera l'elenco completo di tutti i noleggi di tutti gli organizzatori nel sistema
+    // ADMIN: Recupera l'elenco completo di tutti i noleggi di tutti gli organizzatori nel sistema
     @GetMapping
     public ResponseEntity<List<ResponseRentalDTO>> getAllRentalsForAdmin() {
         List<ResponseRentalDTO> tuttiINoleggi = noleggioService.findAllRentalsForAdmin();

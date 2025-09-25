@@ -65,31 +65,29 @@ class OrdineController extends GenericController<Ordine, UUID, CreateOrderDTO, U
             @RequestBody CheckoutInputDTO checkoutDto,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        // 1. Estrae l'ID dell'utente in modo sicuro dall'oggetto 'Principal'
-        //    fornito dal contesto di sicurezza. La chiamata a .getId() ora funziona
-        //    grazie alla nostra classe CustomUserDetails.
+
         UUID utenteId = userDetails.getId();
 
-        // 2. Chiama il service, passando sia i dati della richiesta (DTO)
-        //    sia l'ID dell'utente autenticato.
+        // Chiama il service, passando sia i dati della richiesta (DTO)
+        // sia l'ID dell'utente autenticato
         CheckoutOutputDTO ordineConfermato = ordineService.checkout(checkoutDto, utenteId);
 
-        // 3. Restituisce una risposta di successo con il DTO di output e lo status 201 Created.
+        // Restituisce una risposta di successo con il DTO di output e lo status 201 Created
         return new ResponseEntity<>(ordineConfermato, HttpStatus.CREATED);
     }
 
-    // --- METODO PER LA STORIA ORDINI DELL'UTENTE ---
+    // --- METODO PER LO STORICO ORDINI DELL'UTENTE ---
     @GetMapping("/miei-ordini")
     public ResponseEntity<List<ResponseOrderDTO>> getMyOrders(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        // 1. Recupera l'ID utente in modo sicuro dal token
+        // Recupera l'ID utente in modo sicuro dal token
         UUID utenteId = userDetails.getId();
 
-        // 2. Chiama il service per ottenere la lista di DTO
+        // Chiama il service per ottenere la lista di DTO
         List<ResponseOrderDTO> mieiOrdini = ordineService.findOrdersByUserId(utenteId);
 
-        // 3. Restituisci la lista
+        // Restituisci la lista
         return ResponseEntity.ok(mieiOrdini);
     }
 

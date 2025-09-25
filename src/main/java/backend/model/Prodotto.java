@@ -14,7 +14,6 @@ import java.util.UUID;
 @Table(name = "prodotto")
 public class Prodotto {
     @Id
-    // --- CAMBIAMENTO CRITICO: Aggiunta generazione automatica dell'ID ---
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
@@ -38,7 +37,7 @@ public class Prodotto {
     @Column(columnDefinition = "TEXT")
     private String pathImmagine;
 
-    @ManyToMany(fetch = FetchType.LAZY) // LAZY per non caricare le categorie se non servono
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "prodotto_categoria", // Nome della tabella di join nel DB
             joinColumns = @JoinColumn(name = "prodotto_id"), // FK verso questa entità (Prodotto)

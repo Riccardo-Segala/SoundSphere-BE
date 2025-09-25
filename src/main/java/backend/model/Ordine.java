@@ -19,12 +19,11 @@ public class Ordine {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    // --- CAMBIAMENTO CRITICO: Aggiunta relazione con Utente ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_utente", nullable = false)
     private Utente utente;
 
-    @ManyToOne(fetch = FetchType.LAZY) // CAMBIAMENTO: Aggiunto LAZY per coerenza
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_indirizzo_utente")
     private IndirizzoUtente indirizzo;
 

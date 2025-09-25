@@ -29,10 +29,10 @@ class ProdottoController{
 
     @GetMapping("/{productId}/quantita")
     public ResponseEntity<Integer> getOnlineProductStockQuantityByProductId(@PathVariable UUID productId) {
-        // 1. Chiama il servizio per ottenere il dato
+        // Chiama il servizio per ottenere il dato
         int quantity = stockService.getOnlineStockProductQuantity(productId);
 
-        // 2. Restituisce il numero al frontend
+        // Restituisce il numero al frontend
         return ResponseEntity.ok(quantity);
     }
 

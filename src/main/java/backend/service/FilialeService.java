@@ -31,7 +31,7 @@ public class FilialeService extends GenericService<Filiale, UUID> {
         return this.getByName(nomeFilialeOnline);
     }
 
-    @Transactional(readOnly = true) // Ottimo per le operazioni di sola lettura
+    @Transactional(readOnly = true)
     public boolean existsById(UUID id) {
         return filialeRepository.existsById(id);
     }

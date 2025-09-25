@@ -63,7 +63,6 @@ public class DipendenteService extends GenericService<Dipendente, UUID> {
             throw new ResourceNotFoundException("Il dipendente non è associato a nessuna filiale");
         }
 
-        // 4. Esegui il mapping qui e restituisci il DTO
         return branchMapper.toDto(filiale);
     }
 

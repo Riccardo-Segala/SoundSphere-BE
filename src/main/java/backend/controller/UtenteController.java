@@ -23,17 +23,17 @@ public class UtenteController{
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        // Controlla il ruolo chiamando .getAuthorities() direttamente sul principal.
+        // Controlla il ruolo chiamando .getAuthorities() direttamente sul principal
         boolean isDipendente = userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_DIPENDENTE"));
 
         // Prende l'ID direttamente, senza bisogno di getPrincipal() o cast.
         UUID userId = userDetails.getId();
 
-        // 2. chiama il service
+        // chiama il service
         Object dto = userService.getUserDetailsById(userId, isDipendente);
 
-        // 3. restituisce la risposta
+        // restituisce la risposta
         return ResponseEntity.ok(dto);
     }
 

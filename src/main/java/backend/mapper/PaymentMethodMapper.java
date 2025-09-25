@@ -23,6 +23,5 @@ public interface PaymentMethodMapper extends GenericMapper<MetodoPagamento, Crea
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     MetodoPagamento partialUpdateFromUpdate(UpdatePaymentMethodDTO updatePaymentMethodDTO, @MappingTarget MetodoPagamento metodoPagamento);
 
-    // Metodo aggiuntivo per mappare ResponsePaymentMethodDTO a MetodoPagamento
     MetodoPagamento fromUpdateDto(UpdatePaymentMethodDTO updatePaymentMethodDTO);
 }

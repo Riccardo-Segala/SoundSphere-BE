@@ -40,7 +40,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     @GetMapping("/personalUserAddresses")
     public ResponseEntity<List<ResponseUserAddressDTO>> getAllUserAddressesByUserId(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        UUID userId = userDetails.getId(); // Ottiene l'ID dell'utente autenticato
+        UUID userId = userDetails.getId();
 
         List<ResponseUserAddressDTO> indirizzi = indirizzoService.getAllUserAddressByUserId(userId);
         return ResponseEntity.ok(indirizzi);
@@ -50,11 +50,11 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     public ResponseEntity<ResponseUserAddressDTO> createUserAddress(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CreateUserAddressDTO createDTO) {
-        UUID userId = userDetails.getId(); // Ottiene l'ID dell'utente autenticato
+        UUID userId = userDetails.getId();
 
         ResponseUserAddressDTO nuovoIndirizzoDto = indirizzoService.createForUser(userId, createDTO);
 
-        // Costruisce l'URI della nuova risorsa creata
+        // Costruisce l'URI del nuovo indirizzo creato
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/{id}")
@@ -69,15 +69,14 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     public ResponseEntity<ResponseUserAddressDTO> updateUserAddress(
             @PathVariable UUID addressId,
             @RequestBody UpdateUserAddressDTO updateDTO,
-            @AuthenticationPrincipal CustomUserDetails userDetails) { // <-- Ottiene l'utente loggato
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // 1. Estrae l'ID dell'utente dalla sessione di sicurezza.
         UUID userId = userDetails.getId();
 
-        // 2. Chiama il service, passando sia l'ID dell'utente che quello dell'indirizzo.
+        // Chiama il service, passando sia l'ID dell'utente che quello dell'indirizzo.
         ResponseUserAddressDTO indirizzoAggiornato = indirizzoService.updateAddress(userId, addressId, updateDTO);
 
-        // 3. Restituisce 200 OK con il corpo della risorsa aggiornata.
+        // Restituisce 200 OK con il corpo della risorsa aggiornata
         return ResponseEntity.ok(indirizzoAggiornato);
     }
 
@@ -86,13 +85,12 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
             @PathVariable UUID addressId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // 1. Estrae l'ID dell'utente.
         UUID authUserId = userDetails.getId();
 
-        // 2. Chiama il service per eseguire la cancellazione sicura.
+        // Chiama il service per eseguire la cancellazione sicura
         indirizzoService.deleteAddress(authUserId, addressId);
 
-        // 3. Restituisce 204 No Content
+        // Restituisce 204 No Content
         return ResponseEntity.noContent().build();
     }
 
@@ -101,7 +99,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     public ResponseEntity<ResponseUserAddressDTO> getUserAddressById(
             @PathVariable UUID addressId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        UUID userId = userDetails.getId(); // Ottiene l'ID dell'utente autenticato
+        UUID userId = userDetails.getId();
 
         ResponseUserAddressDTO indirizzoDto = indirizzoService.findAddressById(userId, addressId);
         return ResponseEntity.ok(indirizzoDto);

@@ -48,7 +48,7 @@ public abstract class EmployeeMapper {
 
     @AfterMapping
     protected void linkRolesToUser(UpdateEmployeeFromAdminDTO dto, @MappingTarget Dipendente dipendente) {
-        // Logica delegata e ora ottimizzata
+        // Logica delegata e ottimizzata
         roleAssignmentHelper.synchronizeRoles(dipendente, dto.ruoliIds());
     }
 }

@@ -37,11 +37,11 @@ public interface OrderMapper extends GenericMapper<Ordine, CreateOrderDTO, Updat
 
 
     @Mapping(target = "ordineId", source = "ordine.id")
-    @Mapping(target = "numeroOrdine", source = "ordine.id", qualifiedByName = "generateNumeroOrdine") // Logica custom
+    @Mapping(target = "numeroOrdine", source = "ordine.id", qualifiedByName = "generateNumeroOrdine")
     @Mapping(target = "dataOrdine", source = "ordine.dataAcquisto")
     @Mapping(target = "statoOrdine", source = "ordine.stato")
-    @Mapping(target = "importoTotale", source = "ordine.totale") // Converte double in BigDecimal
-    @Mapping(target = "indirizzoSpedizione", source = "ordine.indirizzo") // Assumendo che esista un AddressMapper
+    @Mapping(target = "importoTotale", source = "ordine.totale")
+    @Mapping(target = "indirizzoSpedizione", source = "ordine.indirizzo")
     @Mapping(target = "prodottiOrdinati", source = "ordine.dettagli")
     @Mapping(target = "puntiTotaliUtente", source = "puntiTotaliUtente")
     CheckoutOutputDTO toCheckoutOutputDTO(Ordine ordine, int puntiTotaliUtente);
