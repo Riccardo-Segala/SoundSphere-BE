@@ -34,6 +34,5 @@ public interface OrderDetailsMapper extends GenericMapper<DettagliOrdine, Create
 
     @Mapping(target = "prodottoId", source = "prodotto.id")
     @Mapping(target = "nomeProdotto", source = "prodotto.nome")
-        // 'quantita' viene mappato automaticamente
     ProductOrderOutputDTO toProductOrderOutputDTO(DettagliOrdine dettaglio);
 }

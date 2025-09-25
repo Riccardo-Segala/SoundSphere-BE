@@ -43,15 +43,13 @@ public interface RentalMapper extends GenericMapper<Noleggio, CreateRentalDTO, U
     CheckoutOutputRentalDTO toCheckoutOutputRentalDTO(Noleggio noleggio);
 
     /**
-     * Logica personalizzata per generare un numero di noleggio leggibile,
-     * proprio come OrderMapper faceva per il numero d'ordine.
+     * Logica personalizzata per generare un numero di noleggio leggibile
      */
     @Named("generateNumeroNoleggio")
     default String generateNumeroNoleggio(UUID id) {
         if (id == null) {
             return null;
         }
-        // Esempio: "RENT-" seguito da parte dell'UUID
         return "RENT-" + id.toString().substring(0, 8).toUpperCase();
     }
 }

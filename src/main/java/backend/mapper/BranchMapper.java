@@ -17,7 +17,7 @@ public interface BranchMapper {
     @Mapping(target = "indirizzo", ignore = true)
     Filiale fromCreateDto(CreateBranchDTO createBranchDTO);
 
-    @Mapping(target = "id", ignore = true) // Ignora sempre l'ID durante un aggiornamento
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "indirizzo", ignore = true)
     Filiale fromUpdateDto(UpdateBranchDTO updateBranchDTO);
 
