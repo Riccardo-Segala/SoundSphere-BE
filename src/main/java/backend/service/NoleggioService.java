@@ -2,6 +2,7 @@ package backend.service;
 
 import backend.dto.checkout.CheckoutInputRentalDTO;
 import backend.dto.checkout.CheckoutOutputRentalDTO;
+import backend.dto.dati_statici.ResponseStaticDataDTO;
 import backend.dto.noleggio.ResponseRentalDTO;
 import backend.mapper.RentalMapper;
 import backend.model.Noleggio;
@@ -25,11 +26,13 @@ import java.util.stream.Collectors;
 public class NoleggioService extends GenericService<Noleggio, UUID> {
     private final NoleggioRepository noleggioRepository;
     private final RentalMapper rentalMapper;
+    private final DatiStaticiService datiStaticiService;
 
-    public NoleggioService(NoleggioRepository noleggioRepository, RentalMapper rentalMapper) {
+    public NoleggioService(NoleggioRepository noleggioRepository, RentalMapper rentalMapper, DatiStaticiService datiStaticiService) {
         super(noleggioRepository);
         this.noleggioRepository = noleggioRepository;
         this.rentalMapper = rentalMapper;
+        this.datiStaticiService = datiStaticiService;
     }
 
     @Autowired
@@ -104,6 +107,11 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
 
         // Il totale non è una semplice somma, ma dipende dalla durata del noleggio.
         double totaleFinale = calcolaTotaleNoleggio(carrello, dto.dataInizio(), dto.dataFine());
+        ResponseStaticDataDTO limiteGratuita = datiStaticiService.getStaticDataByName("COSTO_MINIMO_SPEDIZIONE_GRATUITA");
+        if (totaleFinale <= limiteGratuita.valore()) {
+            ResponseStaticDataDTO spedizioneDati = datiStaticiService.getStaticDataByName("COSTO_SPEDIZIONE");
+            totaleFinale += spedizioneDati.valore();
+        }
 
         noleggioSalvato.setTotale(totaleFinale);
         noleggioSalvato.setDataPagamento(LocalDate.now()); // Registriamo il pagamento
