@@ -107,6 +107,11 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
 
         // Il totale non è una semplice somma, ma dipende dalla durata del noleggio.
         double totaleFinale = calcolaTotaleNoleggio(carrello, dto.dataInizio(), dto.dataFine());
+        ResponseStaticDataDTO limiteGratuita = datiStaticiService.getStaticDataByName("COSTO_MINIMO_SPEDIZIONE_GRATUITA");
+        if (totaleFinale <= limiteGratuita.valore()) {
+            ResponseStaticDataDTO spedizioneDati = datiStaticiService.getStaticDataByName("COSTO_SPEDIZIONE");
+            totaleFinale += spedizioneDati.valore();
+        }
 
         noleggioSalvato.setTotale(totaleFinale);
         noleggioSalvato.setDataPagamento(LocalDate.now()); // Registriamo il pagamento
