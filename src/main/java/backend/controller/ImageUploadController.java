@@ -27,7 +27,7 @@ public class ImageUploadController {
 
             Map<String, String> response = Collections.singletonMap("path", publicPath);
 
-            // SUCCESSO: Restituisce 200 OK con la stringa del path nel corpo
+            // Se ha successo restituisce 200 OK con la stringa del path nel corpo
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {

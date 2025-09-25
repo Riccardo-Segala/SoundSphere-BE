@@ -25,11 +25,11 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
         this.categoryMapper = mapper;
     }
 
-    // --- ENDPOINT PUBBLICI (Senza @PreAuthorize) ---
+    // --- ENDPOINT PUBBLICI ---
 
     /**
      * Endpoint pubblico per la navigazione passo-passo.
-     * Restituisce i dettagli e i figli diretti di una categoria.
+     * Restituisce i dettagli e i figli diretti di una categoria
      */
     @GetMapping("/byId/{id}")
     public ResponseEntity<ResponseCategoryNavigationDTO> getCategoryDetailsById(@PathVariable UUID id) {
@@ -44,7 +44,7 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
     }
 
     /**
-     * Endpoint pubblico per ottenere le categorie principali (quelle senza genitore).
+     * Endpoint pubblico per ottenere le categorie principali (quelle senza genitore)
      */
     @GetMapping
     public ResponseEntity<List<ResponseParentCategoryDTO>> getTopLevelCategories() {
@@ -53,10 +53,10 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
     }
 
 
-    // --- ENDPOINT ADMIN (Protetti con @PreAuthorize) ---
+    // --- ENDPOINT ADMIN ---
 
     /**
-     * Endpoint admin per creare una nuova categoria.
+     * Endpoint admin per creare una nuova categoria
      */
     @PostMapping
     //@PreAuthorize("hasRole('ADMIN')")
@@ -75,8 +75,8 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
     }
 
     /**
-     * Endpoint admin per aggiornare una categoria.
-     * Anche questo FA L'OVERRIDE per restituire il DTO corretto.
+     * Endpoint admin per aggiornare una categoria
+     * Fa L'OVERRIDE per restituire il DTO corretto
      */
     @PutMapping("/{id}")
     //@PreAuthorize("hasRole('ADMIN')")
@@ -91,7 +91,7 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
     }
 
     /**
-     * Endpoint admin per eliminare una categoria.
+     * Endpoint admin per eliminare una categoria
      */
     @DeleteMapping("/{id}")
     //@PreAuthorize("hasRole('ADMIN')")
@@ -100,8 +100,7 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
     }
 
     /**
-     * Endpoint admin per ottenere la visione completa e ricorsiva di una categoria.
-     * Nota: URL diverso per non andare in conflitto con quello pubblico.
+     * Endpoint admin per ottenere la visione completa e ricorsiva di una categoria
      */
 
     @Override
