@@ -25,10 +25,10 @@ public class Categoria {
     @Column(name = "slug", nullable = false, unique = true)
     private String slug;
 
-    // --- RELAZIONE GERARCHICA (AUTO-REFERENZIAMENTO) ---
+    // --- RELAZIONE GERARCHICA ---
     // Molte categorie (figlie) possono avere un solo genitore.
-    @ManyToOne(fetch = FetchType.LAZY) // LAZY per performance
-    @JoinColumn(name = "parent_id") // Colonna FK nel DB
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     private Categoria parent;
 
     // Una categoria (genitore) può avere molte categorie figlie.
@@ -36,7 +36,7 @@ public class Categoria {
     private Set<Categoria> children = new HashSet<>();
 
 
-    // --- RELAZIONE CON PRODOTTO (MOLTI-A-MOLTI) ---
+    // --- RELAZIONE CON PRODOTTO ---
     // mappedBy indica che la relazione è "posseduta" dall'altra parte (dal campo "categorie" in Prodotto).
     // Questo lato è l'inverso, quindi non gestisce la tabella di join.
     @ManyToMany(mappedBy = "categorie")
