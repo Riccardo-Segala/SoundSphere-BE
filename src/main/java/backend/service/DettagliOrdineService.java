@@ -12,7 +12,7 @@ import java.util.List;
 public class DettagliOrdineService extends GenericService<DettagliOrdine, OrdineProdottoId> {
     private final DettagliOrdineRepository dettagliOrdineRepository;
     public DettagliOrdineService(DettagliOrdineRepository repository, DettagliOrdineRepository dettagliOrdineRepository) {
-        super(repository); // Passa il repository al costruttore della classe base
+        super(repository);
         this.dettagliOrdineRepository = dettagliOrdineRepository;
     }
 

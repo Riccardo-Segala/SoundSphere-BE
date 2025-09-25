@@ -93,7 +93,7 @@ public class OrdineService extends GenericService<Ordine, UUID> {
 
                     DettagliOrdine dettaglio = new DettagliOrdine();
 
-                    // **PASSAGGIO CHIAVE 2: Usa l'ID dell'ordine appena salvato.**
+                    // Usa l'ID dell'ordine appena salvato
                     OrdineProdottoId dettagliId = new OrdineProdottoId(ordineSalvato.getId(), prodotto.getId());
                     dettaglio.setId(dettagliId);
 
@@ -127,16 +127,12 @@ public class OrdineService extends GenericService<Ordine, UUID> {
 
         ordineSalvato.setDettagli(dettagliOrdine);
 
-        // Non è strettamente necessario chiamare save() di nuovo, perché 'ordineSalvato'
-        // è già un'entità managed e JPA rileverà la modifica al totale al commit
-        // della transazione. Tuttavia, chiamarlo rende il codice più esplicito.
         ordineRepository.save(ordineSalvato);
 
         // calcolo dei punti e aggiornamento del vantaggio utente
         int puntiTotaliUtente = utenteService.updatePointsAndAdvantagesForOrder(utenteId, ordineSalvato.getId());
 
         carrelloService.deleteAllItems(carrello);
-        // emailService.inviaConfermaOrdine(ordineSalvato);
 
         // --- 5. MAPPATURA DELLA RISPOSTA ---
         return orderMapper.toCheckoutOutputDTO(ordineSalvato, puntiTotaliUtente);

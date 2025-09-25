@@ -26,7 +26,7 @@ public class IndirizzoUtenteService extends GenericService<IndirizzoUtente, UUID
     private final UserAddressMapper userAddressMapper;
 
     public IndirizzoUtenteService(IndirizzoUtenteRepository repository, UtenteService utenteService, UserAddressMapper userAddressMapper) {
-        super(repository); // Passa il repository al costruttore della classe base
+        super(repository);
         this.userAddressRepository = repository;
         this.utenteService = utenteService;
         this.userAddressMapper = userAddressMapper;
@@ -104,15 +104,13 @@ public class IndirizzoUtenteService extends GenericService<IndirizzoUtente, UUID
     public ResponseUserAddressDTO updateAddress(UUID userId, UUID addressId, UpdateUserAddressDTO updateDTO) {
         // 1. Il controllo di sicurezza:
         // Cerca l'indirizzo usando sia il suo ID sia l'ID dell'utente.
-        // Se non viene trovato, significa o che l'indirizzo non esiste, o che non appartiene all'utente.
-        // In entrambi i casi, l'operazione fallisce in modo sicuro.
         IndirizzoUtente indirizzo = userAddressRepository.findByIdAndUtenteId(addressId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Indirizzo non trovato o non appartenente all'utente"));
 
         // 2. Se il controllo passa, applica le modifiche dall'UpdateDTO all'entità.
 
         if (updateDTO.main()) {
-            // ...cerca un altro indirizzo predefinito per l'utente.
+            // cerca un altro indirizzo predefinito per l'utente.
             userAddressRepository.findByUtenteIdAndMainTrue(userId)
                     .ifPresent(oldDefault -> {
                         // Se il vecchio indirizzo predefinito trovato allora è lo stesso che sto modificando,
@@ -136,8 +134,6 @@ public class IndirizzoUtenteService extends GenericService<IndirizzoUtente, UUID
     public void deleteAddress(UUID userId, UUID addressId) {
         // 1. Il controllo di sicurezza:
         // Cerca l'indirizzo usando sia il suo ID sia l'ID dell'utente.
-        // Se non viene trovato, significa o che l'indirizzo non esiste, o che non appartiene all'utente.
-        // In entrambi i casi, l'operazione fallisce in modo sicuro.
         IndirizzoUtente indirizzo = userAddressRepository.findByIdAndUtenteId(addressId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Indirizzo non trovato o non appartenente all'utente"));
 

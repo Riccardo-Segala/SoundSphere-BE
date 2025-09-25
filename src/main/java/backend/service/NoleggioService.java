@@ -29,7 +29,7 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
     public NoleggioService(NoleggioRepository noleggioRepository, RentalMapper rentalMapper) {
         super(noleggioRepository);
         this.noleggioRepository = noleggioRepository;
-        this.rentalMapper = rentalMapper;// Passa il repository al costruttore della classe base
+        this.rentalMapper = rentalMapper;
     }
 
     @Autowired
@@ -80,7 +80,6 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
         Noleggio noleggioSalvato = noleggioRepository.save(nuovoNoleggio);
 
         // --- 3. LOGICA DI BUSINESS E CREAZIONE DEI DETTAGLI "FIGLI" ---
-        // La logica qui cambia: invece di riservare lo stock, verifichiamo la disponibilità.
         List<DettagliNoleggio> dettagliNoleggio = carrello.stream()
                 .map(cartElement -> {
                     Prodotto prodotto = cartElement.getProdotto();
@@ -102,12 +101,9 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
         dettagliNoleggioService.createByList(dettagliNoleggio);
 
         // --- 4. AGGIORNAMENTO FINALE E AZIONI POST-PERSISTENZA ---
-        // **DIFFERENZA CHIAVE 2: Calcolo del totale**
+
         // Il totale non è una semplice somma, ma dipende dalla durata del noleggio.
         double totaleFinale = calcolaTotaleNoleggio(carrello, dto.dataInizio(), dto.dataFine());
-
-        // Qui potresti inserire logiche aggiuntive, come un deposito cauzionale
-        // o costi di servizio, in modo simile alla spedizione gratuita.
 
         noleggioSalvato.setTotale(totaleFinale);
         noleggioSalvato.setDataPagamento(LocalDate.now()); // Registriamo il pagamento
@@ -117,16 +113,15 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
         // Aggiorniamo l'entità 'managed'. JPA rileverà le modifiche.
         noleggioRepository.save(noleggioSalvato);
 
-        // Svuotiamo il carrello, come prima
+        // Svuotiamo il carrello
         carrelloService.deleteAllItems(carrello);
-        // emailService.inviaConfermaNoleggio(noleggioSalvato, dettagliNoleggio);
 
         // --- 5. MAPPATURA DELLA RISPOSTA ---
         // Usiamo un mapper specifico per il noleggio per creare il DTO di risposta.
         return rentalMapper.toCheckoutOutputRentalDTO(noleggioSalvato);
     }
 
-    // Metodo helper per il calcolo del totale
+    // Metodo per il calcolo del totale
     private double calcolaTotaleNoleggio(List<Carrello> carrello, LocalDate inizio, LocalDate fine) {
         long giorniNoleggio = ChronoUnit.DAYS.between(inizio, fine);
         if (giorniNoleggio <= 0) {
@@ -136,7 +131,7 @@ public class NoleggioService extends GenericService<Noleggio, UUID> {
         double totaleParziale = 0.0;
         for (Carrello item : carrello) {
             // Logica di prezzo: prezzo giornaliero del prodotto * quantità * numero di giorni
-            double prezzoGiornaliero = item.getProdotto().getCostoGiornaliero(); // Assumendo esista un prezzo di noleggio
+            double prezzoGiornaliero = item.getProdotto().getCostoGiornaliero();
             totaleParziale += (prezzoGiornaliero * item.getQuantita() * giorniNoleggio);
         }
         return totaleParziale;

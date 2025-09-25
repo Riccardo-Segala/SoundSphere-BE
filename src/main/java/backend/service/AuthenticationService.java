@@ -72,7 +72,7 @@ public class AuthenticationService {
         // Creo il Dipendente dai campi extra (MapStruct)
         Dipendente dipendente = employeeMapper.fromCreateDto(request);
 
-        // Mappo i campi comuni da userDto → Dipendente
+        // Mappo i campi comuni da userDto a Dipendente
         userMapper.partialUpdateFromCreate(userDto, dipendente);
 
         // Imposto la data di registrazione
@@ -118,7 +118,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException("Email non registrata."));
 
         // 3. Genera il token passando l'intera entità 'Utente'.
-        //    Questo invoca il metodo corretto nel tuo JwtService, che è stato
+        //    Questo invoca il metodo corretto nel JwtService, che è stato
         //    progettato appositamente per aggiungere il 'userId' ai claims del token.
         return jwtService.generateToken(user);
     }

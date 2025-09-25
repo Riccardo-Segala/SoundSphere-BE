@@ -33,7 +33,7 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
     private String nomeFilialeOnline;
 
     public ProdottoService(ProdottoRepository repository, RecensioneRepository recensioneRepository, ProductMapper productMapper, FilialeService filialeService, StockRepository stockRepository, CategoriaService categoriaService) {
-        super(repository); // Passa il repository al costruttore della classe base
+        super(repository);
         this.repository = repository;
         this.recensioneRepository = recensioneRepository;
         this.productMapper = productMapper;
@@ -60,7 +60,7 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
     @Transactional(readOnly = true)
     public List<ResponseProductDTO> findProductsByCategoryId(UUID categoryId) {
         if (categoryId == null) {
-            return List.of(); // o gestisci come preferisci
+            return List.of();
         }
         List<Prodotto> prodotti = repository.findByExactCategoryId(categoryId);
         return prodotti.stream()
@@ -99,7 +99,7 @@ public class ProdottoService extends GenericService<Prodotto, UUID> {
         return stockRepository.findDistinctMarcaByFilialeNome(nomeFilialeOnline);
     }
 
-    @Transactional(readOnly = true) // Ottimo per le operazioni di sola lettura
+    @Transactional(readOnly = true)
     public boolean existsById(UUID id) {
         return repository.existsById(id);
     }

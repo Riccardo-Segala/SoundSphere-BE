@@ -27,12 +27,10 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
     private UtenteRepository utenteRepository;
 
     public MetodoPagamentoService(MetodoPagamentoRepository repository) {
-        super(repository); // Passa il repository al costruttore della classe base
+        super(repository);
     }
 
     public Optional<MetodoPagamento> findByIdAndUserId(UUID methodId, UUID userId) {
-        // Delega la chiamata direttamente al metodo sicuro del repository.
-        // Nessuna logica aggiuntiva è necessaria qui, perché la query è già sicura.
         return metodoPagamentoRepository.findByIdAndUtenteId(methodId, userId);
     }
 
@@ -78,8 +76,6 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
     public MetodoPagamento update(UUID userId, UUID methodId, UpdatePaymentMethodDTO dto) {
         // 1. Il controllo di sicurezza:
         // Cerca il metodo usando sia il suo ID sia l'ID dell'utente.
-        // Se non viene trovato, significa o che il metodo non esiste, o che non appartiene all'utente.
-        // In entrambi i casi, l'operazione fallisce in modo sicuro.
         MetodoPagamento metodoEsistente = metodoPagamentoRepository.findByIdAndUtenteId(methodId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Metodo non trovato o non appartenente all'utente"));
 
@@ -89,8 +85,7 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
         // 3. LOGICA DI BUSINESS SEMPLIFICATA
         // Se, dopo l'aggiornamento, questo metodo è diventato il principale...
         if (metodoEsistente.isMain()) {
-            // ...allora ci assicuriamo che sia l'UNICO.
-            // Questa chiamata al repository è un singolo UPDATE sul DB, super efficiente.
+            // ...allora ci assicuriamo che sia l'UNICO
             metodoPagamentoRepository.demoteAllOtherMainMethodsForUser(userId, methodId);
         }
 
@@ -98,25 +93,22 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
         MetodoPagamento savedMethod = metodoPagamentoRepository.save(metodoEsistente);
 
         // 5. CONTROLLO DI SICUREZZA FINALE
-        // Assicurati che esista sempre almeno un metodo principale.
+        // Assicurarsi che esista sempre almeno un metodo principale.
         // Questo gestisce il caso in cui l'utente retrocede l'unico metodo esistente.
         if (!metodoPagamentoRepository.existsByUtenteIdAndMain(userId, true)) {
             // Se nessun metodo è 'main', promuovi il primo che trovi (o quello appena salvato se è l'unico).
             MetodoPagamento primoMetodo = metodoPagamentoRepository.findFirstByUtente_Id(userId)
                     .orElseThrow(() -> new IllegalStateException("Nessun metodo di pagamento trovato per l'utente."));
             primoMetodo.setMain(true);
-            // non serve un'ulteriore save, @Transactional gestisce il commit finale.
         }
 
-        return savedMethod; // Restituisce l'oggetto modificato
+        return savedMethod;
     }
 
     @Transactional
     public void delete(UUID userId, UUID methodId) {
         // 1. Il controllo di sicurezza:
         // Cerca il metodo usando sia il suo ID sia l'ID dell'utente.
-        // Se non viene trovato, significa o che il metodo non esiste, o che non appartiene all'utente.
-        // In entrambi i casi, l'operazione fallisce in modo sicuro.
         MetodoPagamento metodoDaCancellare = metodoPagamentoRepository.findByIdAndUtenteId(methodId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Metodo non trovato o non appartenente all'utente"));
 
@@ -139,11 +131,7 @@ public class MetodoPagamentoService extends GenericService<MetodoPagamento, UUID
             // Se 'altriMetodi' è vuota, non facciamo nulla.
         }
 
-        // 3. Esegui la cancellazione.
-        // Questa istruzione viene eseguita in tutti i casi validi:
-        // - Se il metodo non era 'main'.
-        // - Se era 'main' e un successore è stato promosso.
-        // - Se era 'main' ed era l'ultimo rimasto.
+        // 3. Esegui la cancellazione
         metodoPagamentoRepository.delete(metodoDaCancellare);
     }
 }

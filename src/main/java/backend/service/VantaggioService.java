@@ -18,7 +18,7 @@ public class VantaggioService extends GenericService<Vantaggio, UUID> {
     private VantaggioRepository vantaggioRepository;
 
     public VantaggioService(VantaggioRepository repository) {
-        super(repository); // Passa il repository al costruttore della classe base
+        super(repository);
     }
 
     //Calcola l'importo dello sconto in base ai punti dell'utente.
