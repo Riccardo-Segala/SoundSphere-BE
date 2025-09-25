@@ -10,6 +10,7 @@ import backend.security.CustomUserDetails;
 import backend.service.CarrelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,20 +31,8 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     private CarrelloService carrelloService;
 
 
-
-
-    // GET by ID composto
-   /* @GetMapping("/{utenteId}/{prodottoId}")
-    public ResponseEntity<ResponseCartDTO> getCartById(
-            @PathVariable UUID utenteId,
-            @PathVariable UUID prodottoId) {
-
-        UtenteProdottoId id = new UtenteProdottoId(utenteId, prodottoId);
-        return super.getById(id);
-    }*/
-
-    // POST
     @GetMapping
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<List<ResponseCartDTO>> getAllCartOfUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId();
         // Chiamata per ottenere tutti gli elementi del carrello
@@ -54,6 +43,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     }
 
     @GetMapping("/wishlist")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<List<ResponseCartDTO>> getAllWishlist(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId();
 
@@ -67,6 +57,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
 
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<ResponseCartDTO> updateItemInCart(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                        @RequestBody UpdateCartItemDTO dto)
     {
@@ -79,6 +70,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
     }
 
     @DeleteMapping("/{productId}")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<Void> removeItemFromCart(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                    @PathVariable UUID productId)
     {
@@ -93,6 +85,7 @@ class CarrelloController extends GenericController <Carrello, UtenteProdottoId, 
 
 
     @DeleteMapping("/items")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<Void> removeItemsFromCart(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody DeleteCartDTO dto) {

@@ -8,12 +8,14 @@ import backend.model.Vantaggio;
 import backend.service.VantaggioService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
+@PreAuthorize("hasAuthority('ACQUISTO')")
 @RequestMapping(path ="/api/vantaggio", produces = MediaType.APPLICATION_JSON_VALUE)
 public class VantaggioController extends GenericController<Vantaggio, UUID, CreateBenefitDTO, UpdateBenefitDTO, ResponseBenefitDTO> {
     public VantaggioController(VantaggioService service, BenefitMapper mapper) {

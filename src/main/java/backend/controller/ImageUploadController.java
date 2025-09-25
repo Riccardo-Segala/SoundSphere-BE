@@ -4,6 +4,7 @@ import backend.service.ImageStorageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
+@PreAuthorize("hasAuthority('GESTIONE_STOCK')")
 @RequestMapping(path="/api/upload", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ImageUploadController {
     private final ImageStorageService storageService;

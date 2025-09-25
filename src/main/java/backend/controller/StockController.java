@@ -10,6 +10,7 @@ import backend.service.StockService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,16 +32,6 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
         return super.getAll();
     }
 
-    // GET by ID composto
-    /*@GetMapping("/{filialeId}/{prodottoId}")
-    public ResponseEntity<ResponseStockDTO> getStockItem(
-            @PathVariable UUID filialeId,
-            @PathVariable UUID prodottoId) {
-
-        FilialeProdottoId id = new FilialeProdottoId(filialeId, prodottoId);
-        return super.getById(id);
-    }*/
-
     @GetMapping("/online")
     public ResponseEntity<List<ResponseStockDTO>> getOnlineStock() {
         // 1. Chiama il servizio per ottenere i dati, già pronti in formato DTO
@@ -56,28 +47,6 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
         return super.create(createDTO);
     }
 
-    // PUT by ID composto
-    /*@PutMapping("/{filialeId}/{prodottoId}")
-    public ResponseEntity<ResponseStockDTO> updateStockItem(
-            @PathVariable UUID filialeId,
-            @PathVariable UUID prodottoId,
-            @RequestBody UpdateStockDTO updateDTO) {
-
-        FilialeProdottoId id = new FilialeProdottoId(filialeId, prodottoId);
-        return super.update(id, updateDTO);
-    }
-
-    // DELETE by ID composto
-    @DeleteMapping("/{filialeId}/{prodottoId}")
-    public ResponseEntity<Void> deleteStockItem(
-            @PathVariable UUID filialeId,
-            @PathVariable UUID prodottoId) {
-
-        FilialeProdottoId id = new FilialeProdottoId(filialeId, prodottoId);
-        return super.delete(id);
-    }*/
-
-    // implementazione del metodo astratto getId
     @Override
     protected FilialeProdottoId getId(Stock entity) {
         return entity.getId();
@@ -87,6 +56,7 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     // --- ENDPOINT PER IL DIPENDENTE ---
 
     @GetMapping("/my-filiale")
+    @PreAuthorize("hasAuthority('GESTIONE_STOCK')")
     public ResponseEntity<List<ResponseStockDTO>> getMyFilialeStock(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         List<ResponseStockDTO> stock = stockService.getStockForMyFiliale(userDetails.getId());
@@ -94,6 +64,7 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     }
 
     @GetMapping("/my-filiale/{prodottoId}")
+    @PreAuthorize("hasAuthority('GESTIONE_STOCK')")
     public ResponseEntity<ResponseStockDTO> getSpecificProductStock(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID prodottoId) {
@@ -104,6 +75,7 @@ public class StockController extends GenericController<Stock, FilialeProdottoId,
     }
 
     @PutMapping("/my-filiale")
+    @PreAuthorize("hasAuthority('GESTIONE_STOCK')")
     public ResponseEntity<ResponseStockDTO> updateMyFilialeStock(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody UpdateStockDTO updateDTO) {

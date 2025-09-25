@@ -5,6 +5,7 @@ import backend.security.CustomUserDetails;
 import backend.service.DipendenteService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ class DipendenteController {
 
 
     @GetMapping("/myBranch")
+    @PreAuthorize("hasAuthority('GESTIONE_STOCK')")
     public ResponseEntity<ResponseBranchDTO> getMyBranch(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID id = userDetails.getId();
         return ResponseEntity.ok(dipendenteService.getMyBranch(id));

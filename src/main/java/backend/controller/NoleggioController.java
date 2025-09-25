@@ -75,6 +75,7 @@ class NoleggioController extends GenericController<Noleggio, UUID, CreateRentalD
 
     // --- METODO PER LO STORICO NOLEGGI DELL'ORGANIZZATORE ---
     @GetMapping("/miei-noleggi")
+    @PreAuthorize("hasAuthority('NOLEGGIO')")
     public ResponseEntity<List<ResponseRentalDTO>> getMyRentals(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
