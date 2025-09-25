@@ -4,6 +4,8 @@ import backend.dto.checkout.CheckoutInputDTO;
 import backend.dto.checkout.CheckoutOutputDTO;
 import backend.dto.dati_statici.ResponseStaticDataDTO;
 import backend.dto.ordine.ResponseOrderDTO;
+import backend.dto.vantaggio.ResponseBenefitDTO;
+import backend.mapper.BenefitMapper;
 import backend.mapper.OrderMapper;
 import backend.model.*;
 import backend.model.embeddable.OrdineProdottoId;
@@ -31,6 +33,8 @@ public class OrdineService extends GenericService<Ordine, UUID> {
     private final CarrelloService carrelloService;
     private final DettagliOrdineService dettagliOrdineService;
     private final DatiStaticiService datiStaticiService;
+    private final BenefitMapper benefitMapper;
+    private final VantaggioService vantaggioService;
 
     @Value("${app.filiale.online.name}")
     private String filialeOnlineName;
@@ -44,7 +48,7 @@ public class OrdineService extends GenericService<Ordine, UUID> {
                          StockService stockService,
                          CarrelloService carrelloService,
                          DettagliOrdineService dettagliOrdineService,
-                         DatiStaticiService datiStaticiService) {
+                         DatiStaticiService datiStaticiService, BenefitMapper benefitMapper, VantaggioService vantaggioService) {
         super(repository);
         this.ordineRepository = ordineRepository;
         this.orderMapper = orderMapper;
@@ -55,6 +59,8 @@ public class OrdineService extends GenericService<Ordine, UUID> {
         this.carrelloService = carrelloService;
         this.dettagliOrdineService = dettagliOrdineService;
         this.datiStaticiService = datiStaticiService;
+        this.benefitMapper = benefitMapper;
+        this.vantaggioService = vantaggioService;
     }
 
     @Transactional
@@ -134,8 +140,11 @@ public class OrdineService extends GenericService<Ordine, UUID> {
 
         carrelloService.deleteAllItems(carrello);
 
+        // recupero il vantaggio associato all'ordine
+        ResponseBenefitDTO vantaggio = benefitMapper.toDto(vantaggioService.findVantaggioByPunti(puntiTotaliUtente));
+
         // --- 5. MAPPATURA DELLA RISPOSTA ---
-        return orderMapper.toCheckoutOutputDTO(ordineSalvato, puntiTotaliUtente);
+        return orderMapper.toCheckoutOutputDTO(ordineSalvato, puntiTotaliUtente, vantaggio);
     }
 
 

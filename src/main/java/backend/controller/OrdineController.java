@@ -5,10 +5,13 @@ import backend.dto.checkout.CheckoutOutputDTO;
 import backend.dto.ordine.CreateOrderDTO;
 import backend.dto.ordine.ResponseOrderDTO;
 import backend.dto.ordine.UpdateOrderDTO;
+import backend.dto.vantaggio.ResponseBenefitDTO;
+import backend.mapper.BenefitMapper;
 import backend.mapper.OrderMapper;
 import backend.model.Ordine;
 import backend.security.CustomUserDetails;
 import backend.service.OrdineService;
+import backend.service.VantaggioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +26,15 @@ import java.util.UUID;
 @RequestMapping(path="/api/ordini", produces = MediaType.APPLICATION_JSON_VALUE)
 class OrdineController extends GenericController<Ordine, UUID, CreateOrderDTO, UpdateOrderDTO, ResponseOrderDTO> {
     final OrdineService ordineService;
-    public OrdineController(OrdineService service, OrderMapper mapper, OrdineService ordineService) {
+    private final VantaggioService vantaggioService;
+    private final BenefitMapper benefitMapper;
+
+    OrdineController(OrdineService service, OrderMapper mapper, OrdineService ordineService, VantaggioService vantaggioService, BenefitMapper benefitMapper) {
 
         super(service, mapper);
         this.ordineService = ordineService;
+        this.vantaggioService = vantaggioService;
+        this.benefitMapper = benefitMapper;
     }
 
     @GetMapping

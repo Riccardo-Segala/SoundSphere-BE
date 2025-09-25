@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@PreAuthorize("hasAuthority('ACQUISTO')")
 @RequestMapping(path="/api/utenti", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UtenteController{
     private final UtenteService userService;
