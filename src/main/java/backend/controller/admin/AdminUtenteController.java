@@ -33,7 +33,7 @@ public class AdminUtenteController {
 
     @PostMapping
     public ResponseEntity<ResponseUserDTO> createUser(@RequestBody CreateUserFromAdminDTO utente) {
-        // Qui l'admin può creare un utente base, specificando tutti i campi.
+        // l'admin può creare un utente base, specificando tutti i campi.
         return ResponseEntity.ok(userService.createUser(utente));
     }
 
@@ -42,25 +42,23 @@ public class AdminUtenteController {
         return ResponseEntity.ok(userService.updateUser(id, utenteDetails));
     }
 
-    @PostMapping("/promote-to-organizer") // URL specifico per l'azione di business
+    @PostMapping("/promote-to-organizer")
     public ResponseEntity<Void> promoteUsersToOrganizers(
             @Valid @RequestBody UserIdListDTO dto) {
 
-        // Il controller delega tutta la logica complessa al service.
+        // Il controller delega tutta la logica complessa al service
         userService.assignEventManagerRole(dto.userIdList());
 
-        // Restituisce una risposta positiva con corpo vuoto.
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/demote-to-user") // URL specifico per l'azione di business
+    @PostMapping("/demote-to-user")
     public ResponseEntity<Void> demoteOrganizersToUsers(
             @Valid @RequestBody UserIdListDTO dto) {
 
-        // Il controller delega tutta la logica complessa al service.
+        // Il controller delega tutta la logica complessa al service
         userService.demoteUsersFromEventManager(dto.userIdList());
 
-        // Restituisce una risposta positiva con corpo vuoto.
         return ResponseEntity.ok().build();
     }
 
