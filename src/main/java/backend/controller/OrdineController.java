@@ -78,6 +78,7 @@ class OrdineController extends GenericController<Ordine, UUID, CreateOrderDTO, U
 
     // --- METODO PER LO STORICO ORDINI DELL'UTENTE ---
     @GetMapping("/miei-ordini")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<List<ResponseOrderDTO>> getMyOrders(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {

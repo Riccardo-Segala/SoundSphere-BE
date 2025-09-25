@@ -8,6 +8,7 @@ import backend.security.CustomUserDetails;
 import backend.service.IndirizzoUtenteService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -25,19 +26,8 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
         this.indirizzoService = service;
     }
 
-    /*@GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ResponseUserAddressDTO>> getAllUsersAddressForAdmin() {
-        return super.getAll();
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseUserAddressDTO> getUserAddressByIdForAdmin(@PathVariable UUID id) {
-        return super.getById(id);
-    }*/
-
     @GetMapping("/personalUserAddresses")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<List<ResponseUserAddressDTO>> getAllUserAddressesByUserId(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         UUID userId = userDetails.getId();
@@ -47,6 +37,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<ResponseUserAddressDTO> createUserAddress(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CreateUserAddressDTO createDTO) {
@@ -66,6 +57,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     }
 
     @PutMapping("/{addressId}")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<ResponseUserAddressDTO> updateUserAddress(
             @PathVariable UUID addressId,
             @RequestBody UpdateUserAddressDTO updateDTO,
@@ -81,6 +73,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
     }
 
     @DeleteMapping("/{addressId}")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<Void> deleteUserAddress(
             @PathVariable UUID addressId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -96,6 +89,7 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
 
 
     @GetMapping("/{addressId}")
+    @PreAuthorize("hasAuthority('ACQUISTO')")
     public ResponseEntity<ResponseUserAddressDTO> getUserAddressById(
             @PathVariable UUID addressId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -104,18 +98,6 @@ class IndirizzoUtenteController extends GenericController<IndirizzoUtente, UUID,
         ResponseUserAddressDTO indirizzoDto = indirizzoService.findAddressById(userId, addressId);
         return ResponseEntity.ok(indirizzoDto);
     }
-
-    /*@PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseUserAddressDTO> updateUserAddressForAdmin(@PathVariable UUID id, @RequestBody UpdateUserAddressDTO updateDTO) {
-        return super.update(id, updateDTO);
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteUserAddressForAdmin(@PathVariable UUID id) {
-        return super.delete(id);
-    }*/
 
     @Override
     protected UUID getId(IndirizzoUtente entity) {

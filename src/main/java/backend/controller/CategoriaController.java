@@ -7,6 +7,7 @@ import backend.service.CategoriaService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -59,7 +60,7 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
      * Endpoint admin per creare una nuova categoria
      */
     @PostMapping
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseCategoryDTO> createCategory(@Valid @RequestBody CreateCategoryDTO dto) {
         Categoria savedEntity = categoriaService.create(dto);
 
@@ -79,7 +80,7 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
      * Fa L'OVERRIDE per restituire il DTO corretto
      */
     @PutMapping("/{id}")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseCategoryDTO> updateCategory(@PathVariable UUID id, @Valid @RequestBody UpdateCategoryDTO dto) {
 
         Categoria updatedEntity = categoriaService.update(id, dto);
@@ -94,7 +95,7 @@ public class CategoriaController extends GenericController <Categoria, UUID, Cre
      * Endpoint admin per eliminare una categoria
      */
     @DeleteMapping("/{id}")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
         return super.delete(id); // Usa la logica generica
     }

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@PreAuthorize("hasAuthority('ACQUISTO')")
 @RequestMapping(path="/api/metodi-pagamento", produces = MediaType.APPLICATION_JSON_VALUE)
 class MetodoPagamentoController extends GenericController<MetodoPagamento, UUID, CreatePaymentMethodDTO, UpdatePaymentMethodDTO, ResponsePaymentMethodDTO> {
 
