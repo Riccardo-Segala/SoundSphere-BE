@@ -4,6 +4,7 @@ import backend.dto.checkout.CheckoutOutputDTO;
 import backend.dto.ordine.CreateOrderDTO;
 import backend.dto.ordine.ResponseOrderDTO;
 import backend.dto.ordine.UpdateOrderDTO;
+import backend.dto.vantaggio.ResponseBenefitDTO;
 import backend.model.Ordine;
 import org.mapstruct.*;
 
@@ -44,7 +45,8 @@ public interface OrderMapper extends GenericMapper<Ordine, CreateOrderDTO, Updat
     @Mapping(target = "indirizzoSpedizione", source = "ordine.indirizzo")
     @Mapping(target = "prodottiOrdinati", source = "ordine.dettagli")
     @Mapping(target = "puntiTotaliUtente", source = "puntiTotaliUtente")
-    CheckoutOutputDTO toCheckoutOutputDTO(Ordine ordine, int puntiTotaliUtente);
+    @Mapping(target = "vantaggio", source = "vantaggio")
+    CheckoutOutputDTO toCheckoutOutputDTO(Ordine ordine, int puntiTotaliUtente, ResponseBenefitDTO vantaggio);
 
     @Named("generateNumeroOrdine")
     default String generateNumeroOrdine(UUID id) {

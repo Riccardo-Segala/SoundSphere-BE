@@ -1,6 +1,7 @@
 package backend.dto.checkout;
 
 import backend.dto.indirizzo_utente.ResponseUserAddressDTO;
+import backend.dto.vantaggio.ResponseBenefitDTO;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -17,5 +18,6 @@ public record CheckoutOutputDTO(
         ResponseUserAddressDTO indirizzoSpedizione,
         LocalDate dataConsegnaStimata,
         List<ProductOrderOutputDTO> prodottiOrdinati,
+        ResponseBenefitDTO vantaggio,
         int puntiTotaliUtente
 )implements Serializable {}
