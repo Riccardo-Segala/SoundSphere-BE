@@ -57,7 +57,9 @@ public class CarrelloService extends GenericService<Carrello, UtenteProdottoId> 
     public double calcolaTotaleFinale(UUID utenteId) {
         double totParziale = calcolaTotaleParziale(utenteId);
 
-        double sconto = vantaggioService.calcolaSconto(utenteId);
+        double scontoPercentuale = vantaggioService.calcolaSconto(utenteId);
+
+        double sconto = (scontoPercentuale / 100.0) * totParziale;
 
         double totaleFinale = totParziale - sconto;
 
