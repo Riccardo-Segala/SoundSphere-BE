@@ -7,8 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * DTO per la creazione di una nuova categoria.
- * Contiene i dati minimi richiesti dal client.
+ * DTO per la creazione di una nuova categoria
  */
 public record CreateCategoryDTO(
 

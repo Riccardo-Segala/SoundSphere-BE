@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record CheckoutInputRentalDTO(
         UUID metodoPagamentoId,
-        UUID indirizzoSpedizioneId, // Mantenuto per la consegna di item fisici
+        UUID indirizzoSpedizioneId,
         LocalDate dataInizio,
         LocalDate dataFine
 ) implements Serializable {}
