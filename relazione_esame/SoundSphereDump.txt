@@ -1,0 +1,1457 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17.1 (Debian 17.1-1.pgdg120+1)
+-- Dumped by pg_dump version 17.0
+
+-- Started on 2025-09-26 19:29:11
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3586 (class 1262 OID 16384)
+-- Name: SoundSphereDB; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "SoundSphereDB" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.utf8';
+
+
+ALTER DATABASE "SoundSphereDB" OWNER TO postgres;
+
+\connect "SoundSphereDB"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 2 (class 3079 OID 16700)
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- TOC entry 3587 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 228 (class 1259 OID 16512)
+-- Name: carrello; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.carrello (
+    quantita integer NOT NULL,
+    wishlist boolean NOT NULL,
+    id_utente uuid NOT NULL,
+    id_prodotto uuid NOT NULL
+);
+
+
+ALTER TABLE public.carrello OWNER TO postgres;
+
+--
+-- TOC entry 239 (class 1259 OID 16665)
+-- Name: categoria; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.categoria (
+    id uuid NOT NULL,
+    slug character varying(255) NOT NULL,
+    parent_id uuid,
+    name character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.categoria OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16390)
+-- Name: databasechangelog; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.databasechangelog (
+    id character varying(255) NOT NULL,
+    author character varying(255) NOT NULL,
+    filename character varying(255) NOT NULL,
+    dateexecuted timestamp without time zone NOT NULL,
+    orderexecuted integer NOT NULL,
+    exectype character varying(10) NOT NULL,
+    md5sum character varying(35),
+    description character varying(255),
+    comments character varying(255),
+    tag character varying(255),
+    liquibase character varying(20),
+    contexts character varying(255),
+    labels character varying(255),
+    deployment_id character varying(10)
+);
+
+
+ALTER TABLE public.databasechangelog OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16385)
+-- Name: databasechangeloglock; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.databasechangeloglock (
+    id integer NOT NULL,
+    locked boolean NOT NULL,
+    lockgranted timestamp without time zone,
+    lockedby character varying(255)
+);
+
+
+ALTER TABLE public.databasechangeloglock OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 16554)
+-- Name: dati_statici; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dati_statici (
+    id uuid NOT NULL,
+    nome character varying(255),
+    valore double precision NOT NULL
+);
+
+
+ALTER TABLE public.dati_statici OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 16486)
+-- Name: dettagli_noleggio; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dettagli_noleggio (
+    quantita integer NOT NULL,
+    id_noleggio uuid NOT NULL,
+    id_prodotto uuid NOT NULL
+);
+
+
+ALTER TABLE public.dettagli_noleggio OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 16571)
+-- Name: dettagli_ordine; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dettagli_ordine (
+    quantita integer NOT NULL,
+    id_ordine uuid NOT NULL,
+    id_prodotto uuid NOT NULL
+);
+
+
+ALTER TABLE public.dettagli_ordine OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16400)
+-- Name: dipendente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dipendente (
+    id uuid NOT NULL,
+    stipendio double precision NOT NULL,
+    scadenza_contratto date,
+    data_assunzione date,
+    id_filiale uuid NOT NULL
+);
+
+
+ALTER TABLE public.dipendente OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16405)
+-- Name: filiale; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.filiale (
+    id uuid NOT NULL,
+    email character varying(255),
+    indirizzo character varying(255),
+    nome character varying(255),
+    telefono character varying(255)
+);
+
+
+ALTER TABLE public.filiale OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 16527)
+-- Name: indirizzo_utente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.indirizzo_utente (
+    id uuid NOT NULL,
+    via character varying(255),
+    civico character varying(255),
+    cap character varying(255),
+    citta character varying(255),
+    provincia character varying(255),
+    nazione character varying(255),
+    tipologia character varying(255),
+    id_utente uuid NOT NULL,
+    is_main boolean
+);
+
+
+ALTER TABLE public.indirizzo_utente OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 16559)
+-- Name: metodo_pagamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.metodo_pagamento (
+    id uuid NOT NULL,
+    nome_su_carta character varying(255),
+    numero character varying(255),
+    cvv character varying(255),
+    data_scadenza date,
+    paypal_email character varying(255),
+    tipo_pagamento character varying(255),
+    id_utente uuid,
+    is_main boolean
+);
+
+
+ALTER TABLE public.metodo_pagamento OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 16479)
+-- Name: noleggio; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.noleggio (
+    id uuid NOT NULL,
+    data_inizio date,
+    data_scadenza date,
+    data_restituzione date,
+    data_pagamento date,
+    totale double precision NOT NULL,
+    id_utente uuid NOT NULL,
+    id_indirizzo_utente uuid
+);
+
+
+ALTER TABLE public.noleggio OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 16544)
+-- Name: ordine; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ordine (
+    id uuid NOT NULL,
+    data_acquisto date,
+    data_consegna date,
+    spedizione_gratuita boolean,
+    totale double precision NOT NULL,
+    stato character varying(255),
+    id_indirizzo_utente uuid,
+    id_utente uuid NOT NULL,
+    data_consegna_stimata date
+);
+
+
+ALTER TABLE public.ordine OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 16616)
+-- Name: permesso; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permesso (
+    id uuid NOT NULL,
+    nome character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.permesso OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 16420)
+-- Name: prodotto; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.prodotto (
+    id uuid NOT NULL,
+    costo_giornaliero double precision,
+    descrizione character varying(255),
+    is_rentable boolean,
+    marca character varying(255),
+    nome character varying(255),
+    path_immagine text,
+    prezzo double precision NOT NULL
+);
+
+
+ALTER TABLE public.prodotto OWNER TO postgres;
+
+--
+-- TOC entry 240 (class 1259 OID 16672)
+-- Name: prodotto_categoria; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.prodotto_categoria (
+    categoria_id uuid NOT NULL,
+    prodotto_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.prodotto_categoria OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16425)
+-- Name: recensione; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.recensione (
+    id uuid NOT NULL,
+    data date NOT NULL,
+    num_stelle integer NOT NULL,
+    id_prodotto uuid NOT NULL,
+    id_utente uuid NOT NULL,
+    descrizione text NOT NULL,
+    titolo character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.recensione OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 16621)
+-- Name: ruolo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ruolo (
+    id uuid NOT NULL,
+    nome character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.ruolo OWNER TO postgres;
+
+--
+-- TOC entry 238 (class 1259 OID 16631)
+-- Name: ruolo_permesso; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ruolo_permesso (
+    id_ruolo uuid NOT NULL,
+    id_permesso uuid NOT NULL
+);
+
+
+ALTER TABLE public.ruolo_permesso OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 16576)
+-- Name: stock; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stock (
+    quantita integer NOT NULL,
+    quantita_per_noleggio integer NOT NULL,
+    id_filiale uuid NOT NULL,
+    id_prodotto uuid NOT NULL
+);
+
+
+ALTER TABLE public.stock OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 16430)
+-- Name: utente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.utente (
+    id uuid NOT NULL,
+    nome character varying(255),
+    cognome character varying(255),
+    email character varying(255) NOT NULL,
+    password character varying(255) NOT NULL,
+    data_di_nascita date,
+    tipologia character varying(255),
+    path_immagine text,
+    sesso character varying(255),
+    data_registrazione date,
+    punti integer,
+    id_vantaggio uuid,
+    CONSTRAINT chk_utente_vantaggio CHECK ((((tipologia)::text <> 'UTENTE'::text) OR (id_vantaggio IS NOT NULL)))
+);
+
+
+ALTER TABLE public.utente OWNER TO postgres;
+
+--
+-- TOC entry 237 (class 1259 OID 16626)
+-- Name: utente_ruolo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.utente_ruolo (
+    id_utente uuid NOT NULL,
+    id_ruolo uuid NOT NULL,
+    id uuid NOT NULL,
+    data_scadenza date
+);
+
+
+ALTER TABLE public.utente_ruolo OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 16437)
+-- Name: vantaggio; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.vantaggio (
+    id uuid NOT NULL,
+    nome character varying(255),
+    punteggio_massimo integer,
+    punteggio_minimo integer,
+    sconto double precision
+);
+
+
+ALTER TABLE public.vantaggio OWNER TO postgres;
+
+--
+-- TOC entry 3568 (class 0 OID 16512)
+-- Dependencies: 228
+-- Data for Name: carrello; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- TOC entry 3579 (class 0 OID 16665)
+-- Dependencies: 239
+-- Data for Name: categoria; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.categoria VALUES ('a5752b56-fee9-42bd-9bb1-e7ac0b7af9b9', 'chitarre', NULL, 'Chitarre');
+INSERT INTO public.categoria VALUES ('e23e74ee-abf3-4ce0-b955-c81dc9b88f52', 'acustiche', 'a5752b56-fee9-42bd-9bb1-e7ac0b7af9b9', 'Acustiche');
+INSERT INTO public.categoria VALUES ('400cdcd7-ccf7-46b6-9a48-9e518d2ca6ca', 'batterie', NULL, 'Batterie');
+INSERT INTO public.categoria VALUES ('a5a56e70-c609-42f2-90ce-5d83c0b72c83', 'classiche', 'a5752b56-fee9-42bd-9bb1-e7ac0b7af9b9', 'Classiche');
+INSERT INTO public.categoria VALUES ('d3f3cb68-48af-4896-a681-903d22dd0d86', 'elettriche', 'a5752b56-fee9-42bd-9bb1-e7ac0b7af9b9', 'Elettriche');
+INSERT INTO public.categoria VALUES ('2c74c3cb-2bc1-4ddd-b2d2-bef6d70f60a6', 'batterie-elettriche', '400cdcd7-ccf7-46b6-9a48-9e518d2ca6ca', 'Elettriche');
+INSERT INTO public.categoria VALUES ('927bfbc4-2f24-4ffc-ae4e-bbd7a8974145', 'batterie-acustiche', '400cdcd7-ccf7-46b6-9a48-9e518d2ca6ca', 'Acustiche');
+INSERT INTO public.categoria VALUES ('2632d1b6-7d4a-4224-96c8-d6ca19a2c0ee', 'tastiere', NULL, 'Tastiere');
+INSERT INTO public.categoria VALUES ('c0fa0bc2-d935-4159-94d4-11cbe8b73dcb', 'pianoforti', '2632d1b6-7d4a-4224-96c8-d6ca19a2c0ee', 'Pianoforti');
+INSERT INTO public.categoria VALUES ('0d88bbb9-0f8c-4821-8311-53a6cd3e38be', 'tastiere-tastiere', '2632d1b6-7d4a-4224-96c8-d6ca19a2c0ee', 'Tastiere');
+INSERT INTO public.categoria VALUES ('65c3c564-e648-447a-a6d7-2212e215bb04', 'studio', NULL, 'Studio');
+INSERT INTO public.categoria VALUES ('927bbfff-1650-49e1-9f19-6a71e1199c2a', 'interfacce-audio', '65c3c564-e648-447a-a6d7-2212e215bb04', 'Interfacce Audio');
+INSERT INTO public.categoria VALUES ('3ff802c3-8ef8-4cb3-bbe0-c219de47943f', 'monitor-studio', '65c3c564-e648-447a-a6d7-2212e215bb04', 'Monitor Studio');
+INSERT INTO public.categoria VALUES ('3af261f7-32fb-44b2-8853-667f8625957b', 'microfoni', '65c3c564-e648-447a-a6d7-2212e215bb04', 'Microfoni');
+INSERT INTO public.categoria VALUES ('34cfde52-f006-40f6-b88c-92aeaf4fa1ec', 'cuffie', '65c3c564-e648-447a-a6d7-2212e215bb04', 'Cuffie');
+INSERT INTO public.categoria VALUES ('3587c8d3-ce82-49e3-abd8-68249b977576', 'mixer-digitali', '65c3c564-e648-447a-a6d7-2212e215bb04', 'Mixer Digitali');
+INSERT INTO public.categoria VALUES ('9daf88e3-cb39-4c4a-86b1-c0c3ee068728', 'convertitori', '65c3c564-e648-447a-a6d7-2212e215bb04', 'Convertitori');
+
+
+--
+-- TOC entry 3559 (class 0 OID 16390)
+-- Dependencies: 219
+-- Data for Name: databasechangelog; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.databasechangelog VALUES ('1', 'admin', 'db/changelog/db.changelog-master.xml', '2025-09-26 17:25:56.998404', 1, 'MARK_RAN', '8:81fbfd5ce6a030d6d56b1b8b54298d3a', 'createTable tableName=DATABASECHANGELOG; createTable tableName=DATABASECHANGELOGLOCK', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1743669069736-1', 'Ricky', 'db/changelog/migration/03-01-sample-entity.xml', '2025-09-26 17:25:57.052239', 2, 'EXECUTED', '8:bb1be824ea1c7c3ffaf27ec382e82dc1', 'createTable tableName=sample_entity', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-1', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.092402', 3, 'EXECUTED', '8:5d390ed34917315ec394de546a5727ae', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-2', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.126853', 4, 'EXECUTED', '8:d32d7992a7c8a25e894fe3d159a1bd9d', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-3', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.16563', 5, 'EXECUTED', '8:ed99eeb513653dd36dde5bdc4a13ee13', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-4', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.187012', 6, 'EXECUTED', '8:0545a3f7b541a51415904d59aaa28bc9', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-5', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.202417', 7, 'EXECUTED', '8:98c9f7548e1d7ecaf38b01a832fcdd21', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-6', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.224835', 8, 'EXECUTED', '8:44546704e8122aaf8c747cebea1ba46c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-7', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.272204', 9, 'EXECUTED', '8:db4c895afcf10f5138259492188850fd', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-8', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.297093', 10, 'EXECUTED', '8:e8847726fd6f612636a123e0bcdded4d', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-9', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.314452', 11, 'EXECUTED', '8:6e46462e4fda3b277014df9c02406907', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-10', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.352911', 12, 'EXECUTED', '8:d124f3db73eaa204d1223f49afd4d1c0', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-11', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.373951', 13, 'EXECUTED', '8:f749105a2b6bc42c0057759b0ea825a2', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-12', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.400849', 14, 'EXECUTED', '8:5a354606e06e38f7d256c45dae73b47c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-13', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.439724', 15, 'EXECUTED', '8:52590d2e4c067c733d4d40467115f44f', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-14', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.470853', 16, 'EXECUTED', '8:73e2881942de0744a2d37310d2aed28c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-15', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.493946', 17, 'EXECUTED', '8:4241edecaa848291183aec6ab59fb03f', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745504870859-16', 'riccardo', 'db/changelog/migration/24-01-UtenteDipendenteOrganizzatoreECollegate.sql', '2025-09-26 17:25:57.509858', 18, 'EXECUTED', '8:8b8f21be0e2fe53ef5e981f182537a21', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745505709426-1', 'riccardo', 'db/changelog/migration/24-04-AggiuntaNoleggioEDescrizioneInRecensione.sql', '2025-09-26 17:25:57.536587', 19, 'EXECUTED', '8:4b45c7a365e5ac855a5415ea38ff5d55', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745505709426-2', 'riccardo', 'db/changelog/migration/24-04-AggiuntaNoleggioEDescrizioneInRecensione.sql', '2025-09-26 17:25:57.558035', 20, 'EXECUTED', '8:11cbb3e4e44df27eeacb7ad0974644e8', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745505709426-3', 'riccardo', 'db/changelog/migration/24-04-AggiuntaNoleggioEDescrizioneInRecensione.sql', '2025-09-26 17:25:57.581678', 21, 'EXECUTED', '8:ea10a5457f06b2f3b4efb1aa2f1ead98', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745510414198-1', 'riccardo', 'db/changelog/migration/24-05-AggiuntaDettagliNoleggio.sql', '2025-09-26 17:25:57.603687', 22, 'EXECUTED', '8:5e71234d9b42ca0442d626c64c85017d', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745510414198-2', 'riccardo', 'db/changelog/migration/24-05-AggiuntaDettagliNoleggio.sql', '2025-09-26 17:25:57.622136', 23, 'EXECUTED', '8:4782abd1ac9ce2e2f6b5efa81e873a69', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745510414198-3', 'riccardo', 'db/changelog/migration/24-05-AggiuntaDettagliNoleggio.sql', '2025-09-26 17:25:57.642625', 24, 'EXECUTED', '8:a9b7012ae1d4f3d0f2c899bd049f5842', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745510414198-4', 'riccardo', 'db/changelog/migration/24-05-AggiuntaDettagliNoleggio.sql', '2025-09-26 17:25:57.661268', 25, 'EXECUTED', '8:edaa273953b9aad5633e9d368c0f5dea', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745510414198-5', 'riccardo', 'db/changelog/migration/24-05-AggiuntaDettagliNoleggio.sql', '2025-09-26 17:25:57.677853', 26, 'EXECUTED', '8:55387bb93f47c715557fb66faf9dab18', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745595139069-1', 'Miriam', 'db/changelog/migration/25-01-AddCampiTabellaFiliale.sql', '2025-09-26 17:25:57.71117', 27, 'EXECUTED', '8:ea5d9b375fa886c94e81d309ee71df8c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745596789630-1', 'Miriam', 'db/changelog/migration/25-01-AddCampiTabellaProdotto.sql', '2025-09-26 17:25:57.750559', 28, 'EXECUTED', '8:12b82da1fd2425cfa2878873b789fcf3', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745596789630-8', 'Miriam', 'db/changelog/migration/25-01-AddCampiTabellaProdotto.sql', '2025-09-26 17:25:57.765313', 29, 'EXECUTED', '8:dc4a0bf72c51cce65ef9f65e31af9309', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745593721231-1', 'Miriam', 'db/changelog/migration/25-01-AddTabellaCarrello.sql', '2025-09-26 17:25:57.79753', 30, 'EXECUTED', '8:c41aa8a92b65508e3e6a72a3f5e9e4ab', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745593721231-2', 'Miriam', 'db/changelog/migration/25-01-AddTabellaCarrello.sql', '2025-09-26 17:25:57.820125', 31, 'EXECUTED', '8:4401e19309f3b3cc82fc788b2a982848', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745593721231-3', 'Miriam', 'db/changelog/migration/25-01-AddTabellaCarrello.sql', '2025-09-26 17:25:57.843527', 32, 'EXECUTED', '8:502c7864a81c76db5bba4cd572ee23a2', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-6', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:57.861043', 33, 'EXECUTED', '8:69ec5acdd0cdf6fd3b253c3c75284664', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-1', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:57.896344', 34, 'EXECUTED', '8:141d0d3dba1212497a16aa5761c6946f', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-2', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:57.924012', 35, 'EXECUTED', '8:9aaddc9cc57f52628de85aeb9a5bf14b', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-3', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:57.941374', 36, 'EXECUTED', '8:3c3ced57f885061edaed41cb0672c081', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-4', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:57.970051', 37, 'EXECUTED', '8:b79a89eb76fdcde3cb9f6ee64f009391', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-5', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:57.996317', 38, 'EXECUTED', '8:aa49a4c3f78692baa5f48cf5621a8241', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-7', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:58.037267', 39, 'EXECUTED', '8:d9ce895439360ad7d6e8412ffc157866', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588194331-8', 'Miriam', 'db/changelog/migration/25-01-AddTabellaIndirizzoUtente.sql', '2025-09-26 17:25:58.060137', 40, 'EXECUTED', '8:90d6835a9037c69e11fbcf27d72d883d', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745592157413-1', 'Miriam', 'db/changelog/migration/25-01-AddTabellaOrdine.sql', '2025-09-26 17:25:58.085392', 41, 'EXECUTED', '8:b64e259b86129a0a3c744028cab58e3d', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588953366-4', 'Miriam', 'db/changelog/migration/25-01-Cambioid-utente.sql', '2025-09-26 17:25:58.098454', 42, 'EXECUTED', '8:fc759138902893f300b37f6a45fb8a16', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588953366-1', 'Miriam', 'db/changelog/migration/25-01-Cambioid-utente.sql', '2025-09-26 17:25:58.113043', 43, 'EXECUTED', '8:c5dcf4f8ffb4f5bf57b9375cd35478a7', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588953366-2', 'Miriam', 'db/changelog/migration/25-01-Cambioid-utente.sql', '2025-09-26 17:25:58.130752', 44, 'EXECUTED', '8:11ffddda32dfdbc8242427cdda7a1108', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588953366-3', 'Miriam', 'db/changelog/migration/25-01-Cambioid-utente.sql', '2025-09-26 17:25:58.143493', 45, 'EXECUTED', '8:bb9535f28a91dcac02dfa42278396962', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745588953366-5', 'Miriam', 'db/changelog/migration/25-01-Cambioid-utente.sql', '2025-09-26 17:25:58.153936', 46, 'EXECUTED', '8:37ea54c6421013326b75fd7aa0266ee8', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745686101959-1', 'Miriam', 'db/changelog/migration/26-01-AggiuntaDatiStatici.sql', '2025-09-26 17:25:58.179491', 47, 'EXECUTED', '8:870e04de64902d1f1d91becd2e3efb4a', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745696985403-1', 'Miriam', 'db/changelog/migration/26-01-AggiuntaMetodoPagamento.sql', '2025-09-26 17:25:58.217345', 48, 'EXECUTED', '8:e19823cf787edc5b8d135e3c9aaa38fd', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745696985403-2', 'Miriam', 'db/changelog/migration/26-01-AggiuntaMetodoPagamento.sql', '2025-09-26 17:25:58.239505', 49, 'EXECUTED', '8:ed34e611df23bb970af20a32e5ac5e5b', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745685380623-1', 'Miriam', 'db/changelog/migration/26-01-AggiuntaVantaggio.sql', '2025-09-26 17:25:58.26091', 50, 'EXECUTED', '8:bbc8508e9c000e19132fe75aabe7db0c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745683657389-1', 'riccardo', 'db/changelog/migration/26-01-ToltoIdIndirizzoDaUtente.sql', '2025-09-26 17:25:58.271511', 51, 'EXECUTED', '8:9110434e398d1e1da19890bd4377906a', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745683657389-2', 'riccardo', 'db/changelog/migration/26-01-ToltoIdIndirizzoDaUtente.sql', '2025-09-26 17:25:58.289068', 52, 'EXECUTED', '8:ced2f63920dffa73dcebf694e76596d0', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745742120413-1', 'riccardo', 'db/changelog/migration/27-01-AggiuntoStockEDettagliOrdine.sql', '2025-09-26 17:25:58.31521', 53, 'EXECUTED', '8:05f627464a16fba16e83313d8817c895', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745742120413-2', 'riccardo', 'db/changelog/migration/27-01-AggiuntoStockEDettagliOrdine.sql', '2025-09-26 17:25:58.336446', 54, 'EXECUTED', '8:8d4a95a8e646e76fd2ca303ba31e9002', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745742120413-3', 'riccardo', 'db/changelog/migration/27-01-AggiuntoStockEDettagliOrdine.sql', '2025-09-26 17:25:58.354354', 55, 'EXECUTED', '8:2b68695ba61036f76b03da1af4420b63', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745742120413-4', 'riccardo', 'db/changelog/migration/27-01-AggiuntoStockEDettagliOrdine.sql', '2025-09-26 17:25:58.374984', 56, 'EXECUTED', '8:461d350b03509d31696d6fc33fd2b395', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745742120413-5', 'riccardo', 'db/changelog/migration/27-01-AggiuntoStockEDettagliOrdine.sql', '2025-09-26 17:25:58.389439', 57, 'EXECUTED', '8:7cd065b9e4a7fb0958d5d14e0a4f24c5', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745742120413-6', 'riccardo', 'db/changelog/migration/27-01-AggiuntoStockEDettagliOrdine.sql', '2025-09-26 17:25:58.429561', 58, 'EXECUTED', '8:aec76303de95143c21bccb22cb9631e7', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745742120413-7', 'riccardo', 'db/changelog/migration/27-01-AggiuntoStockEDettagliOrdine.sql', '2025-09-26 17:25:58.446448', 59, 'EXECUTED', '8:4492f14f533f073fdcaa20e0206ac445', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745855998117-4', 'Miriam', 'db/changelog/migration/28-01-AggChiaveEsternaOrdineECorrettoErroreStock.sql', '2025-09-26 17:25:58.462464', 60, 'EXECUTED', '8:1f0a174aab449e1eec5b5b3920dcfcdb', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745855998117-1', 'Miriam', 'db/changelog/migration/28-01-AggChiaveEsternaOrdineECorrettoErroreStock.sql', '2025-09-26 17:25:58.472352', 61, 'EXECUTED', '8:2e669fe3210b383ebeedf01a74204b61', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745855998117-2', 'Miriam', 'db/changelog/migration/28-01-AggChiaveEsternaOrdineECorrettoErroreStock.sql', '2025-09-26 17:25:58.490612', 62, 'EXECUTED', '8:0f176fc6fadb5bba6a68a09cbb0301f2', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1745855998117-3', 'Miriam', 'db/changelog/migration/28-01-AggChiaveEsternaOrdineECorrettoErroreStock.sql', '2025-09-26 17:25:58.506713', 63, 'EXECUTED', '8:bad19ef958cde8b771a25adec1972bdd', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755007724344-1', 'riccardo', 'db/changelog/migration/29-01-RuoliPermessi.sql', '2025-09-26 17:25:58.543996', 64, 'EXECUTED', '8:7f195b209ba047cca38afa3971a88d97', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755007724344-2', 'riccardo', 'db/changelog/migration/29-01-RuoliPermessi.sql', '2025-09-26 17:25:58.589801', 65, 'EXECUTED', '8:dcf83f5b2f773b0bf3a163e2e7d11efd', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755007724344-3', 'riccardo', 'db/changelog/migration/29-01-RuoliPermessi.sql', '2025-09-26 17:25:58.615678', 66, 'EXECUTED', '8:84babe0e5f3037ec4a050fbee409b306', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755007724344-4', 'riccardo', 'db/changelog/migration/29-01-RuoliPermessi.sql', '2025-09-26 17:25:58.636123', 67, 'EXECUTED', '8:9619f2911372fad9b02c1eea6fd00cdc', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755007724344-5', 'riccardo', 'db/changelog/migration/29-01-RuoliPermessi.sql', '2025-09-26 17:25:58.661303', 68, 'EXECUTED', '8:39c8e4fdc0fcf00a818448e94fcc5f75', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755007724344-6', 'riccardo', 'db/changelog/migration/29-01-RuoliPermessi.sql', '2025-09-26 17:25:58.687179', 69, 'EXECUTED', '8:04511223c4b808031eca9148be54ceca', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755007724344-7', 'riccardo', 'db/changelog/migration/29-01-RuoliPermessi.sql', '2025-09-26 17:25:58.718089', 70, 'EXECUTED', '8:b08f62054ed20be9252dd54c10497d87', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('insert-initial-security-data-1', 'riccardo', 'db/changelog/migration/29-02-InsertPermessiBase.sql', '2025-09-26 17:25:58.732626', 71, 'EXECUTED', '8:ab99cfd437e4b7ad91190ddcaa793181', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('insert-initial-security-data-2', 'riccardo', 'db/changelog/migration/29-02-InsertPermessiBase.sql', '2025-09-26 17:25:58.780494', 72, 'EXECUTED', '8:5233ec8718249aaa0fd521951c151cb7', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('insert-initial-security-data-3', 'riccardo', 'db/changelog/migration/29-02-InsertPermessiBase.sql', '2025-09-26 17:25:58.79583', 73, 'EXECUTED', '8:6b8a872b7490b858a0191b9b9a35dd07', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755703264836-11', 'riccardo', 'db/changelog/migration/31-01-cambioRelazioneTernariaProdottoUtenteOrdine.sql', '2025-09-26 17:25:58.813523', 74, 'EXECUTED', '8:a8f9d4f56921d116ad33b848933de962', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755703264836-8', 'riccardo', 'db/changelog/migration/31-01-cambioRelazioneTernariaProdottoUtenteOrdine.sql', '2025-09-26 17:25:58.837319', 75, 'EXECUTED', '8:52d31e6acbd4b1b7b3919d5b09cb2b6b', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755703264836-9', 'riccardo', 'db/changelog/migration/31-01-cambioRelazioneTernariaProdottoUtenteOrdine.sql', '2025-09-26 17:25:58.849668', 76, 'EXECUTED', '8:f966238b9c3c024e315ef9611adcac63', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755703264836-10', 'riccardo', 'db/changelog/migration/31-01-cambioRelazioneTernariaProdottoUtenteOrdine.sql', '2025-09-26 17:25:58.865103', 77, 'EXECUTED', '8:62a0c174e3b4baefc67640f9d97e0cb0', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755703264836-12', 'riccardo', 'db/changelog/migration/31-01-cambioRelazioneTernariaProdottoUtenteOrdine.sql', '2025-09-26 17:25:58.876816', 78, 'EXECUTED', '8:23547c37d21c033aa76e96d96daab2c4', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755711451727-1', 'riccardo', 'db/changelog/migration/31-02-changelog-AggiuntaDataConsegnaStimata_Ordine.sql', '2025-09-26 17:25:58.886537', 79, 'EXECUTED', '8:a83e9db6dd94dd5317d54b5ba08b8594', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755952803402-1', 'riccardo', 'db/changelog/migration/32-01-addReviewTitleColumnInReview.sql', '2025-09-26 17:25:58.902407', 80, 'EXECUTED', '8:35edb27f62e06aad0a410767609a512a', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1755952803402-2', 'riccardo', 'db/changelog/migration/32-01-addReviewTitleColumnInReview.sql', '2025-09-26 17:25:58.9625', 81, 'EXECUTED', '8:cb47b2b05d2b2b17ee65c68e21c1dc4c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756027304453-1', 'riccardo', 'db/changelog/migration/32-03-AddTablesCategoria.sql', '2025-09-26 17:25:59.016767', 82, 'EXECUTED', '8:f8a3fe35a8604a5b63e4271afbc086c9', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756027304453-2', 'riccardo', 'db/changelog/migration/32-03-AddTablesCategoria.sql', '2025-09-26 17:25:59.051511', 83, 'EXECUTED', '8:43a2784cc51978f2a5a28c8380e71560', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756027304453-3', 'riccardo', 'db/changelog/migration/32-03-AddTablesCategoria.sql', '2025-09-26 17:25:59.08157', 84, 'EXECUTED', '8:5f49bc3c7c82326ee342692e77d1e651', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756027304453-4', 'riccardo', 'db/changelog/migration/32-03-AddTablesCategoria.sql', '2025-09-26 17:25:59.154554', 85, 'EXECUTED', '8:50001221f91bda52698239ea5364c5b0', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756027304453-5', 'riccardo', 'db/changelog/migration/32-03-AddTablesCategoria.sql', '2025-09-26 17:25:59.178189', 86, 'EXECUTED', '8:10f0dcf9f63b894402e604ea17e5695e', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756027304453-6', 'riccardo', 'db/changelog/migration/32-03-AddTablesCategoria.sql', '2025-09-26 17:25:59.197131', 87, 'EXECUTED', '8:fae4d8c3cbdccbb2fd72f8447b82bc89', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756050658058-1', 'riccardo', 'db/changelog/migration/32-04-ChangeNomeToNameInCategoria.sql', '2025-09-26 17:25:59.210692', 88, 'EXECUTED', '8:01982562b5f48232c557ca16f80dda24', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756050658058-2', 'riccardo', 'db/changelog/migration/32-04-ChangeNomeToNameInCategoria.sql', '2025-09-26 17:25:59.245597', 89, 'EXECUTED', '8:3c26fb46f6cb101e93312b496f86d9d1', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756050658058-3', 'riccardo', 'db/changelog/migration/32-04-ChangeNomeToNameInCategoria.sql', '2025-09-26 17:25:59.258979', 90, 'EXECUTED', '8:a490fcb3dc38269dee8142e6af5eb288', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756210658895-1', 'riccardo', 'db/changelog/migration/32-05-changeIsDefaultToIsMainINIndirizzoUtente.sql', '2025-09-26 17:25:59.276342', 91, 'EXECUTED', '8:cf0bb20c02747ef6d09b6ba982b489b7', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756210658895-2', 'riccardo', 'db/changelog/migration/32-05-changeIsDefaultToIsMainINIndirizzoUtente.sql', '2025-09-26 17:25:59.30693', 92, 'EXECUTED', '8:08c5ba524aa4e9c05168f822c9e58f70', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756652157436-1', 'riccardo', 'db/changelog/migration/32-06-RenameIs_defaultToIs_main_Metodo_Pagamento.sql', '2025-09-26 17:25:59.332883', 93, 'EXECUTED', '8:c2208edf131c9bd15a01d0db4903ba27', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756652157436-2', 'riccardo', 'db/changelog/migration/32-06-RenameIs_defaultToIs_main_Metodo_Pagamento.sql', '2025-09-26 17:25:59.353734', 94, 'EXECUTED', '8:5c956f7be938c4db3df292c057bf589e', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756210658895-1', 'riccardo', 'db/changelog/migration/32-07-setCheckForBenefitInUserTable.sql', '2025-09-26 17:25:59.384593', 95, 'EXECUTED', '8:58685bb8afe78d090ac847493355fd29', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756653684894-1', 'riccardo', 'db/changelog/migration/32-08-setBenefitToNullableInUserTable.sql', '2025-09-26 17:25:59.404893', 96, 'EXECUTED', '8:acadee6d3dd4599dcd9540e610cb74b5', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756719899902-5', 'riccardo', 'db/changelog/migration/32-09-ChangeDBStructureForEventManager.sql', '2025-09-26 17:25:59.435828', 97, 'EXECUTED', '8:39aa578d098f7a55b5d487e846544540', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756719899902-6', 'riccardo', 'db/changelog/migration/32-09-ChangeDBStructureForEventManager.sql', '2025-09-26 17:25:59.456053', 98, 'EXECUTED', '8:22b4fb1cba457ac2cc68543323eaf987', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756719899902-1', 'riccardo', 'db/changelog/migration/32-09-ChangeDBStructureForEventManager.sql', '2025-09-26 17:25:59.477186', 99, 'EXECUTED', '8:74cbe732c07d48ce14f51f5db547f40e', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756719899902-2', 'riccardo', 'db/changelog/migration/32-09-ChangeDBStructureForEventManager.sql', '2025-09-26 17:25:59.53441', 100, 'EXECUTED', '8:9624e4c23e8975e3579527467a36453c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756719899902-4', 'riccardo', 'db/changelog/migration/32-09-ChangeDBStructureForEventManager.sql', '2025-09-26 17:25:59.572832', 101, 'EXECUTED', '8:15ed899a3b50ed807cb5e243b98bb8ad', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756719899902-9', 'riccardo', 'db/changelog/migration/32-09-ChangeDBStructureForEventManager.sql', '2025-09-26 17:25:59.601292', 102, 'EXECUTED', '8:10a39d769072f20f862fb245e3540d80', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756719899902-8', 'riccardo', 'db/changelog/migration/32-09-ChangeDBStructureForEventManager.sql', '2025-09-26 17:25:59.659518', 103, 'EXECUTED', '8:fbff6d0078fafe4016700bc51e71646c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1-enable-uuid-extension', 'riccardo', 'db/changelog/migration/32-09-InsertNewColumnPrimaryKeyID.sql', '2025-09-26 17:25:59.745419', 104, 'EXECUTED', '8:47d15b22c8013ffae9ff720a6100dc58', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('2-drop-old-pk', 'riccardo', 'db/changelog/migration/32-09-InsertNewColumnPrimaryKeyID.sql', '2025-09-26 17:25:59.767853', 105, 'EXECUTED', '8:7e7ce604dee46265e9423bb07221801e', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('3-add-uuid-column', 'riccardo', 'db/changelog/migration/32-09-InsertNewColumnPrimaryKeyID.sql', '2025-09-26 17:25:59.787079', 106, 'EXECUTED', '8:481f3514622d4c19bbc3b3d186c530fc', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('4-populate-uuid-for-existing-rows', 'riccardo', 'db/changelog/migration/32-09-InsertNewColumnPrimaryKeyID.sql', '2025-09-26 17:25:59.813956', 107, 'EXECUTED', '8:a5f0a0ef0a3dc9c9ba1277b51c50dfff', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('5-add-not-null-and-pk-constraint', 'riccardo', 'db/changelog/migration/32-09-InsertNewColumnPrimaryKeyID.sql', '2025-09-26 17:25:59.834263', 108, 'EXECUTED', '8:0a3c6cb411729f64f1cc5df70ecdd1c3', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756730264688-1', 'riccardo', 'db/changelog/migration/32-10-AddDataScadenzaIntoUtenteRuolo.sql', '2025-09-26 17:25:59.84416', 109, 'EXECUTED', '8:334b1512bed329dfe0f7114f22e4a940', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756730264688-1', 'riccardo', 'db/changelog/migration/32-11-AddDurataRinnovoInDatiStatici.sql', '2025-09-26 17:25:59.865926', 110, 'EXECUTED', '8:46cee5707b79e1ebdb27e0270dccbf15', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756730264688-1', 'riccardo', 'db/changelog/migration/32-11-AddVantaggi.sql', '2025-09-26 17:25:59.891579', 111, 'EXECUTED', '8:f9a3cf9fd6a5a498dee840894167adb9', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1757879562999-1', 'Miriam', 'db/changelog/migration/33-01-AddFKIndirizzoInNoleggio.sql', '2025-09-26 17:25:59.93232', 112, 'EXECUTED', '8:ed4e74419f357cf1db7b8afbdca64b80', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1757879562999-2', 'Miriam', 'db/changelog/migration/33-01-AddFKIndirizzoInNoleggio.sql', '2025-09-26 17:25:59.958', 113, 'EXECUTED', '8:77ae30e1215f59310866badc2fbabb5e', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1756730264688-1', 'riccardo', 'db/changelog/migration/33-02-AddInsertInDatiStatici.sql', '2025-09-26 17:25:59.969213', 114, 'EXECUTED', '8:dbef3cc18173583695ba44ee1706c5ec', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-1', 'riccardo', 'db/changelog/migration/40-removeSampleEntity.sql', '2025-09-26 17:25:59.988552', 115, 'EXECUTED', '8:30c12df6b58cf303399cf01c5223e4bd', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-2', 'riccardo', 'db/changelog/migration/41-StaticIdForVantaggi.sql', '2025-09-26 17:26:00.01914', 116, 'EXECUTED', '8:f0ff9f6ec9280e4fbd79c97a08c5c11a', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-3', 'riccardo', 'db/changelog/migration/42-InsertProdotto.sql', '2025-09-26 17:26:00.053444', 117, 'EXECUTED', '8:4e7eef04b87afd3aa3d853eb4c09fd7c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-4', 'riccardo', 'db/changelog/migration/43-InsertFiliale.sql', '2025-09-26 17:26:00.076261', 118, 'EXECUTED', '8:b0a4c859fb7b51d14f3f5ecbf4a85c78', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-5', 'riccardo', 'db/changelog/migration/44-InsertCategoria.sql', '2025-09-26 17:26:00.128303', 119, 'EXECUTED', '8:0cc5756921179ecf3803903f523e4a85', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-6', 'riccardo', 'db/changelog/migration/45-InsertProdottoCategoria.sql', '2025-09-26 17:26:00.221302', 120, 'EXECUTED', '8:9a953c15c606b7579662911c8c92905a', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-7', 'riccardo', 'db/changelog/migration/46-InsertStock.sql', '2025-09-26 17:26:00.301243', 121, 'EXECUTED', '8:d6db94f3bcb66abe3a7efb92b14c0300', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-8', 'riccardo', 'db/changelog/migration/47-InsertUtente.sql', '2025-09-26 17:26:00.358787', 122, 'EXECUTED', '8:24d9a414d0669eb14250cc11956b2d39', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-9', 'riccardo', 'db/changelog/migration/48-InsertDipendente.sql', '2025-09-26 17:26:00.372872', 123, 'EXECUTED', '8:509f5499233f7ab60975257ba553c500', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-10', 'riccardo', 'db/changelog/migration/49-InsertMetodoPagamento.sql', '2025-09-26 17:26:00.386726', 124, 'EXECUTED', '8:73a9b67432f5ad202849d74a57238b7a', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-11', 'riccardo', 'db/changelog/migration/50-InsertIndirizzoUtente.sql', '2025-09-26 17:26:00.399128', 125, 'EXECUTED', '8:6b541192ee77be8c3047d6d8c56321fe', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-12', 'riccardo', 'db/changelog/migration/51-InsertIUtenteRuolo.sql', '2025-09-26 17:26:00.419253', 126, 'EXECUTED', '8:081dcd3aaee0f03c767d8e16945f169c', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-13', 'riccardo', 'db/changelog/migration/52-InsertIOrdine.sql', '2025-09-26 17:26:00.447741', 127, 'EXECUTED', '8:8e919081ab1ba553bcae17ca51cbaf7e', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-14', 'riccardo', 'db/changelog/migration/53-InsertINoleggio.sql', '2025-09-26 17:26:00.47614', 128, 'EXECUTED', '8:48854b419c9187eaafa992342193ae00', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-15', 'riccardo', 'db/changelog/migration/54-InsertIDettagliOrdine.sql', '2025-09-26 17:26:00.495223', 129, 'EXECUTED', '8:2132e8235e1c74fb3f6a0ed12e02bb24', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+INSERT INTO public.databasechangelog VALUES ('1758809323842-16', 'riccardo', 'db/changelog/migration/55-InsertDettagliNoleggio.sql', '2025-09-26 17:26:00.527127', 130, 'EXECUTED', '8:f5f169308e15a0f6a1fed6ab82f18e7e', 'sql', '', NULL, '4.15.0', NULL, NULL, '8907556857');
+
+
+--
+-- TOC entry 3558 (class 0 OID 16385)
+-- Dependencies: 218
+-- Data for Name: databasechangeloglock; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.databasechangeloglock VALUES (1, false, NULL, NULL);
+
+
+--
+-- TOC entry 3571 (class 0 OID 16554)
+-- Dependencies: 231
+-- Data for Name: dati_statici; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.dati_statici VALUES ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'DURATA_RINNOVO_RUOLO', 6);
+INSERT INTO public.dati_statici VALUES ('f47ac10b-58cc-4372-a567-0e02b2c3d474', 'COSTO_SPEDIZIONE', 15);
+INSERT INTO public.dati_statici VALUES ('f47ac10b-58cc-4372-a567-0e02b2c3d473', 'COSTO_MINIMO_SPEDIZIONE_GRATUITA', 150);
+
+
+--
+-- TOC entry 3567 (class 0 OID 16486)
+-- Dependencies: 227
+-- Data for Name: dettagli_noleggio; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.dettagli_noleggio VALUES (2, 'c625e64e-14c0-49d6-8984-2a311aa735fa', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.dettagli_noleggio VALUES (4, '1f72a966-2574-4b37-bdde-4ad5fe7119db', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.dettagli_noleggio VALUES (1, 'ca718d63-8681-4b6c-b5e3-019fb19c8554', '34c09f57-fdb7-45e2-bfb4-27638165f7a0');
+INSERT INTO public.dettagli_noleggio VALUES (1, '5df13b03-7db8-4ee0-bdbc-d68ebb9b5ac3', '6b8a891d-7bb7-47b5-aede-2e7e70fae010');
+
+
+--
+-- TOC entry 3573 (class 0 OID 16571)
+-- Dependencies: 233
+-- Data for Name: dettagli_ordine; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.dettagli_ordine VALUES (2, '1bde045d-7659-408f-8773-d2ee2544a89b', 'e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a');
+INSERT INTO public.dettagli_ordine VALUES (1, '1bde045d-7659-408f-8773-d2ee2544a89b', 'f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d');
+INSERT INTO public.dettagli_ordine VALUES (2, 'e5774dcf-addc-4abb-9aea-f24143b0390e', 'e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a');
+INSERT INTO public.dettagli_ordine VALUES (1, 'e5774dcf-addc-4abb-9aea-f24143b0390e', 'f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d');
+INSERT INTO public.dettagli_ordine VALUES (2, '2aea89ed-2647-46d2-8d2a-a7bc233fe121', 'f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d');
+INSERT INTO public.dettagli_ordine VALUES (2, '2aea89ed-2647-46d2-8d2a-a7bc233fe121', 'e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a');
+INSERT INTO public.dettagli_ordine VALUES (2, '2aea89ed-2647-46d2-8d2a-a7bc233fe121', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.dettagli_ordine VALUES (1, '32d9c4db-81bb-4b0b-8569-54c47fd3d7c6', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.dettagli_ordine VALUES (1, '52b8869f-1d0e-4d9c-8db1-6322b91270be', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+
+
+--
+-- TOC entry 3560 (class 0 OID 16400)
+-- Dependencies: 220
+-- Data for Name: dipendente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.dipendente VALUES ('c945016e-fd15-480b-acc1-4ac71c8ffaec', 40000, '2025-09-30', '2024-05-25', 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5');
+
+
+--
+-- TOC entry 3561 (class 0 OID 16405)
+-- Dependencies: 221
+-- Data for Name: filiale; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.filiale VALUES ('c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'online@soundsphere.it', '', 'OnlineStore', '11223344556');
+INSERT INTO public.filiale VALUES ('00463066-b672-49b6-b9e2-7032dd975c74', 'roma@soundsphere.it', 'Via del Corso, Roma, 00186, RM, Italia', 'Roma', '3391122334');
+INSERT INTO public.filiale VALUES ('ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'verona@soundsphere.it', 'Via Mazzini, Verona, 37121, VR, Italia', 'Verona', '3391523748');
+
+
+--
+-- TOC entry 3569 (class 0 OID 16527)
+-- Dependencies: 229
+-- Data for Name: indirizzo_utente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.indirizzo_utente VALUES ('a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b', 'Oberdan', '4', '37045', 'Legnago', 'VR', 'Italia', 'SPEDIZIONE', 'e2bd0a46-f13e-4b23-8119-9755b1089e13', true);
+
+
+--
+-- TOC entry 3572 (class 0 OID 16559)
+-- Dependencies: 232
+-- Data for Name: metodo_pagamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.metodo_pagamento VALUES ('7e5f9c1a-2b3d-4e8f-9a0b-1c2d3e4f5a6b', 'Riccardo Segala', '1111-2222-3333-4444', '123', '2050-10-10', NULL, 'CARTA_DI_CREDITO', 'e2bd0a46-f13e-4b23-8119-9755b1089e13', true);
+
+
+--
+-- TOC entry 3566 (class 0 OID 16479)
+-- Dependencies: 226
+-- Data for Name: noleggio; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.noleggio VALUES ('c625e64e-14c0-49d6-8984-2a311aa735fa', '2025-09-24', '2025-09-24', NULL, '2025-09-24', 600, 'e2bd0a46-f13e-4b23-8119-9755b1089e13', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b');
+INSERT INTO public.noleggio VALUES ('1f72a966-2574-4b37-bdde-4ad5fe7119db', '2025-09-24', '2025-09-30', NULL, '2025-09-24', 7200, 'e2bd0a46-f13e-4b23-8119-9755b1089e13', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b');
+INSERT INTO public.noleggio VALUES ('ca718d63-8681-4b6c-b5e3-019fb19c8554', '2025-09-25', '2025-09-25', NULL, '2025-09-25', 200, 'e2bd0a46-f13e-4b23-8119-9755b1089e13', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b');
+INSERT INTO public.noleggio VALUES ('5df13b03-7db8-4ee0-bdbc-d68ebb9b5ac3', '2025-09-25', '2025-09-25', NULL, '2025-09-25', 100, 'e2bd0a46-f13e-4b23-8119-9755b1089e13', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b');
+
+
+--
+-- TOC entry 3570 (class 0 OID 16544)
+-- Dependencies: 230
+-- Data for Name: ordine; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.ordine VALUES ('1bde045d-7659-408f-8773-d2ee2544a89b', '2025-08-20', NULL, false, 1690, 'IN_ATTESA', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b', 'e2bd0a46-f13e-4b23-8119-9755b1089e13', '2025-08-23');
+INSERT INTO public.ordine VALUES ('e5774dcf-addc-4abb-9aea-f24143b0390e', '2025-08-20', NULL, false, 1690, 'IN_ATTESA', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b', 'e2bd0a46-f13e-4b23-8119-9755b1089e13', '2025-08-23');
+INSERT INTO public.ordine VALUES ('2aea89ed-2647-46d2-8d2a-a7bc233fe121', '2025-09-15', NULL, false, 10425, 'IN_ATTESA', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b', 'e2bd0a46-f13e-4b23-8119-9755b1089e13', '2025-09-18');
+INSERT INTO public.ordine VALUES ('32d9c4db-81bb-4b0b-8569-54c47fd3d7c6', '2025-09-21', NULL, true, 4995, 'IN_ATTESA', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b', 'e2bd0a46-f13e-4b23-8119-9755b1089e13', '2025-09-24');
+INSERT INTO public.ordine VALUES ('52b8869f-1d0e-4d9c-8db1-6322b91270be', '2025-09-21', NULL, true, 4985, 'IN_ATTESA', 'a1b9e8f0-6c7d-4e5f-8a9b-0c1d2e3f4a5b', 'e2bd0a46-f13e-4b23-8119-9755b1089e13', '2025-09-24');
+
+
+--
+-- TOC entry 3575 (class 0 OID 16616)
+-- Dependencies: 235
+-- Data for Name: permesso; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.permesso VALUES ('5a4a9c6c-9477-4b71-92b0-8c20b8f416c1', 'ACQUISTO');
+INSERT INTO public.permesso VALUES ('6b2b7e5e-3c5b-4d9f-a0c5-5a7c73c880a2', 'NOLEGGIO');
+INSERT INTO public.permesso VALUES ('7c3c8d4d-2a6d-4c81-8b06-6b2d24b619e3', 'GESTIONE_STOCK');
+
+
+--
+-- TOC entry 3562 (class 0 OID 16420)
+-- Dependencies: 222
+-- Data for Name: prodotto; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.prodotto VALUES ('05b56dd7-a85c-435f-8926-390f0d9f95ea', 80, 'Batteria - set completo Serie Energy Studio Version...', false, 'Gretsch', 'Drums Energy Studio Black', '/images/e466c013-004a-453f-b07c-5ed647d405e9.png', 888);
+INSERT INTO public.prodotto VALUES ('8d5ecf64-ddc3-4bcf-8e1a-ccf0ada22d93', 85, 'Batteria - set completo Serie Roadshow...', false, 'Pearl', 'Roadshow 22" Plus Matte Red', '/images/7e120a99-4fc1-4370-8609-58b20046d777.png', 859);
+INSERT INTO public.prodotto VALUES ('918321e7-30ce-4274-bb68-c557c7c44f56', 60, 'Monitor attivo nearfield Progettato senza apertura posteriore...', false, 'Focal', 'Shape 65', '/images/c10c386f-49b1-46eb-b737-b508206fb4e7.png', 629);
+INSERT INTO public.prodotto VALUES ('e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a', 10, 'cambio di nome per test', true, 'Midas', 'MR 18', '/images/11a1bd1c-57e7-4acd-9beb-147e467ab404.png', 800);
+INSERT INTO public.prodotto VALUES ('a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d', 300, 'Mixer digitale a 48 in e 36 aux', true, 'Hallen & Heat', 'SQ7', '/images/053991c8-401d-4315-a275-750e4ff8c8af.png', 5000);
+INSERT INTO public.prodotto VALUES ('364098ca-bced-4466-b9d8-f76dc1e25ffc', 40, 'Interfaccia audio USB 2.0 Convertitore AD/DA a 24 bit/192 kHz...', false, 'RME', 'Fireface UCX II', '/images/68cea51c-15a2-4db4-8163-b880348c9ba0.png', 1299);
+INSERT INTO public.prodotto VALUES ('f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d', 10, 'Scheda audio focusrite 2i2', true, 'Focusrite', 'Scarlett 2i2', '/images/d3e9fcc6-a091-44cc-9303-b99b25d796b8.png', 140);
+INSERT INTO public.prodotto VALUES ('5721081f-8ca4-43f5-9036-c787d7fc024c', 15, 'Chitarra elettrica Corpo: pioppo Manico avvitato: acero...', false, 'Harley Benton', 'ST-20HH Active SBK', '/images/0dfea372-3669-4410-b630-37d1b9e23e0f.png', 149);
+INSERT INTO public.prodotto VALUES ('6b8a891d-7bb7-47b5-aede-2e7e70fae010', 100, 'Chitarra elettrica Collezione custom Inspired by Gibson 2025...', false, 'Epiphone', '1960 Les Paul Special DC TVY', '/images/e56fb200-ad46-48dd-93ad-45ce927d2bcc.png', 1050);
+INSERT INTO public.prodotto VALUES ('938ad12a-0f5f-463e-b71c-c2e27dfaead8', 8, 'Chitarra acustica Forma del corpo: Dreadnought con cutaway...', false, 'Harley Benton', 'D-120CE NT', '/images/0357e718-d394-4662-8f5b-5f5569ac28f1.png', 89);
+INSERT INTO public.prodotto VALUES ('a91410e3-64fa-4271-b4b8-4fcb98757a3d', 100, 'Chitarra acustica con pick-up Inspired by Gibson Custom...', false, 'Epiphone', 'Hummingbird Deluxe EC AB IBC', '/images/eafcafb4-816e-4516-9291-854115721e32.png', 1290);
+INSERT INTO public.prodotto VALUES ('c29b5724-5991-45f0-bffb-69ff70db7d99', 20, 'Chitarra classica con pick-up Forma del corpo: con cutaway...', false, 'Yamaha', 'NTX1NT NAT', '/images/2d384ca7-b3bd-4d01-af21-6c9f8984352e.png', 409);
+INSERT INTO public.prodotto VALUES ('34c09f57-fdb7-45e2-bfb4-27638165f7a0', 200, 'Chitarra classica con pick-up Forma del corpo: Grand Auditorium...', false, 'Taylor', '814ce-N', '/images/d2ddcb36-7a64-4f03-aff7-ab9076a2c7b3.png', 3599);
+INSERT INTO public.prodotto VALUES ('ec1673d2-3d31-4591-9bef-78ed6c265dc4', 87, 'Roland SPD-SX PRO Sampling Pad Pad di campionamento...', false, 'Roland', 'SPD-SX PRO Sampling Pad Bundle', '/images/ff218c18-bdc5-401f-ac5a-84c3abdcfd15.png', 879);
+INSERT INTO public.prodotto VALUES ('814e5967-5a70-467c-960e-f6ec708a3be3', 70, 'Set di batteria elettronica Con pelli mesh per un rebound naturale...', false, 'Alesis', 'Nitro Pro XL Drum Kit', '/images/6c9c83d1-3133-4800-97b5-2394e70aaa52.png', 729);
+INSERT INTO public.prodotto VALUES ('10d8ee06-15c1-4f73-aa28-29551d7cbed9', 200, 'Workstation digitale 76 tasti (FSX) con sensibilità al tocco...', false, 'Yamaha', 'Genos 2', '/images/ab22c934-fc8b-45ee-9fc9-7760df506ca2.png', 3990);
+INSERT INTO public.prodotto VALUES ('c39af9fe-4539-408c-8c41-be2d624301c2', 300, 'Performance Stage Piano 88 tasti pesati con aftertouch...', false, 'Clavia', 'Nord Stage 4 88', '/images/f86b9983-eaf6-42ad-8260-d5168e6e43cd.png', 4399);
+INSERT INTO public.prodotto VALUES ('8fe938b4-a829-45ed-9712-27458d5b0321', 400, 'Pianoforte a coda Il nuovo pianoforte a coda GC 1...', false, 'Yamaha', 'GC 1 M PE Grand Piano', '/images/ca881bb7-366f-4470-85e5-67150503479d.png', 19390);
+INSERT INTO public.prodotto VALUES ('e86d8627-1abb-48b3-834d-0c47b8535a51', 3000, 'Pianoforte a coda Strumento usato - meticolosamente revisionato...', false, 'Steinway & Sons', 'B-211', '/images/9028ad4b-2a12-4f4c-bb2c-057ee5bf8457.png', 57800);
+INSERT INTO public.prodotto VALUES ('d2077879-7ec3-4783-a793-350ea44a3845', 10, 'Monitor Nearfield attivo a 2 vie Altoparlanti: Woofer da 6,5"...', false, 'Yamaha', 'HS 7', '/images/7a1be234-5cb8-4561-ab0f-ba6c96b94b02.png', 229);
+INSERT INTO public.prodotto VALUES ('12f36cf6-d5ea-40aa-90bf-8d69d02eaa7f', 30, 'Microfono dinamico Figura polare: cardioide...', false, 'Shure', 'SM 7 B', '/images/b57d04e7-c148-4e65-91c2-8e05c08d1fd4.png', 389);
+INSERT INTO public.prodotto VALUES ('932b611f-f185-4287-86be-717f16510417', 100, 'Microfono a diaframma largo Design della capsula basato sul leggendario U 87...', false, 'Neumann', 'TLM 103', '/images/ad8eeab2-744d-4808-8c23-a0efc470b62a.png', 1033);
+INSERT INTO public.prodotto VALUES ('31b2b04a-b5c0-45b5-8546-c95049b54b26', 15, 'Cuffie da studio Chiuse Circumaurale Dinamico...', false, 'beyerdynamic', 'DT-770 Pro 80 Ohm', '/images/70d36d11-33fe-4b19-ad64-87fb898db375.png', 149);
+INSERT INTO public.prodotto VALUES ('3425c753-8978-476e-8ca7-71641565dd88', 20, 'Cuffie Dinamiche Aperte Circumaurali...', false, 'Sennheiser', 'HD 600', '/images/1820f603-ffd6-4d4e-9f25-7b10a65e5265.png', 319);
+INSERT INTO public.prodotto VALUES ('43e2cff0-4200-4702-b037-8faadad8b391', 15, 'Cuffie da studio Driver da 45 mm con sistema di magneti al neodimio...', false, 'Audio-Technica', 'ATH-M50X', '/images/01f04da6-199b-475b-9426-94c54e028956.png', 149);
+INSERT INTO public.prodotto VALUES ('497fe185-21d3-4a05-8bb6-c9e99e87b922', 70, 'Convertitore DA e amplificatore per cuffie di alta gamma...', false, 'RME', 'ADI-2 DAC FS', '/images/2d041c97-25e9-4c96-a6dc-31663b967bcf.png', 839);
+INSERT INTO public.prodotto VALUES ('b5afd89b-049a-4b90-b34f-9cc38ef6a146', 300, 'Interfaccia audio DigiLink a 34 canali per Pro Tools Ultimate...', false, 'Avid', 'Pro Tools MTRX Studio', '/images/64953191-c19e-477c-a833-2c6581fea720.png', 5333);
+INSERT INTO public.prodotto VALUES ('ab8c39df-18b5-4e5f-aeaa-c3fd881a7656', 300, 'Modular audio recording interface with Thunderbolt connection...', false, 'Apogee', 'Symphony I/O Mk2 16x16 SE TB', '/images/f1349cc0-8736-41b3-9e60-83993371e917.png', 6222);
+
+
+--
+-- TOC entry 3580 (class 0 OID 16672)
+-- Dependencies: 240
+-- Data for Name: prodotto_categoria; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.prodotto_categoria VALUES ('3587c8d3-ce82-49e3-abd8-68249b977576', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.prodotto_categoria VALUES ('927bbfff-1650-49e1-9f19-6a71e1199c2a', '364098ca-bced-4466-b9d8-f76dc1e25ffc');
+INSERT INTO public.prodotto_categoria VALUES ('927bbfff-1650-49e1-9f19-6a71e1199c2a', 'f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d');
+INSERT INTO public.prodotto_categoria VALUES ('d3f3cb68-48af-4896-a681-903d22dd0d86', '5721081f-8ca4-43f5-9036-c787d7fc024c');
+INSERT INTO public.prodotto_categoria VALUES ('d3f3cb68-48af-4896-a681-903d22dd0d86', '6b8a891d-7bb7-47b5-aede-2e7e70fae010');
+INSERT INTO public.prodotto_categoria VALUES ('e23e74ee-abf3-4ce0-b955-c81dc9b88f52', '938ad12a-0f5f-463e-b71c-c2e27dfaead8');
+INSERT INTO public.prodotto_categoria VALUES ('e23e74ee-abf3-4ce0-b955-c81dc9b88f52', 'a91410e3-64fa-4271-b4b8-4fcb98757a3d');
+INSERT INTO public.prodotto_categoria VALUES ('a5a56e70-c609-42f2-90ce-5d83c0b72c83', 'c29b5724-5991-45f0-bffb-69ff70db7d99');
+INSERT INTO public.prodotto_categoria VALUES ('a5a56e70-c609-42f2-90ce-5d83c0b72c83', '34c09f57-fdb7-45e2-bfb4-27638165f7a0');
+INSERT INTO public.prodotto_categoria VALUES ('927bfbc4-2f24-4ffc-ae4e-bbd7a8974145', '05b56dd7-a85c-435f-8926-390f0d9f95ea');
+INSERT INTO public.prodotto_categoria VALUES ('927bfbc4-2f24-4ffc-ae4e-bbd7a8974145', '8d5ecf64-ddc3-4bcf-8e1a-ccf0ada22d93');
+INSERT INTO public.prodotto_categoria VALUES ('2c74c3cb-2bc1-4ddd-b2d2-bef6d70f60a6', 'ec1673d2-3d31-4591-9bef-78ed6c265dc4');
+INSERT INTO public.prodotto_categoria VALUES ('2c74c3cb-2bc1-4ddd-b2d2-bef6d70f60a6', '814e5967-5a70-467c-960e-f6ec708a3be3');
+INSERT INTO public.prodotto_categoria VALUES ('0d88bbb9-0f8c-4821-8311-53a6cd3e38be', '10d8ee06-15c1-4f73-aa28-29551d7cbed9');
+INSERT INTO public.prodotto_categoria VALUES ('0d88bbb9-0f8c-4821-8311-53a6cd3e38be', 'c39af9fe-4539-408c-8c41-be2d624301c2');
+INSERT INTO public.prodotto_categoria VALUES ('c0fa0bc2-d935-4159-94d4-11cbe8b73dcb', '8fe938b4-a829-45ed-9712-27458d5b0321');
+INSERT INTO public.prodotto_categoria VALUES ('c0fa0bc2-d935-4159-94d4-11cbe8b73dcb', 'e86d8627-1abb-48b3-834d-0c47b8535a51');
+INSERT INTO public.prodotto_categoria VALUES ('3ff802c3-8ef8-4cb3-bbe0-c219de47943f', '918321e7-30ce-4274-bb68-c557c7c44f56');
+INSERT INTO public.prodotto_categoria VALUES ('3ff802c3-8ef8-4cb3-bbe0-c219de47943f', 'd2077879-7ec3-4783-a793-350ea44a3845');
+INSERT INTO public.prodotto_categoria VALUES ('3af261f7-32fb-44b2-8853-667f8625957b', '12f36cf6-d5ea-40aa-90bf-8d69d02eaa7f');
+INSERT INTO public.prodotto_categoria VALUES ('3af261f7-32fb-44b2-8853-667f8625957b', '932b611f-f185-4287-86be-717f16510417');
+INSERT INTO public.prodotto_categoria VALUES ('34cfde52-f006-40f6-b88c-92aeaf4fa1ec', '31b2b04a-b5c0-45b5-8546-c95049b54b26');
+INSERT INTO public.prodotto_categoria VALUES ('34cfde52-f006-40f6-b88c-92aeaf4fa1ec', '3425c753-8978-476e-8ca7-71641565dd88');
+INSERT INTO public.prodotto_categoria VALUES ('34cfde52-f006-40f6-b88c-92aeaf4fa1ec', '43e2cff0-4200-4702-b037-8faadad8b391');
+INSERT INTO public.prodotto_categoria VALUES ('9daf88e3-cb39-4c4a-86b1-c0c3ee068728', '497fe185-21d3-4a05-8bb6-c9e99e87b922');
+INSERT INTO public.prodotto_categoria VALUES ('9daf88e3-cb39-4c4a-86b1-c0c3ee068728', 'b5afd89b-049a-4b90-b34f-9cc38ef6a146');
+INSERT INTO public.prodotto_categoria VALUES ('9daf88e3-cb39-4c4a-86b1-c0c3ee068728', 'ab8c39df-18b5-4e5f-aeaa-c3fd881a7656');
+INSERT INTO public.prodotto_categoria VALUES ('3587c8d3-ce82-49e3-abd8-68249b977576', 'e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a');
+
+
+--
+-- TOC entry 3563 (class 0 OID 16425)
+-- Dependencies: 223
+-- Data for Name: recensione; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- TOC entry 3576 (class 0 OID 16621)
+-- Dependencies: 236
+-- Data for Name: ruolo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.ruolo VALUES ('1e99d7a2-1d54-46e3-8f0a-6e5a0f5d72f4', 'UTENTE');
+INSERT INTO public.ruolo VALUES ('8a1c0d4f-5b7c-48b8-b4b3-9e9d6d5f47c5', 'DIPENDENTE');
+INSERT INTO public.ruolo VALUES ('9c2b1e5d-7a6e-4f7f-a2c6-0d1c7f4e9a8b', 'ORGANIZZATORE_EVENTI');
+INSERT INTO public.ruolo VALUES ('a3f2b1a1-3d7e-4c8a-b5c9-1f2a3c4b5e6f', 'ADMIN');
+
+
+--
+-- TOC entry 3578 (class 0 OID 16631)
+-- Dependencies: 238
+-- Data for Name: ruolo_permesso; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.ruolo_permesso VALUES ('1e99d7a2-1d54-46e3-8f0a-6e5a0f5d72f4', '5a4a9c6c-9477-4b71-92b0-8c20b8f416c1');
+INSERT INTO public.ruolo_permesso VALUES ('8a1c0d4f-5b7c-48b8-b4b3-9e9d6d5f47c5', '7c3c8d4d-2a6d-4c81-8b06-6b2d24b619e3');
+INSERT INTO public.ruolo_permesso VALUES ('9c2b1e5d-7a6e-4f7f-a2c6-0d1c7f4e9a8b', '5a4a9c6c-9477-4b71-92b0-8c20b8f416c1');
+INSERT INTO public.ruolo_permesso VALUES ('9c2b1e5d-7a6e-4f7f-a2c6-0d1c7f4e9a8b', '6b2b7e5e-3c5b-4d9f-a0c5-5a7c73c880a2');
+INSERT INTO public.ruolo_permesso VALUES ('a3f2b1a1-3d7e-4c8a-b5c9-1f2a3c4b5e6f', '5a4a9c6c-9477-4b71-92b0-8c20b8f416c1');
+INSERT INTO public.ruolo_permesso VALUES ('a3f2b1a1-3d7e-4c8a-b5c9-1f2a3c4b5e6f', '6b2b7e5e-3c5b-4d9f-a0c5-5a7c73c880a2');
+INSERT INTO public.ruolo_permesso VALUES ('a3f2b1a1-3d7e-4c8a-b5c9-1f2a3c4b5e6f', '7c3c8d4d-2a6d-4c81-8b06-6b2d24b619e3');
+
+
+--
+-- TOC entry 3574 (class 0 OID 16576)
+-- Dependencies: 234
+-- Data for Name: stock; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'ab8c39df-18b5-4e5f-aeaa-c3fd881a7656');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'b5afd89b-049a-4b90-b34f-9cc38ef6a146');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '497fe185-21d3-4a05-8bb6-c9e99e87b922');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '43e2cff0-4200-4702-b037-8faadad8b391');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '3425c753-8978-476e-8ca7-71641565dd88');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '31b2b04a-b5c0-45b5-8546-c95049b54b26');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '932b611f-f185-4287-86be-717f16510417');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '12f36cf6-d5ea-40aa-90bf-8d69d02eaa7f');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'd2077879-7ec3-4783-a793-350ea44a3845');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'e86d8627-1abb-48b3-834d-0c47b8535a51');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '8fe938b4-a829-45ed-9712-27458d5b0321');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'c39af9fe-4539-408c-8c41-be2d624301c2');
+INSERT INTO public.stock VALUES (586, 120, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a');
+INSERT INTO public.stock VALUES (532, 328, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'ec1673d2-3d31-4591-9bef-78ed6c265dc4');
+INSERT INTO public.stock VALUES (680, 357, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '364098ca-bced-4466-b9d8-f76dc1e25ffc');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'ab8c39df-18b5-4e5f-aeaa-c3fd881a7656');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'b5afd89b-049a-4b90-b34f-9cc38ef6a146');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '497fe185-21d3-4a05-8bb6-c9e99e87b922');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '43e2cff0-4200-4702-b037-8faadad8b391');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '3425c753-8978-476e-8ca7-71641565dd88');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '31b2b04a-b5c0-45b5-8546-c95049b54b26');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '932b611f-f185-4287-86be-717f16510417');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '12f36cf6-d5ea-40aa-90bf-8d69d02eaa7f');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'd2077879-7ec3-4783-a793-350ea44a3845');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'e86d8627-1abb-48b3-834d-0c47b8535a51');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '8fe938b4-a829-45ed-9712-27458d5b0321');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'c39af9fe-4539-408c-8c41-be2d624301c2');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '10d8ee06-15c1-4f73-aa28-29551d7cbed9');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '814e5967-5a70-467c-960e-f6ec708a3be3');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'ec1673d2-3d31-4591-9bef-78ed6c265dc4');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '34c09f57-fdb7-45e2-bfb4-27638165f7a0');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'c29b5724-5991-45f0-bffb-69ff70db7d99');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'a91410e3-64fa-4271-b4b8-4fcb98757a3d');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '938ad12a-0f5f-463e-b71c-c2e27dfaead8');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '6b8a891d-7bb7-47b5-aede-2e7e70fae010');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '5721081f-8ca4-43f5-9036-c787d7fc024c');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '364098ca-bced-4466-b9d8-f76dc1e25ffc');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', 'e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '918321e7-30ce-4274-bb68-c557c7c44f56');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '8d5ecf64-ddc3-4bcf-8e1a-ccf0ada22d93');
+INSERT INTO public.stock VALUES (300, 0, 'ad4b4c33-8699-4961-b28d-c0bc40e97eb5', '05b56dd7-a85c-435f-8926-390f0d9f95ea');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '05b56dd7-a85c-435f-8926-390f0d9f95ea');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '8d5ecf64-ddc3-4bcf-8e1a-ccf0ada22d93');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '918321e7-30ce-4274-bb68-c557c7c44f56');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'e8b9b4a0-c8f4-4e9a-9b1a-2b3c4d5e6f7a');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '364098ca-bced-4466-b9d8-f76dc1e25ffc');
+INSERT INTO public.stock VALUES (500, 130, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'a91410e3-64fa-4271-b4b8-4fcb98757a3d');
+INSERT INTO public.stock VALUES (540, 200, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'c29b5724-5991-45f0-bffb-69ff70db7d99');
+INSERT INTO public.stock VALUES (370, 153, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '05b56dd7-a85c-435f-8926-390f0d9f95ea');
+INSERT INTO public.stock VALUES (600, 220, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '8d5ecf64-ddc3-4bcf-8e1a-ccf0ada22d93');
+INSERT INTO public.stock VALUES (600, 268, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d');
+INSERT INTO public.stock VALUES (700, 400, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '814e5967-5a70-467c-960e-f6ec708a3be3');
+INSERT INTO public.stock VALUES (450, 325, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d');
+INSERT INTO public.stock VALUES (452, 134, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '5721081f-8ca4-43f5-9036-c787d7fc024c');
+INSERT INTO public.stock VALUES (579, 354, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '10d8ee06-15c1-4f73-aa28-29551d7cbed9');
+INSERT INTO public.stock VALUES (674, 302, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'c39af9fe-4539-408c-8c41-be2d624301c2');
+INSERT INTO public.stock VALUES (731, 204, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '8fe938b4-a829-45ed-9712-27458d5b0321');
+INSERT INTO public.stock VALUES (503, 104, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'e86d8627-1abb-48b3-834d-0c47b8535a51');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'f3d1a2b3-e4f5-4a6b-8c9d-0e1f2a3b4c5d');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '5721081f-8ca4-43f5-9036-c787d7fc024c');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '6b8a891d-7bb7-47b5-aede-2e7e70fae010');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '938ad12a-0f5f-463e-b71c-c2e27dfaead8');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'a91410e3-64fa-4271-b4b8-4fcb98757a3d');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'c29b5724-5991-45f0-bffb-69ff70db7d99');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '34c09f57-fdb7-45e2-bfb4-27638165f7a0');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', 'ec1673d2-3d31-4591-9bef-78ed6c265dc4');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '814e5967-5a70-467c-960e-f6ec708a3be3');
+INSERT INTO public.stock VALUES (500, 0, '00463066-b672-49b6-b9e2-7032dd975c74', '10d8ee06-15c1-4f73-aa28-29551d7cbed9');
+INSERT INTO public.stock VALUES (400, 169, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '34c09f57-fdb7-45e2-bfb4-27638165f7a0');
+INSERT INTO public.stock VALUES (535, 133, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '6b8a891d-7bb7-47b5-aede-2e7e70fae010');
+INSERT INTO public.stock VALUES (932, 356, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '932b611f-f185-4287-86be-717f16510417');
+INSERT INTO public.stock VALUES (500, 100, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '938ad12a-0f5f-463e-b71c-c2e27dfaead8');
+INSERT INTO public.stock VALUES (800, 352, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '918321e7-30ce-4274-bb68-c557c7c44f56');
+INSERT INTO public.stock VALUES (965, 476, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'd2077879-7ec3-4783-a793-350ea44a3845');
+INSERT INTO public.stock VALUES (1000, 373, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '12f36cf6-d5ea-40aa-90bf-8d69d02eaa7f');
+INSERT INTO public.stock VALUES (979, 324, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '31b2b04a-b5c0-45b5-8546-c95049b54b26');
+INSERT INTO public.stock VALUES (1050, 359, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '3425c753-8978-476e-8ca7-71641565dd88');
+INSERT INTO public.stock VALUES (1390, 553, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '43e2cff0-4200-4702-b037-8faadad8b391');
+INSERT INTO public.stock VALUES (584, 231, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', '497fe185-21d3-4a05-8bb6-c9e99e87b922');
+INSERT INTO public.stock VALUES (395, 80, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'b5afd89b-049a-4b90-b34f-9cc38ef6a146');
+INSERT INTO public.stock VALUES (470, 90, 'c2f8c4e4-e7b3-4a1d-8a6c-0b1a2b3c4d5e', 'ab8c39df-18b5-4e5f-aeaa-c3fd881a7656');
+
+
+--
+-- TOC entry 3564 (class 0 OID 16430)
+-- Dependencies: 224
+-- Data for Name: utente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.utente VALUES ('1438fb78-94f9-4762-9e23-8e60e8b304aa', 'Admin', 'Admin', 'admin@soundsphere.it', '$2a$10$AZnayv5HAT1DNGlALfyVKuIrd8vnTEWjhqjA/bmT2LWgsK3yO096u', '1963-02-25', 'UTENTE', NULL, 'NON_SPECIFICATO', '2025-09-25', 0, '09412801-bcfa-4bfa-ad55-4aec880525dc');
+INSERT INTO public.utente VALUES ('e2bd0a46-f13e-4b23-8119-9755b1089e13', 'Riccardo', 'Segala', 'riccardosegala99@gmail.com', '$2a$10$yZX3GKVORGliOa3C0hy61eSb4Gv4yOe4iQjNkzi7DiTuQLkQAra8e', '1999-10-10', 'UTENTE', '', 'MASCHIO', '2025-08-14', 1166, 'ff7d695a-21a0-490f-82ec-74cbf872dbfc');
+INSERT INTO public.utente VALUES ('c945016e-fd15-480b-acc1-4ac71c8ffaec', 'Mario ', 'Rossi', 'mario.rossi@soundsphere.it', '$2a$10$QMBm.Lrw0wLAaKBtKX.tKOIj5hRRyBK6fi6RNFo0yEGEwO36vGNiC', '1978-02-25', 'DIPENDENTE', NULL, 'MASCHIO', '2025-09-25', NULL, NULL);
+INSERT INTO public.utente VALUES ('24d53fd4-1685-4c48-b856-aad58eb2eb2e', 'mario', 'rossi', 'mario.rossi@gmail.com', '$2a$10$homOHA84I4/7hy.sbd06deeIQd9PHYOWHwfauAqpcv/Rck9hKstA.', '1992-01-25', 'UTENTE', NULL, 'MASCHIO', '2025-09-25', 0, '09412801-bcfa-4bfa-ad55-4aec880525dc');
+
+
+--
+-- TOC entry 3577 (class 0 OID 16626)
+-- Dependencies: 237
+-- Data for Name: utente_ruolo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.utente_ruolo VALUES ('c945016e-fd15-480b-acc1-4ac71c8ffaec', '8a1c0d4f-5b7c-48b8-b4b3-9e9d6d5f47c5', '1b02b0a4-8461-4506-8b4e-9de1ce997e51', NULL);
+INSERT INTO public.utente_ruolo VALUES ('24d53fd4-1685-4c48-b856-aad58eb2eb2e', '1e99d7a2-1d54-46e3-8f0a-6e5a0f5d72f4', 'b1eea0ca-57a1-42cd-bc65-8a78439880ce', NULL);
+INSERT INTO public.utente_ruolo VALUES ('1438fb78-94f9-4762-9e23-8e60e8b304aa', 'a3f2b1a1-3d7e-4c8a-b5c9-1f2a3c4b5e6f', '487bbc9f-ce98-4e4a-9b5f-f5104bb83fda', NULL);
+INSERT INTO public.utente_ruolo VALUES ('e2bd0a46-f13e-4b23-8119-9755b1089e13', '9c2b1e5d-7a6e-4f7f-a2c6-0d1c7f4e9a8b', '828610c9-c0e9-47c9-b8be-3829493520f1', '2026-09-08');
+INSERT INTO public.utente_ruolo VALUES ('e2bd0a46-f13e-4b23-8119-9755b1089e13', 'a3f2b1a1-3d7e-4c8a-b5c9-1f2a3c4b5e6f', 'c99fe0ae-fa48-4280-a5ae-cdc7cb7e0ab5', NULL);
+
+
+--
+-- TOC entry 3565 (class 0 OID 16437)
+-- Dependencies: 225
+-- Data for Name: vantaggio; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.vantaggio VALUES ('09412801-bcfa-4bfa-ad55-4aec880525dc', 'Starter', 100, 0, 0);
+INSERT INTO public.vantaggio VALUES ('2456c58c-9322-4716-8b56-a7689ab96b74', 'Explorer', 200, 101, 5);
+INSERT INTO public.vantaggio VALUES ('063e07d6-8b00-43f5-a8a9-bb6714ab6ca5', 'Adventurer', 500, 201, 10);
+INSERT INTO public.vantaggio VALUES ('ab3d8f11-e985-464c-88b7-73dee949f15c', 'Pioneer', 1000, 501, 15);
+INSERT INTO public.vantaggio VALUES ('ff7d695a-21a0-490f-82ec-74cbf872dbfc', 'Expert', 2500, 1001, 20);
+INSERT INTO public.vantaggio VALUES ('5744c3c3-ba76-4ec8-a97d-72cfcf711a14', 'Master', 5000, 2501, 30);
+INSERT INTO public.vantaggio VALUES ('6fa060cc-9417-4101-9e4d-12ba8aefea0c', 'Guru', 7000, 5001, 40);
+INSERT INTO public.vantaggio VALUES ('ede8a1a4-32a0-4e6e-a31a-5304d25821c2', 'Legend', 2147483647, 7001, 50);
+
+
+--
+-- TOC entry 3336 (class 2606 OID 16389)
+-- Name: databasechangeloglock databasechangeloglock_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.databasechangeloglock
+    ADD CONSTRAINT databasechangeloglock_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3356 (class 2606 OID 16516)
+-- Name: carrello pk_carrello; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carrello
+    ADD CONSTRAINT pk_carrello PRIMARY KEY (id_utente, id_prodotto);
+
+
+--
+-- TOC entry 3382 (class 2606 OID 16671)
+-- Name: categoria pk_categoria; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categoria
+    ADD CONSTRAINT pk_categoria PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3362 (class 2606 OID 16558)
+-- Name: dati_statici pk_dati_statici; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dati_statici
+    ADD CONSTRAINT pk_dati_statici PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3354 (class 2606 OID 16490)
+-- Name: dettagli_noleggio pk_dettagli_noleggio; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dettagli_noleggio
+    ADD CONSTRAINT pk_dettagli_noleggio PRIMARY KEY (id_noleggio, id_prodotto);
+
+
+--
+-- TOC entry 3366 (class 2606 OID 16575)
+-- Name: dettagli_ordine pk_dettagli_ordine; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dettagli_ordine
+    ADD CONSTRAINT pk_dettagli_ordine PRIMARY KEY (id_ordine, id_prodotto);
+
+
+--
+-- TOC entry 3338 (class 2606 OID 16404)
+-- Name: dipendente pk_dipendente; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dipendente
+    ADD CONSTRAINT pk_dipendente PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3340 (class 2606 OID 16409)
+-- Name: filiale pk_filiale; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.filiale
+    ADD CONSTRAINT pk_filiale PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3358 (class 2606 OID 16533)
+-- Name: indirizzo_utente pk_indirizzo_utente; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.indirizzo_utente
+    ADD CONSTRAINT pk_indirizzo_utente PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3364 (class 2606 OID 16565)
+-- Name: metodo_pagamento pk_metodo_pagamento; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.metodo_pagamento
+    ADD CONSTRAINT pk_metodo_pagamento PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3352 (class 2606 OID 16483)
+-- Name: noleggio pk_noleggio; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.noleggio
+    ADD CONSTRAINT pk_noleggio PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3360 (class 2606 OID 16548)
+-- Name: ordine pk_ordine; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ordine
+    ADD CONSTRAINT pk_ordine PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3370 (class 2606 OID 16620)
+-- Name: permesso pk_permesso; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permesso
+    ADD CONSTRAINT pk_permesso PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3342 (class 2606 OID 16424)
+-- Name: prodotto pk_prodotto; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.prodotto
+    ADD CONSTRAINT pk_prodotto PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3386 (class 2606 OID 16676)
+-- Name: prodotto_categoria pk_prodotto_categoria; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.prodotto_categoria
+    ADD CONSTRAINT pk_prodotto_categoria PRIMARY KEY (categoria_id, prodotto_id);
+
+
+--
+-- TOC entry 3344 (class 2606 OID 16429)
+-- Name: recensione pk_recensione; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.recensione
+    ADD CONSTRAINT pk_recensione PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3374 (class 2606 OID 16625)
+-- Name: ruolo pk_ruolo; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ruolo
+    ADD CONSTRAINT pk_ruolo PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3380 (class 2606 OID 16635)
+-- Name: ruolo_permesso pk_ruolo_permesso; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ruolo_permesso
+    ADD CONSTRAINT pk_ruolo_permesso PRIMARY KEY (id_ruolo, id_permesso);
+
+
+--
+-- TOC entry 3368 (class 2606 OID 16580)
+-- Name: stock pk_stock; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stock
+    ADD CONSTRAINT pk_stock PRIMARY KEY (id_filiale, id_prodotto);
+
+
+--
+-- TOC entry 3346 (class 2606 OID 16436)
+-- Name: utente pk_utente; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente
+    ADD CONSTRAINT pk_utente PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3378 (class 2606 OID 16738)
+-- Name: utente_ruolo pk_utente_ruolo; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente_ruolo
+    ADD CONSTRAINT pk_utente_ruolo PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3350 (class 2606 OID 16441)
+-- Name: vantaggio pk_vantaggio; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vantaggio
+    ADD CONSTRAINT pk_vantaggio PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3384 (class 2606 OID 16678)
+-- Name: categoria uc_categoria_slug; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categoria
+    ADD CONSTRAINT uc_categoria_slug UNIQUE (slug);
+
+
+--
+-- TOC entry 3372 (class 2606 OID 16637)
+-- Name: permesso uc_permesso_nome; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permesso
+    ADD CONSTRAINT uc_permesso_nome UNIQUE (nome);
+
+
+--
+-- TOC entry 3376 (class 2606 OID 16639)
+-- Name: ruolo uc_ruolo_nome; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ruolo
+    ADD CONSTRAINT uc_ruolo_nome UNIQUE (nome);
+
+
+--
+-- TOC entry 3348 (class 2606 OID 16443)
+-- Name: utente uc_utente_email; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente
+    ADD CONSTRAINT uc_utente_email UNIQUE (email);
+
+
+--
+-- TOC entry 3396 (class 2606 OID 16517)
+-- Name: carrello fk_carrello_on_id_prodotto; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carrello
+    ADD CONSTRAINT fk_carrello_on_id_prodotto FOREIGN KEY (id_prodotto) REFERENCES public.prodotto(id);
+
+
+--
+-- TOC entry 3397 (class 2606 OID 16522)
+-- Name: carrello fk_carrello_on_id_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carrello
+    ADD CONSTRAINT fk_carrello_on_id_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id);
+
+
+--
+-- TOC entry 3410 (class 2606 OID 16679)
+-- Name: categoria fk_categoria_on_parent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categoria
+    ADD CONSTRAINT fk_categoria_on_parent FOREIGN KEY (parent_id) REFERENCES public.categoria(id);
+
+
+--
+-- TOC entry 3394 (class 2606 OID 16493)
+-- Name: dettagli_noleggio fk_dettagli_noleggio_on_id_noleggio; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dettagli_noleggio
+    ADD CONSTRAINT fk_dettagli_noleggio_on_id_noleggio FOREIGN KEY (id_noleggio) REFERENCES public.noleggio(id);
+
+
+--
+-- TOC entry 3395 (class 2606 OID 16503)
+-- Name: dettagli_noleggio fk_dettagli_noleggio_on_id_prodotto; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dettagli_noleggio
+    ADD CONSTRAINT fk_dettagli_noleggio_on_id_prodotto FOREIGN KEY (id_prodotto) REFERENCES public.prodotto(id);
+
+
+--
+-- TOC entry 3402 (class 2606 OID 16581)
+-- Name: dettagli_ordine fk_dettagli_ordine_on_id_ordine; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dettagli_ordine
+    ADD CONSTRAINT fk_dettagli_ordine_on_id_ordine FOREIGN KEY (id_ordine) REFERENCES public.ordine(id);
+
+
+--
+-- TOC entry 3403 (class 2606 OID 16586)
+-- Name: dettagli_ordine fk_dettagli_ordine_on_id_prodotto; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dettagli_ordine
+    ADD CONSTRAINT fk_dettagli_ordine_on_id_prodotto FOREIGN KEY (id_prodotto) REFERENCES public.prodotto(id);
+
+
+--
+-- TOC entry 3387 (class 2606 OID 16444)
+-- Name: dipendente fk_dipendente_on_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dipendente
+    ADD CONSTRAINT fk_dipendente_on_id FOREIGN KEY (id) REFERENCES public.utente(id);
+
+
+--
+-- TOC entry 3388 (class 2606 OID 16449)
+-- Name: dipendente fk_dipendente_on_id_filiale; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dipendente
+    ADD CONSTRAINT fk_dipendente_on_id_filiale FOREIGN KEY (id_filiale) REFERENCES public.filiale(id);
+
+
+--
+-- TOC entry 3398 (class 2606 OID 16549)
+-- Name: indirizzo_utente fk_indirizzo_utente_on_id_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.indirizzo_utente
+    ADD CONSTRAINT fk_indirizzo_utente_on_id_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id);
+
+
+--
+-- TOC entry 3401 (class 2606 OID 16566)
+-- Name: metodo_pagamento fk_metodo_pagamento_on_id_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.metodo_pagamento
+    ADD CONSTRAINT fk_metodo_pagamento_on_id_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id);
+
+
+--
+-- TOC entry 3392 (class 2606 OID 16739)
+-- Name: noleggio fk_noleggio_on_id_indirizzo_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.noleggio
+    ADD CONSTRAINT fk_noleggio_on_id_indirizzo_utente FOREIGN KEY (id_indirizzo_utente) REFERENCES public.indirizzo_utente(id);
+
+
+--
+-- TOC entry 3393 (class 2606 OID 16695)
+-- Name: noleggio fk_noleggio_on_id_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.noleggio
+    ADD CONSTRAINT fk_noleggio_on_id_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id);
+
+
+--
+-- TOC entry 3399 (class 2606 OID 16606)
+-- Name: ordine fk_ordine_on_id_indirizzo_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ordine
+    ADD CONSTRAINT fk_ordine_on_id_indirizzo_utente FOREIGN KEY (id_indirizzo_utente) REFERENCES public.indirizzo_utente(id);
+
+
+--
+-- TOC entry 3400 (class 2606 OID 16660)
+-- Name: ordine fk_ordine_on_id_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ordine
+    ADD CONSTRAINT fk_ordine_on_id_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id);
+
+
+--
+-- TOC entry 3411 (class 2606 OID 16684)
+-- Name: prodotto_categoria fk_procat_on_categoria; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.prodotto_categoria
+    ADD CONSTRAINT fk_procat_on_categoria FOREIGN KEY (categoria_id) REFERENCES public.categoria(id);
+
+
+--
+-- TOC entry 3412 (class 2606 OID 16689)
+-- Name: prodotto_categoria fk_procat_on_prodotto; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.prodotto_categoria
+    ADD CONSTRAINT fk_procat_on_prodotto FOREIGN KEY (prodotto_id) REFERENCES public.prodotto(id);
+
+
+--
+-- TOC entry 3389 (class 2606 OID 16459)
+-- Name: recensione fk_recensione_on_id_prodotto; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.recensione
+    ADD CONSTRAINT fk_recensione_on_id_prodotto FOREIGN KEY (id_prodotto) REFERENCES public.prodotto(id);
+
+
+--
+-- TOC entry 3390 (class 2606 OID 16464)
+-- Name: recensione fk_recensione_on_id_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.recensione
+    ADD CONSTRAINT fk_recensione_on_id_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id);
+
+
+--
+-- TOC entry 3408 (class 2606 OID 16655)
+-- Name: ruolo_permesso fk_ruper_on_permesso; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ruolo_permesso
+    ADD CONSTRAINT fk_ruper_on_permesso FOREIGN KEY (id_permesso) REFERENCES public.permesso(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3409 (class 2606 OID 16650)
+-- Name: ruolo_permesso fk_ruper_on_ruolo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ruolo_permesso
+    ADD CONSTRAINT fk_ruper_on_ruolo FOREIGN KEY (id_ruolo) REFERENCES public.ruolo(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3404 (class 2606 OID 16611)
+-- Name: stock fk_stock_on_id_filiale; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stock
+    ADD CONSTRAINT fk_stock_on_id_filiale FOREIGN KEY (id_filiale) REFERENCES public.filiale(id);
+
+
+--
+-- TOC entry 3405 (class 2606 OID 16601)
+-- Name: stock fk_stock_on_id_prodotto; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stock
+    ADD CONSTRAINT fk_stock_on_id_prodotto FOREIGN KEY (id_prodotto) REFERENCES public.prodotto(id);
+
+
+--
+-- TOC entry 3391 (class 2606 OID 16474)
+-- Name: utente fk_utente_on_id_vantaggio; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente
+    ADD CONSTRAINT fk_utente_on_id_vantaggio FOREIGN KEY (id_vantaggio) REFERENCES public.vantaggio(id);
+
+
+--
+-- TOC entry 3406 (class 2606 OID 16645)
+-- Name: utente_ruolo fk_utru_on_ruolo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente_ruolo
+    ADD CONSTRAINT fk_utru_on_ruolo FOREIGN KEY (id_ruolo) REFERENCES public.ruolo(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3407 (class 2606 OID 16640)
+-- Name: utente_ruolo fk_utru_on_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente_ruolo
+    ADD CONSTRAINT fk_utru_on_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id) ON DELETE CASCADE;
+
+
+-- Completed on 2025-09-26 19:29:12
+
+--
+-- PostgreSQL database dump complete
+--
+
