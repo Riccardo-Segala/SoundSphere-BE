@@ -6,3 +6,6 @@ https://miro.com/app/board/uXjVIUL9UI4=/
 
 DokerFile:
 I dockerfile sono integrati con il progetto sia a frontend che a beckend
+
+Video:
+Per scaricare il video andare su GitHub e cliccare sopra il video (VideoSoundSphere.mov) e poi cliccare View Raw.
